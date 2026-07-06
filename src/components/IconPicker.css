@@ -1,0 +1,28 @@
+.icon-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  place-items: center;
+  margin: 15px 0 30px 0;
+}
+
+.icon-picker-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background-color: var(--icon-picker-bgk);
+  border: 1px solid var(--icon-picker-border);
+}
+
+.icon-picker-button.selected {
+  border: 3px solid white;
+  box-shadow: 0 0 0 2px gray;
+}
+
+.icon-picker-font {
+  font-size: 24px;
+  color: var(--icon-picker-font);
+}

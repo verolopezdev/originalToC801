@@ -1,0 +1,99 @@
+.expense-item {
+    display: grid;
+    grid-template-columns: 1fr auto; /* Left and right adjust to content, center takes remaining space */
+    gap: 16px; /* Optional: Adjust spacing between columns */
+    align-items: center; /* Vertically align items */
+    padding: 14px;
+    border: 1px solid var(--ion-item-border);
+    background-color: var(--ion-item-background); /* Optional: Background color */
+    border-radius: 10px; /* Optional: Rounded corners */
+    margin-bottom: 16px;
+    color: var(--ion-text-color);
+  }
+  
+  .expense-item.active {
+    border: 1px solid var(--ion-color-primary);
+  }
+  
+  /* Styling for individual columns */
+  .expense-item .center-col {
+    display: flex;
+    flex-direction: column; /* Align items vertically */
+    justify-content: center; /* Align content in the center (vertically) */
+  }
+
+  .expense-item .right-col {
+    display: flex;
+    justify-content: center;
+  }
+
+  .expense-item .inner-right-col {
+    display: flex;
+  }
+
+  .expense-item .icon-btn {
+    font-size: 18px;
+    background-color: var(--ion-color-primary);
+    padding: 10px;
+    border-radius: 8px;
+  }
+  
+  .expense-item .icon-btn-danger {  
+    background-color: var(--ion-color-danger);
+  }
+  
+  .expense-item .icon-btn-success {  
+    background-color: var(--ion-color-success);
+  }
+  
+
+  .expense-item .center-col {
+    text-align: left; /* Align text to the left */
+    color: var(--ion-text-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: var(--ion-text-color);
+    min-width: 0; /* <- important to allow shrinkage in flex */
+  }
+  
+  .expense-item .original-due-date {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin: 0 0 5px 0;
+  }
+
+  .expense-payment-status {
+    display: flex;
+    font-size: 0.8rem;
+  }
+  
+  .right-col {
+    text-align: right; /* Align text to the right */
+  }
+  
+  .expense-item-amount {
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+  }
+  
+  .installment-label {
+    padding-left: 5px;
+    font-style: italic;
+    color: var(--ion-color-note);
+  }
+  
+  .card-label {
+    font-style: italic;
+    color: var(--ion-color-note);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    flex-shrink: 1;
+  }
+  
+  .projected {
+    font-style: italic;
+  }

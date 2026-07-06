@@ -1,0 +1,97 @@
+
+/* Used to show category icon in transaction item */
+.category-container-wrapper {
+  position: relative; /* Ensures absolute positioning works */
+}
+
+.category {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 55px;
+  height: 55px;
+  border-radius: 10px;
+  border: 1px solid var(--icon-picker-border);
+  font-size: 24px;  
+  color: var(--category-icon);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+.transaction-category {
+  width: 45px;
+  height: 45px;
+  font-size: 20px;  
+}
+
+.reports-category {
+  width: 40px;
+  height: 40px;
+  font-size: 18px; 
+}
+
+
+.category-name {
+  width: 100%;
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 14px;
+  text-align: center;
+  color: var(--ion-text-color);
+  word-break: break-word; /* Ensures long words break */
+}
+
+.disabled-category {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.favorite-icon {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-size: 16px; /* Adjust size */
+  color: var(--ion-text-color); /* Favorite color */
+  background: var(--ion-background-color); /* Optional: for contrast */
+  border-radius: 50%; /* Make it circular */
+  padding: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional: shadow effect */
+}
+
+.travel-icon {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 14px; /* Adjust size */
+  color: var(--ion-text-color); /* Favorite color */
+  background: var(--ion-item-background); /* Optional: for contrast */  
+  border-radius: 50%; /* Make it circular */
+  padding: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional: shadow effect */
+}
+
+.recursive-mode {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  font-size: 11px;
+  line-height: 20px;
+  font-weight: bold;
+  color: white;
+  background-color: green;
+  border-radius: 50%;
+  top: -7px;
+  right: -7px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.6); /* adjust as needed */
+}
+
+.recursive-mode.auto {
+  background-color: var(--blue);
+}
+
+.recursive-mode.manual {
+  background-color: var(--red);
+}

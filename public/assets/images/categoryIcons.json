@@ -1,0 +1,18 @@
+{
+  "animals": [ "faPaw", "faFish", "faHorse", "faDove", "faDog","faCat", "faBone"],
+  "buildings": ["faHouse", "faCity", "faLandmark", "faBuilding", "faStore", "faHotel", "faPlaceOfWorship", "faHospital", "faWarehouse"],
+  "business": ["faCreditCard", "faMoneyBill","faLaptop", "faMicrochip", "faCalculator", "faMobileRetro"],
+  "education": [ "faBook", "faPen","faSchool", "faGraduationCap", "faChalkboardUser", "faBookBookmark"],
+  "food": [ "faMugSaucer", "faMugHot", "faLemon", "faWineBottle", "faPizzaSlice", "faPepperHot", "faMartiniGlassCitrus", "faIceCream", "faHotdog", "faCarrot", "faCakeCandles",  "faBurger", "faBowlRice", "faBowlFood", "faAppleWhole"],
+  "health": ["faSuitcaseMedical","faStethoscope","faGlasses", "faSmoking", "faHeartPulse", "faBandage", "faTooth"],
+  "hobbies": ["faFilm", "faMusic","faCameraRetro","faHeadphones","faTicket", "faPalette", "faGamepad", "faDice", "faPaintbrush", "faMasksTheater", "faChessKnight"],
+  "household": [ "faLightbulb", "faPhone", "faUtensils", "faKey", "faWifi", "faPaintRoller", "faBrush", "faWrench", "faHammer", "faWineGlassEmpty", "faScrewdriverWrench", "faScaleBalanced", "faSatelliteDish", "faFireBurner", "faFaucetDrip", "faDisplay", "faComputer", "faCouch"],
+  "nature": [ "faCloud", "faStar", "faBolt", "faDroplet", "faFire", "faTree", "faSnowflake", "faSun", "faMountainSun", "faWater", "faMoon", "faLeaf", "faSeedling", "faSnowman", "faMountainCity", "faClover", "faCaravan", "faCampground"],
+  "miscellaneous": ["faGlobe", "faHeart", "faFaceSmile","faHandHoldingHeart","faRobot"],
+  "people": ["faBaby", "faBabyCarriage"],
+  "personalCare": [ "faScissors", "faSpa"],
+  "shopping": ["faCartShopping", "faBagShopping", "faGift", "faShirt","faCartPlus", "faTags", "faCrown", "faGifts", "faGem", "faBasketShopping"],
+  "sports": [ "faDumbbell", "faBicycle", "faTrophy", "faWaterLadder", "faVolleyball", "faPersonSwimming", "faPersonSkiing", "faPersonHiking", "faPersonBiking",  "faGolfBallTee", "faFutbol", "faFootball", "faBasketball",  "faBaseballBatBall", "faBaseball"],
+  "travel": [ "faPlane","faCompass","faEarthAmericas", "faAnchor", "faCableCar","faShip", "faUmbrellaBeach", "faPlaneDeparture", "faSuitcaseRolling","faSailboat", "faFerry"],
+  "vehicles": ["faCar", "faTruck","faGauge", "faCarSide", "faTruckFront","faFlagCheckered","faRocket", "faMotorcycle", "faTrain", "faTruckMonster", "faVanShuttle", "faTaxi", "faOilCan", "faHelicopter", "faGasPump", "faChargingStation","faBus"]
+}

@@ -1,0 +1,43 @@
+.backup-img {
+  width: 210px;
+  margin-bottom: 16px;
+}
+
+.restore-item {
+  display: grid;
+  grid-template-columns: 1fr auto; /* Right adjusts to content, left takes remaining space */
+  gap: 10px; /* Optional: Adjust spacing between columns */
+  align-items: center; /* Vertically align items */
+  margin-bottom: 15px;
+}
+
+.restore-item:first-child {
+  padding: 0;
+}
+
+.backup-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.backup-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.restoring-icon {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,46 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/dist
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+/.nx
+/.nx/cache
+/.vscode/*
+!/.vscode/extensions.json
+.idea
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Optional eslint cache
+.eslintcache
+
+# --- Capacitor & Mobile Specific ---
+# Ignore the temporary web assets copy folder that Capacitor syncs
+/www/
+/public/build/
+
+# Ignore Capacitor's auto-generated config lock file
+caps-lock.json
+
+# If you end up adding Android/iOS native platforms later, 
+# you'll want to ignore local SDK and IDE user configurations:
+.gradle/
+local.properties
+/.bundle/
+vendor/bundle/

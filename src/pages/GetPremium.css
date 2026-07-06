@@ -1,0 +1,34 @@
+.premium-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.premium-icon {
+  font-size: 5em;
+  color: var(--ion-color-primary);
+}
+
+.premium-list {
+  margin-left: 0; /* Removes the left margin */
+  padding-left: 0; /* Removes padding to align with the left edge */
+  list-style: none; /* Optionally remove the bullet points */
+}
+
+.premium-list li {
+  display: flex; /* Ensures the icon and label align nicely */
+  align-items: center; /* Vertically aligns the icon and label */
+  gap: 8px; /* Space between the icon and label */
+  padding: 5px 0;
+  font-size: 1.1em;
+}
+
+.premium-list ion-icon {
+  color: var(--ion-color-primary);
+}
+
+.premium-list ion-label {
+  white-space: nowrap; /* Prevent text from wrapping */
+}

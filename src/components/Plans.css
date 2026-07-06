@@ -1,0 +1,52 @@
+.plan-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* Left and right adjust to content, center takes remaining space */
+  gap: 16px; /* Optional: Adjust spacing between columns */
+  align-items: center; /* Vertically align items */
+  padding: 10px;
+  border: 1px solid var(--ion-item-border);
+  background-color: var(--ion-item-background); /* Optional: Background color */
+  border-radius: 8px; /* Optional: Rounded corners */
+  margin-bottom: 16px;
+}
+
+/* Styling for individual columns */
+.left-col,
+.center-col,
+.right-col {
+  display: flex;
+  flex-direction: column; /* Align items vertically */
+  justify-content: center; /* Align content in the center (vertically) */
+}
+
+.left-col {
+  font-size: 1.8em;
+}
+
+.center-col {
+  text-align: left; /* Align text to the left */
+}
+
+.right-col {
+  text-align: right; /* Align text to the right */
+}
+
+.plan-item ion-icon {
+  color: var(--ion-color-note);
+}
+
+.selected-plan {
+  border: 1px solid var(--ion-color-primary);
+}
+
+.selected-plan .left-col > ion-icon {
+  color: var(--ion-color-primary);
+}
+
+/* .selected-plan .right-col ion-chip {
+  color: var(--ion-text-color);
+} */
+
+/* .selected-plan .right-col ion-chip ion-icon {
+  color: var(--ion-text-color);
+} */

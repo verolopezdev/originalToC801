@@ -1,0 +1,49 @@
+
+.small-select-popover ion-item {
+  --min-height: 32px;
+  --padding-top: 4px;
+  --padding-bottom: 4px;
+}
+
+.no-chart-available {
+  height: 50px; /* keeps the space */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ion-color-medium);
+  text-align: center;
+}
+
+.period-month-label {
+  margin-left: 10px;
+}
+
+.caret-icon {
+  font-size: 14px;
+  color: var(--ion-color-step-600, #666);
+  transition: transform 0.2s ease;
+  margin-right: 0;
+}
+
+.picker-section-title {
+  margin: 30px 10px 10px 14px;
+}
+
+.year-picker-grid, .month-picker-grid {
+  --ion-grid-column-padding: 8px;
+  text-align: center;
+}
+
+.year-item, .month-item {
+  padding: 10px 0;
+  border-radius: 10px;
+  background: var(--ion-color-light);
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s;
+}
+
+.year-item.selected, .month-item.selected {
+  background: var(--ion-color-primary);
+  color: white;
+}
+

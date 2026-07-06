@@ -1,0 +1,228 @@
+ion-menu ion-content {
+  --background: var(--ion-item-background, var(--ion-background-color, #fff));
+}
+
+ion-menu.md ion-content {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+  /* --background: lightcoral; */
+}
+
+ion-menu.md ion-list {
+  padding: 20px 0;
+  border: none;
+}
+
+ion-menu.md ion-note {
+  margin-bottom: 20px;
+}
+
+ion-menu.md ion-list-header, ion-menu.md ion-note {
+  padding-left: 10px;
+}
+
+ion-menu.md ion-list#inbox-list ion-list-header {
+  font-size: 22px;
+  font-weight: 600;
+  min-height: 20px;
+}
+
+ion-menu.md ion-list#labels-list ion-list-header {
+  font-size: 16px;
+  margin-bottom: 18px;
+  color: #757575;
+  min-height: 26px;
+}
+
+ion-menu.md ion-item {
+  --padding-start: 10px;
+  --padding-end: 10px;
+  border-radius: 4px;
+}
+
+ion-menu.md ion-item.selected {
+  --background: rgba(var(--ion-color-primary-rgb), 0.14);
+}
+
+ion-menu.md ion-item.selected ion-icon {
+  color: var(--ion-color-primary);
+}
+
+ion-menu.md ion-item ion-icon {
+  color: #616e7e;
+}
+
+ion-menu.md ion-item ion-label {
+  font-weight: 500;
+}
+
+ion-menu.ios ion-content {
+  --padding-bottom: 20px;
+}
+
+ion-menu.ios ion-list {
+  padding: 20px 0 0 0;
+  border: none;
+}
+
+ion-menu.ios ion-note {
+  line-height: 24px;
+  margin-bottom: 20px;
+}
+
+ion-menu.ios ion-item {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --min-height: 50px;
+}
+
+ion-menu.ios ion-item ion-icon {
+  font-size: 24px;
+  color: #73849a;
+}
+
+ion-menu.ios ion-item .selected ion-icon {
+  color: var(--ion-color-primary);
+}
+
+ion-menu.ios ion-list#labels-list ion-list-header {
+  margin-bottom: 8px;
+}
+
+ion-menu.ios ion-list-header,
+ion-menu.ios ion-note {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+ion-menu.ios ion-note {
+  margin-bottom: 8px;
+}
+
+ion-note {
+  display: inline-block;
+  font-size: 16px;
+  line-height: 16px;
+  color: var(--ion-color-medium-shade);
+}
+
+ion-item.selected {
+  --color: var(--ion-color-primary);
+} 
+
+
+
+ion-searchbar.menu-search-bar {
+  --background: var(--ion-item-background);
+  --color: var(--ion-text-color);  
+  --placeholder-color: var(--ion-text-color);
+  --icon-color: var(--ion-text-color);
+  --clear-button-color: var(--ion-text-color);
+  --border-radius: 8px;
+  --border-width: 1px;
+  --border-color: gray;
+  --box-shadow: 0;
+  padding: 0;
+}
+
+ion-searchbar {
+  --border-radius: 8px; /* Apply border-radius globally */
+  --border-width: 1px; /* Set border width */
+  --border-color: gray; /* Set border color */
+}
+
+ion-searchbar .searchbar-input {
+  border-radius: 8px; /* Ensure the input field itself has rounded corners */
+  border: 1px solid gray !important; /* Apply border color to the input */
+}
+
+ion-searchbar .searchbar-clear {
+  border-radius: 50%; /* Ensure the clear button is rounded */
+}
+
+
+ion-menu .menu-list {
+  margin: 0;
+  padding: 0 !important;
+}
+
+ion-menu.md ion-item.top-bottom-item {
+  --padding-start: 0px;
+  --padding-end: 0px;
+  --inner-padding-end: 0;
+}
+
+
+.app-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
+}
+
+.profile-bar {
+  display: flex;
+  align-items: center;
+}
+
+.profile-bar .avatar-container {
+  width: 60px;
+  height: 50px;
+}
+
+.profile-bar .profile-avatar  {     
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: var( --ion-avatar-background);
+  border: 2px solid var(--ion-avatar-inner-border);
+  box-shadow: 0 0 0 1px var(--ion-avatar-outer-border); /* Gray border around the white border */
+  background-color: var( --ion-avatar-background);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.3em;
+  font-weight: 300;
+}
+
+.profile-bar .menu-avatar-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid var(--ion-avatar-inner-border);
+  box-shadow: 0 0 0 1px var(--ion-avatar-outer-border); /* Gray border around the white border */
+  object-fit: cover;
+}
+
+.profile-data {
+  flex: 1; /* Takes up the remaining space */
+  white-space: nowrap; /* Prevents text from wrapping */
+  overflow: hidden; /* Hides overflow */
+  text-overflow: ellipsis; /* Shows ellipsis when text is too long */
+}
+
+.profile-data p {
+  font-size: 1.1em;
+}
+
+.profile-data span {
+  font-style: italic;
+  color: var(--ion-color-note);
+}
+
+ion-icon.item-detail-icon  {
+  --background: green;
+}
+
+.chart-category-menu-toolbar {
+  --background: var(--ion-item-background);
+}

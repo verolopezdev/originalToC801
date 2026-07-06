@@ -1,0 +1,30 @@
+.expense-slider {
+  margin-left: -16px; /* Negative margin cancels out the padding */
+  margin-right: -16px;
+  width: calc(100% + 32px); /* Ensures full width after removing padding */
+  height: 170px;
+  margin-bottom: 20px;
+}
+
+.swiper {
+  overflow: visible !important;
+}
+
+.swiper-wrapper {
+  height: 170px;
+}
+
+.swiper-pagination {
+  bottom: -3px !important; /* Move dots 10px lower */
+  z-index: -1 !important; /* Lower than dropdown */
+}
+
+.swiper-pagination-bullet {
+  background-color: #999; /* Default dot color */
+  opacity: 0.5;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: var(--ion-color-primary); /* Active dot color */
+  opacity: 1;
+}

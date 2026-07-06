@@ -1,0 +1,100 @@
+.profile-container {
+  position: relative;
+  display: inline-block; /* Ensures the container size matches the image */
+  width: 150px;
+}
+
+.profile-container img {
+  display: block; /* Prevents inline spacing issues */
+  width: 100%; /* Ensures the image fills the container */
+}
+
+.icon-lower-right {
+  position: absolute;
+  bottom: 5px; /* Adjust distance from the bottom of the image */
+  right: 5px;  /* Adjust distance from the right of the image */
+  font-size: 25px; /* Adjust the size of the icon */
+  background-color: var(--ion-color-primary);
+  color: var(--button-text-color, white);
+  padding: 5px;
+  border: 1px solid var(--ion-text-color-step-450); /* Fine border */
+  border-radius: 50%;
+  display: flex; /* Align icon centrally in the circular background */
+  align-items: center;
+  justify-content: center;
+}
+
+.centered-modal {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+}
+
+.avatar-profile {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 2px solid var(--ion-avatar-inner-border);
+  box-shadow: 0 0 0 2px var(--ion-avatar-outer-border); /* Gray border around the white border */
+  background-color: var( --ion-avatar-background);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 4em;
+  font-weight: 200;
+}
+
+.avatar-profile-image {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 2px solid var(--ion-avatar-inner-border);
+  box-shadow: 0 0 0 1px var(--ion-avatar-outer-border); /* Gray border around the white border */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  object-fit: cover; /* Maintains aspect ratio and fills the container */
+}
+
+.crop-buttons {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+}
+
+.modal-list {
+  margin-top: 10px;
+  padding: 20px;
+}
+
+.modal-title {
+  display: flex;
+  justify-content: center;
+  font-size: 1.3em;
+}
+
+.modal-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--ion-color-primary);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.modal-icon ion-icon {
+  font-size: 1.5em;
+  color: white;
+  text-align: center;
+}

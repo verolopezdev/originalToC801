@@ -1,0 +1,45 @@
+.country-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /* horizontally */
+  height: 100vh;             /* full screen height */
+  padding: 30px;
+}
+
+.big-logo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 2px solid var(--ion-avatar-inner-border);
+  box-shadow: 0 0 0 1px var(--ion-avatar-outer-border); /* Gray border around the white border */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  object-fit: cover; /* Maintains aspect ratio and fills the container */
+}
+
+h1.app-name {
+  font-size: 2em;
+  line-height: 40px;
+  margin-bottom: 0;
+}
+
+h4.app-type {
+  margin-top: 5px;
+  font-style: italic;
+}
+
+.big-header {
+  font-size: 2.5em;
+  font-weight: 600;
+  width: 250px;
+  margin-top: 48px;
+}
+
+.country-header-prompt {
+  line-height: 30px;
+}
+
+.country-select {
+  margin: 36px 0 18px 0;
+}

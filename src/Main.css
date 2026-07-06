@@ -1,0 +1,1536 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+@font-face {
+  font-family: 'FontAwesome';
+  src: url('/fontawesome/webfonts/fa-solid-900.woff2') format('woff2'),
+       url('/fontawesome/webfonts/fa-solid-900.woff') format('woff');
+  font-weight: 900;
+  font-style: normal;
+}
+
+:root {
+  --red: #B4160B; 
+  --redOrange: #E74017;
+  --orange: #FF6A00;
+  --yellowOrange: #FFA500;
+  --yellow: #ffc600;
+  --yellowGreen: #7BAF26;
+  --green: #008800;
+  --cyan: #008B8B;
+  --skyBlue: #4682B4;
+  --blue: #00509d;
+  --indigo: #6a5acd;
+  --violet: #6c3baa;
+  --magenta: #a04b90;
+  --pink: #D81B60;
+  --crimson: #e70e02;
+  --baseGray: #E9ECEF;
+  --mistGray: #C6C9CE;
+  --medGray: #8C939C;
+  --slateGray: #444B53;
+  --darkGray: #2E353D;
+  --neutral: var(--app-step-450);
+  --ultraDarkGray: #171B1F;
+  --categoryless: #007BA7;
+}
+
+/* -- TESTING -- */
+.reset-btn {
+  --background: var(--ion-color-danger);
+}
+
+.testing {
+  background-color: var(--ion-color-danger);
+  padding: 2px 15px;
+  border-radius: 8px;
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 1.1em;
+}
+
+.purple-bg {
+  background-color: purple !important;
+}
+
+.green-bg {
+  background-color: green !important;
+}
+
+.dark-blue-bg {
+  background-color: darkblue !important;
+}
+
+
+
+
+/* -- Color -- */
+.danger {
+  color: var(--ion-color-danger);
+}
+
+.success {
+  color: var(--ion-color-success);
+}
+
+.primary {
+  color: var(--ion-color-primary);
+}
+
+
+/* -- Solid Background colors -- */
+.red-sbg {
+  background: var(--red) !important;
+}
+
+.redOrange-sbg {
+  background: var(--redOrange) !important;
+}
+
+.orange-sbg {
+  background: var(--orange) !important;
+}
+
+.yellowOrange-sbg {
+  background: var(--yellowOrange) !important;
+}
+
+.yellow-sbg {
+  background: var(--yellow) !important;
+}
+
+.yellowGreen-sbg {
+  background: var(--yellowGreen) !important;
+}
+
+.green-sbg {
+  background: var(--green) !important;
+}
+
+.cyan-sbg {
+  background: var(--cyan) !important;
+}
+
+.skyBlue-sbg {
+  background: var(--skyBlue) !important;
+}
+
+.blue-sbg {
+  background: var(--blue) !important;
+}
+
+.indigo-sbg {
+  background: var(--indigo) !important;
+}
+
+.violet-sbg {
+  background: var(--violet) !important;
+}
+
+.magenta-sbg {
+  background: var(--magenta) !important;
+}
+
+.pink-sbg {
+  background: var(--pink) !important;
+}
+
+.crimson-sbg {
+  background: var(--crimson) !important;
+}
+
+.slateGray-sbg {
+  background: var(--slateGray) !important;
+}
+
+.categoryless-sbg {
+  background: var(--categoryless) !important;
+}
+
+.danger-sbg {
+  background: var(--ion-color-danger) !important;
+}
+
+.success-sbg {
+  background: var(--ion-color-success) !important;
+}
+
+.primary-sbg {
+  background: var(--ion-color-primary) !important;
+}
+
+.neutral-sbg {
+  background: var(--app-step-450) !important;
+}
+
+
+
+
+/* -- Background colors -- */
+.red-bg {
+  background: linear-gradient(
+    to top,
+    var(--red),
+    color-mix(in srgb, var(--red) 70%, white)
+  ) !important;
+}
+
+.redOrange-bg {
+  background: linear-gradient(
+    to top,
+    var(--redOrange),
+    color-mix(in srgb, var(--redOrange) 65%, white)
+  ) !important;
+}
+
+.orange-bg {
+  background: linear-gradient(
+    to top,
+    var(--orange),
+    color-mix(in srgb, var(--orange) 65%, white)
+  ) !important;
+}
+
+.yellowOrange-bg {
+  background: linear-gradient(
+    to top,
+    var(--yellowOrange),
+    color-mix(in srgb, var(--yellowOrange) 65%, white)
+  ) !important;
+}
+
+.yellow-bg {
+  background: linear-gradient(
+    to top,
+    var(--yellow),
+    color-mix(in srgb, var(--yellow) 65%, white)
+  ) !important;
+}
+
+.yellowGreen-bg {
+  background: linear-gradient(
+    to top,
+    var(--yellowGreen),
+    color-mix(in srgb, var(--yellowGreen) 65%, white)
+  ) !important;
+}
+
+.green-bg {
+  background: linear-gradient(
+    to top,
+    var(--green),
+    color-mix(in srgb, var(--green) 65%, white)
+  ) !important;
+}
+
+.cyan-bg {
+  background: linear-gradient(
+    to top,
+    var(--cyan),
+    color-mix(in srgb, var(--cyan) 65%, white)
+  ) !important;
+}
+
+.skyBlue-bg {
+  background: linear-gradient(
+    to top,
+    var(--skyBlue),
+    color-mix(in srgb, var(--skyBlue) 65%, white)
+  ) !important;
+}
+
+.blue-bg {
+  background: linear-gradient(
+    to top,
+    var(--blue),
+    color-mix(in srgb, var(--blue) 65%, white)
+  ) !important;
+}
+
+.indigo-bg {
+  background: linear-gradient(
+    to top,
+    var(--indigo),
+    color-mix(in srgb, var(--indigo) 65%, white)
+  ) !important;
+}
+
+.violet-bg {
+  background: linear-gradient(
+    to top,
+    var(--violet),
+    color-mix(in srgb, var(--violet) 65%, white)
+  ) !important;
+}
+
+.magenta-bg {
+  background: linear-gradient(
+    to top,
+    var(--magenta),
+    color-mix(in srgb, var(--magenta) 65%, white)
+  ) !important;
+}
+
+.pink-bg {
+  background: linear-gradient(
+    to top,
+    var(--pink),
+    color-mix(in srgb, var(--pink) 65%, white)
+  ) !important;
+}
+
+.crimson-bg {
+  background: linear-gradient(
+    to top,
+    var(--crimson),
+    color-mix(in srgb, var(--crimson) 65%, white)
+  ) !important;
+}
+
+.slateGray-bg {
+  background: linear-gradient(
+    to top,
+    var(--slateGray),
+    color-mix(in srgb, var(--slateGray) 65%, white)
+  ) !important;
+}
+
+.categoryless-bg {
+  background: linear-gradient(
+    to top,
+    var(--categoryless),
+    color-mix(in srgb, var(--categoryless) 65%, white)
+  ) !important;
+}
+
+.danger-bg {
+  background: linear-gradient(
+    to top,
+    var(--ion-color-danger),
+    color-mix(in srgb, var(--ion-color-danger) 65%, white)
+  ) !important;
+}
+
+.success-bg {
+  background-color: var(--ion-color-success);
+  background: linear-gradient(
+    to top,
+    var(--ion-color-success),
+    color-mix(in srgb, var(--ion-color-success) 65%, white)
+  ) !important;
+}
+
+.primary-bg {
+  background: linear-gradient(
+    to top,
+    var(--ion-color-primary),
+    color-mix(in srgb, var(--ion-color-primary) 65%, white)
+  ) !important;
+}
+
+.neutral-bg {
+  background-color: var(--app-step-450);
+  background: linear-gradient(
+    to top,
+    var(--app-step-450),
+    color-mix(in srgb, var(--app-step-450) 65%, white)
+  ) !important;
+}
+
+
+
+/* -- Gradients -- */
+.red {
+  background: linear-gradient(135deg, var(--red), color-mix(in srgb, var(--red) 40%, var(--ion-gradient-card) 60%));
+}
+
+.redOrange {
+  background: linear-gradient(135deg, var(--redOrange), color-mix(in srgb, var(--redOrange) 40%, var(--ion-gradient-card) 60%));
+}
+
+.orange {
+  background: linear-gradient(135deg, var(--orange), color-mix(in srgb, var(--orange) 40%, var(--ion-gradient-card) 60%));
+}
+
+.yellowOrange {
+  background: linear-gradient(135deg, var(--yellowOrange), color-mix(in srgb, var(--yellowOrange) 40%, var(--ion-gradient-card) 60%));
+}
+
+.yellow {
+  background: linear-gradient(135deg, var(--yellow), color-mix(in srgb, var(--yellow) 40%, var(--ion-gradient-card) 60%));
+}
+
+.yellowGreen {
+  background: linear-gradient(135deg, var(--yellowGreen), color-mix(in srgb, var(--yellowGreen) 40%, var(--ion-gradient-card) 60%));
+}
+
+.green {
+  background: linear-gradient(135deg, var(--green), color-mix(in srgb, var(--green) 40%, var(--ion-gradient-card) 60%));
+}
+
+.cyan {
+  background: linear-gradient(135deg, var(--cyan), color-mix(in srgb, var(--cyan) 40%, var(--ion-gradient-card) 60%));
+}
+
+.skyBlue {
+  background: linear-gradient(135deg, var(--skyBlue), color-mix(in srgb, var(--skyBlue) 40%, var(--ion-gradient-card) 60%));
+}
+
+.blue {
+  background: linear-gradient(135deg, var(--blue), color-mix(in srgb, var(--blue) 40%, var(--ion-gradient-card) 60%));
+}
+
+.indigo {
+  background: linear-gradient(135deg, var(--indigo), color-mix(in srgb, var(--indigo) 40%, var(--ion-gradient-card) 60%));
+}
+
+.violet {
+  background: linear-gradient(135deg, var(--violet), color-mix(in srgb, var(--violet) 40%, var(--ion-gradient-card) 60%));
+}
+
+.magenta {
+  background: linear-gradient(135deg, var(--magenta), color-mix(in srgb, var(--magenta) 40%, var(--ion-gradient-card) 60%));
+}
+
+.pink {
+  background: linear-gradient(135deg, var(--pink), color-mix(in srgb, var(--pink) 40%, var(--ion-gradient-card) 60%));
+}
+
+.crimson {
+  background: linear-gradient(135deg, var(--crimson), color-mix(in srgb, var(--crimson) 40%, var(--ion-gradient-card) 60%));
+}
+
+.slateGray {
+  background: linear-gradient(135deg, var(--slateGray), color-mix(in srgb, var(--slateGray) 40%, var(--ion-gradient-card) 60%));
+}
+
+
+/* -- General Elements -- */
+
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+ion-content .inner-scroll {
+  scroll-behavior: smooth;
+}
+
+
+body {
+  font-family: 'Lato', sans-serif;  /* Apply Lato as the default font for the entire app */
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.border-right {
+  border-right: 1px solid var(--ion-color-note); 
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.card {
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.slider-list {
+  width: 100%;
+  background: transparent;
+  border: none;
+}
+
+.slider-item {
+  margin-bottom: 24px;
+  --background: transparent;
+}
+
+.slider-item ion-item {
+  margin: 0;
+  padding: 0;
+  --background: transparent;
+  --border-style: none;
+}
+
+.centered-container {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  justify-content: center; /* Center items vertically */
+  align-items: center; /* Center items horizontally */
+  text-align: center; /* Center-align the text inside each IonText */
+  padding: 0;
+  margin: 0;
+}
+
+.centered-in-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /* horizontally */
+  align-items: center;       /* vertically */
+  height: 100vh;             /* full screen height */
+}
+
+.critical-storage-item {
+  --border-color: var(--ion-color-danger);
+  --border-style: solid;
+  --border-width: 1px;
+  --inner-padding-end: 10px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.warning-storage-item {
+  --border-color: var(--ion-color-warning);
+  --border-style: solid;
+  --border-width: 1px;
+  --inner-padding-end: 10px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background-color: var(--ion-item-background);
+}
+
+.close-btn-storage-item {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 10;
+  margin: 0;
+  height: 32px;
+  width: 32px;
+  --padding-start: 0;
+  --padding-end: 0;
+}
+
+
+.currency-code {
+  font-size: 10px;
+}
+
+.custom-back-button {
+  font-size: 28px;
+}
+
+.ios .custom-back-button {
+  font-size: 21px;
+  --padding-start: 0;
+}
+
+
+.developer-note {
+  font-size: 1.2em;
+}
+
+.disabled {
+  opacity: 0.7;
+  pointer-events: none;
+  cursor: default;
+}
+
+
+.exchange-currency {
+  font-size: 0.8em;
+  margin-right: 5px;
+}
+
+.fail-text {
+  color: var(--crimson) !important;
+}
+
+.flex {
+  display: flex;
+  align-items: center;
+}
+
+.flex-end {
+  display: flex;
+  justify-content: right;
+  align-items: center;
+}
+
+.flex-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.flex-row ion-item ion-label {
+  width: fit-content;
+}
+
+.flex-row-right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+}
+
+
+.flex-space {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-space-bottom {
+  display: flex;
+  align-items: flex-end; /* aligns to bottom */
+  justify-content: space-between;
+}
+
+
+.flex-top {
+  display: flex;
+  align-items: flex-start;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+}
+
+hr {
+  background-color: var(--neutral); 
+  height: 1px; 
+  border: 0;
+}
+
+.h-200 {
+  height: 200px;
+}
+
+/* Activity screen */
+.icon-menu-bar {
+  display: flex;
+  justify-content: end;
+  gap: 20px; /* 5px space between spans */
+}
+
+/* .icon-menu-bar ion-icon { 
+  font-size: 1.3rem;
+  padding: 5px 5px;
+  border-radius: 5px;
+  color: var(--ion-color-primary);
+}
+ */
+
+.small-icon-btn {
+  font-size: 1.5rem;
+}
+
+.medium-icon-btn {
+  font-size: 1.7rem;
+}
+
+.icon-btn {
+  font-size: 22px;
+  background-color: var(--ion-color-primary);
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.icon-btn-danger {  
+  background-color: var(--ion-color-danger);
+}
+
+.icon-toolbar-right {
+  display: flex;
+  justify-content: end;
+  gap: 5px; /* 5px space between spans */
+}
+
+
+input::placeholder {
+  color: var(--ion-color-medium); /* or any color you like */
+  opacity: 1; /* Some browsers apply default opacity */
+}
+
+.led-icon.danger {
+  color: var(--ion-color-danger);
+}
+
+.led-icon.success {
+  color: var(--ion-color-success);
+}
+
+.icon-btn-round {
+  font-size: 1.5em;
+  background-color: var(--ion-color-primary);
+  padding: 10px;
+  border-radius: 50%;
+}
+
+ion-content::part(scroll) {
+  padding-top: var(--ion-safe-area-top, 0);
+}
+
+.link {
+  color: var(--ion-color-primary);
+  font-size: 0.9rem;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.list-item {
+  display: grid;
+  grid-template-columns: 1fr auto; /* Right adjusts to content, left takes remaining space */
+  gap: 10px; /* Optional: Adjust spacing between columns */
+  align-items: center; /* Vertically align items */
+  padding: 10px 0;
+}
+
+.list-item-select {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.list-item-select .icon {
+  font-size: 24px;
+  margin-right: 5px;
+}
+
+.list-item-select ion-icon {
+  font-size: 0.8em;
+  margin-right: 0;
+  margin-left: 4px;
+  color: var(--ion-color-note);
+}
+
+.list-item ion-icon {
+  font-size: 1.3em;
+}
+
+.mb-0 {
+  margin-bottom: 0;
+}
+
+.mb-10 {
+  margin-bottom: 10px;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.mb-30 {
+  margin-bottom: 30px;
+}
+
+.mb-40 {
+  margin-bottom: 40px;
+}
+
+.mb-60 {
+  margin-bottom: 60px;
+}
+
+.ml-5 {
+  margin-left: 5px;
+}
+
+.ml-10 {
+  margin-left: 10px;
+}
+
+.ml-20 {
+  margin-left: 20px;
+}
+
+.mr-5 {
+  margin-right: 5px;
+}
+
+.mr-10 {
+  margin-right: 10px;
+}
+
+.mr-15 {
+  margin-right: 15px;
+}
+
+.mr-20 {
+  margin-right: 20px;
+}
+
+.mr-30 {
+  margin-right: 30px;
+}
+
+.mt-5 {
+  margin-top: 5px;
+}
+
+.mt-10 {
+  margin-top: 10px;
+}
+
+.mt-15 {
+  margin-top: 15px;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.mt-25 {
+  margin-top: 25px;
+}
+
+.mt-30 {
+  margin-top: 30px;
+}
+
+.mt-40 {
+  margin-top: 40px;
+}
+
+.no-padding {
+  padding: 0;
+}
+
+.pt-10 {
+  padding-top: 10px;
+}
+
+.page-header {
+  height: 50px;
+}
+
+.page-header ion-toolbar {
+  position: relative;
+}
+
+.page-header ion-title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  text-align: center;
+  width: auto;
+}
+
+.repeat-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.repeat-label {
+  white-space: nowrap;
+  font-size: 16px;
+}
+
+.repeat-input-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.repeat-input {
+  position: relative;
+  caret-color: transparent; /* hide native caret */
+  width: 60px;
+  margin: 0 8px;
+  padding: 8px;
+  border: none; /* Remove all borders */
+  border-bottom: 1px solid  var(--input-border-color); /* Add only bottom border var(--input-border-color) */
+  border-radius: 0; /* Remove border radius */
+  font-size: 14px;
+  background: var(--ion-item-color);
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+  text-align: center;
+}
+
+/* Show blinking bar only when input is focused */
+.repeat-input:focus::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: calc(100% - 8px); /* adjust for visual alignment */
+  width: 1px;
+  height: 1.2em;
+  background-color: red;
+  animation: blink 1s step-start infinite;
+  pointer-events: none;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.repeat-input.date {
+  width: 150px;
+}
+
+
+.placeholder {
+  color: var(--ion-color-medium); /* or gray, or #999 */
+}
+
+.repeat-input:focus {
+  border-color: var(--ion-color-primary);;
+  outline: none;
+}
+
+.repeat-input.invalid {
+  border-color: var(--error-msg-color) !important;
+}
+
+
+.repeat-select {
+  --min-width: 120px;
+  border-bottom: 1px solid var(--input-border-color); /* Add only bottom border */
+
+  font-size: 16px;
+}
+
+.screen-title {
+  display: flex;
+  justify-content: center;
+  width: 80%;
+  margin-top: 3px;
+}
+
+.screen-title-0 {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+}
+
+.screen-wide-img {
+  width: auto;
+  height: 140px;
+  margin: 20px 0;
+}
+
+.screen-narrow-img {
+  width: auto;
+  height: 180px;
+  margin: 20px 0;
+}
+
+
+
+.screen-prompt {
+  width: 80%;
+  text-align: center;
+  margin-top: 0;
+}
+
+.secondary-menu {
+  --width: 210px;
+  text-align: center;
+}
+
+/* Remove the little arrow on iOS popovers */
+ion-popover::part(arrow) {
+  display: none;
+}
+
+.secondary-menu ion-content {
+  --background: var(--ion-item-background);
+  --ion-safe-area-top: 0px;
+}
+
+.secondary-menu .list {
+  list-style: none;
+  margin: 0;
+  padding: 20px;
+}
+
+.secondary-menu .item,
+.secondary-menu .list ion-router-link .item {
+  height: 35px;
+  background: none;
+  border: none;
+  text-align: left;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  color: var(--ion-text-color);
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.secondary-menu .item:last-child {
+  margin-bottom: 0;
+}
+
+.secondary-menu ion-icon {
+  color: var(--ion-text-color);
+  font-size: 24px;
+  margin-right: 15px;
+}
+
+
+section {
+  margin-bottom: 40px !important;
+}
+
+.section-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center; /* vertical centering */
+  height: 30px; /* for those headers that have text-buttons on the opposite side */
+  margin-bottom: 10px;
+}
+
+.section-title {
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+  margin: 0;             /* remove default heading margin */
+  margin-bottom: 10px;
+  line-height: 1;        /* prevent tall text box */
+  display: flex;
+  align-items: center;   /* ensure text itself is vertically centered if multiline */
+}
+
+.info-icon {
+  font-size: 18px;
+  margin-left: 8px;
+  vertical-align: middle;
+  color: var(--ion-color-medium);
+}
+
+.section-title-icon {
+  font-size: 1.4em;
+  color: var(--ion-color-primary);
+  margin-left: 5px;
+}
+
+.sort-icon {
+  font-size: 48px !important;
+}
+
+.system-warning {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.system-warning .title {
+  color: var(--ion-color-danger);
+  text-align: center;
+  width: 80%;
+  margin-bottom: 0;
+}
+
+.system-warning .message {
+  margin-top: 5px;
+}
+
+
+.attention-modal-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 30px;
+}
+
+.attention-modal-title h2 {
+  margin: 0;
+  padding: 0;
+}
+
+.attention-modal-list {
+  padding-left: 25px;
+}
+
+.attention-modal-danger {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--ion-item-background);
+  color: var(--ion-color-danger);
+  border: 1px solid var(--ion-color-danger);
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 20px;
+}
+
+.text-btn {
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: 500;
+  padding: 7px 10px;
+  border-radius: 5px;
+  background-color: var(--ion-color-primary);
+  color: white;
+  text-transform: uppercase;
+}
+
+.text-danger {
+  color: var(--ion-color-danger);
+}
+
+.text-success {
+  color: var(--ion-color-success);
+}
+
+.text-warning {
+  color: var(--ion-color-warning);
+}
+
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+}
+
+.toggle-row span {
+  margin-left: 10px;
+}
+
+.top-toolbar-icon-btn {
+  font-size: 1.6em;
+}
+
+.dotted-underlined {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--ion-color-primary);
+}
+
+/* -------- MODALS --------- */
+/* Custom styles for the small modal */
+.small-modal {
+  --width: 300px; /* Set the modal width */
+  --max-width: 90%; /* Max width as percentage to be responsive */
+  --height: fit-content; /* Set the height to auto to accommodate content */
+  --max-height: 80%; /* Limit the height of the modal */
+  --border-radius: 10px; /* Optional: add rounded corners */
+}
+
+.small-modal::part(content) {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.small-modal ion-toolbar {
+  --background: transparent;
+}
+
+.small-modal-content {
+  padding: 20px;
+  background: var(--ion-item-color);
+}
+
+.small-modal-btn {
+  padding: 10px;
+}
+
+
+.modal-content {
+  text-align: center;
+  padding: 0px 30px 40px 30px;
+  background: var(--ion-item-color);
+}
+
+.centered-modal-content {
+  display: flex;
+  justify-content: center;
+  margin-top: 50%;
+}
+
+.modal-prompt-icon {
+  font-size: 4.5em;
+  color: var(--ion-color-primary);
+}
+
+.modal-btns {
+  display: flex;
+  justify-content: center;
+}
+
+/* Custom styles for actions modal, small modal with title and a list of actions with icons*/
+.actions-modal {
+  --width: fit-content; /* Set the modal width */
+  --max-width: 90%; /* Max width as percentage to be responsive */
+  --height: fit-content; /* Set the height to auto to accommodate content */
+  --max-height: 80%; /* Limit the height of the modal */
+  --border-radius: 10px; /* Optional: add rounded corners */
+}
+
+.actions-modal .content {
+  text-align: center;
+  padding: 10px 30px 20px 30px;
+  margin: 0;
+  background: var(--ion-item-color);
+}
+
+.actions-modal .title {
+  font-size: 18px;
+  line-height: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.actions-modal .list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.actions-modal .item {
+  height: 50px;
+  background: none;
+  border: none;
+  text-align: left;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  color: var(--ion-text-color);
+}
+
+.actions-modal ion-icon {
+  background-color: var(--ion-text-color);
+  color: var(--ion-background-color);
+  padding: 5px;
+  border-radius: 50%;
+  margin-right: 15px;
+}
+
+.no-favourites-screen {
+  font-size: 5em;
+  color: var(--ion-color-primary);
+  margin: 30px 0px 20px 0px;
+}
+
+
+
+
+/* -- Ionic componets -- */
+
+.alert-button-destructive {
+  color: var(--ion-color-danger) !important;
+}
+
+.custom-alert {
+  --background: var(--ion-background-color);
+}
+
+ion-button {
+  color: white;
+  --border-radius: 7px;
+  width: 100%;
+  height: 50px;
+}
+
+ion-button::part(native) {
+  /* This targets the internal DOM part that holds the text */
+  color: white; 
+}
+
+ion-button.medium {
+  color: white;
+  --border-radius: 7px;
+  width: 100%;
+  height: 40px;
+}
+
+
+ion-button.success {
+  color: white;
+  --background: var(--ion-color-success);
+}
+
+ion-button.danger {
+  color: white;
+  --background: var(--ion-color-danger);
+}
+
+
+ion-button.block {
+  height: 50px;
+}
+
+ion-button.fit-content {
+  width: auto; /* Fit width to content */
+  padding: 0.5rem 1rem; /* Adjust padding to your needs */
+}
+
+ion-button.ultra-small {
+  height: 15px;
+  width: auto; /* Fit width to content */
+  padding: 0; /* Adjust padding to your needs */
+  font-size: 0.8em;
+  white-space: nowrap;
+}
+
+
+
+ion-button.small-btn,
+ion-button.small-btn-fill {  
+  height: auto;
+  min-width: auto;
+  width: 60%;
+  font-size: 12px;
+}
+
+ion-button.small-btn-fill::part(native) {
+  color: var(--ion-color-primary) !important; /* cancel and ok button text in primary color*/
+}
+
+ion-button.small-btn[color="primary"]::part(native) {
+  color: #fff !important; /* reset button text in danger color */
+}
+
+
+ion-button.fail-btn {
+  --background: var(--red);
+}
+
+ion-button.secondary-option {
+  --background: color-mix(in srgb, var(--ion-color-primary) 70%, white 30%);
+}
+
+ion-card {
+  border-radius: 11px;
+}
+
+ion-chip {
+  --background: var(--ion-color-primary);
+  --color: var(--button-text-color, white);
+  font-size: 0.9em;
+  font-style: italic;
+}
+
+ion-chip ion-icon {
+  color: var(--button-text-color, white) !important;
+}
+
+ion-content {
+  height: auto;
+}
+
+ion-datetime {
+  --ion-color-primary-contrast: #ffffff; /* selected date color in white */
+  --background: var(--ion-item-background);
+  border-radius: 10px; /* Optional: add rounded corners */
+}
+
+ion-datetime ion-button::part(native) {
+  color: var(--ion-color-primary) !important; /* cancel and ok button text in primary color*/
+}
+
+ion-datetime ion-button[color="danger"]::part(native) {
+  color: var(--ion-color-danger) !important; /* reset button text in danger color */
+}
+
+ion-fab-button {
+  --box-shadow: none; /* Removes the shadow */
+  --color: var(--button-text-color, white);
+}
+
+ion-header, ion-toolbar {
+ --background: var(--ion-background-color);
+}
+
+ion-icon {
+  color: var(--ion-text-color);
+}
+
+ion-icon.close-modal {
+  font-size: 2em;
+}
+
+ion-input {
+  background-color: var(--ion-item-background);
+}
+
+ion-item {
+  --border-radius: 8px;
+  padding: 5px 0;
+  --border-style: none;
+
+}
+
+ion-item.item-transparent {
+  --background: var(--ion-background-color);
+}
+
+ion-item.system-danger::part(native) {
+  border-color: var(--ion-color-danger);
+  border-style: solid;
+  border-width: 1px;
+}
+
+ion-item ion-icon {
+  color: var(--ion-text-color);
+  margin-right: 15px;
+}
+
+ion-item-option {
+  --background: transparent;
+}
+
+ion-item-option ion-icon {
+  font-size: 2.5em;
+  color: var(--ion-color-primary);
+}
+
+ion-item-sliding.card-item {
+  --border-style: none;
+}
+
+ion-list {
+  border-radius: 18px;
+  border: 1px solid var(--ion-item-border);
+}
+
+ion-list:last-child ion-item {
+  border: none;
+}
+
+ion-menu-button {
+  z-index: 10000;
+}
+
+ion-modal {
+  --background: var(--ion-item-background);
+}
+
+
+ion-modal.sheet-modal {
+  /*display: flex;*/
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  --height: auto;
+}
+
+.sheet-modal-icon {
+  margin-top: 10px;
+  font-size: 3em;
+  color: var(--ion-color-primary);
+}
+
+.sheet-modal-title {
+  line-height: 20px;
+}
+
+ion-note {
+  font-style: italic;
+  line-height: 1.4rem !important;
+}
+
+.note {
+  font-size: 16px;
+  font-style: italic;
+  color: var(--ion-color-note);
+}
+
+ion-radio-group.frecuency-radio-group {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 20px;
+}
+
+.radio-with-input {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+ion-textarea {
+  background-color: var(--ion-item-background);
+}
+
+
+
+
+/* -- FORM ELEMETS -- */
+.form-item {
+  margin-bottom: 24px;
+  width: 100%;
+  border-radius: 4px;
+}
+
+.form-item ion-label {
+  font-weight: bold; /* bolder label for form labels only */
+}
+
+.input-container {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 400px;
+}
+
+.input-container label {
+  margin-bottom: 5px;
+}
+
+.input {
+  padding: 8px 12px;
+  border: none; /* Remove all borders */
+  border-bottom: 1px solid var(--input-border-color); /* Add only bottom border */
+  border-radius: 0; /* Remove border radius */
+  font-size: 14px;
+  width: 100%;
+  height: 55px;
+  background-color: var(--ion-background-color);
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+.input:focus {
+  border-color: var(--ion-color-primary);;
+  outline: none;
+}
+
+.input.invalid {
+  border-color: var(--error-msg-color) !important;
+}
+
+.error-text {
+  color: var(--error-msg-color);
+  font-size: 14px;
+  font-style: italic;
+  line-height: 14px;
+  margin-top: 4px;
+  margin-bottom: 0px;
+}
+
+
+/* ---- Ion Toast ---- */
+ion-toast.custom-toast {
+  --background: var(--ion-color-primary);
+  --box-shadow: 3px 3px 10px 0 rgba(0, 0, 0, 0.2);
+  color: #fff;
+}
+
+ion-toast.custom-toast::part(message) {
+  font-size: 14px;
+  font-style: italic;
+  color: #fff;
+  font-size: 16px;
+}
+
+ion-toast.custom-toast::part(button) {
+  border-left: 1px solid #fff; /* ✅ fix */
+  font-size: 14px;
+}
+
+ion-toast.custom-toast::part(button cancel) {
+  color: #fff; /* ✅ fix */
+}

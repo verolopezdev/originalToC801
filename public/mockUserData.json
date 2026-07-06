@@ -1,0 +1,12 @@
+{
+  "name": "",
+  "lastName": "",
+  "email": "",
+  "avatar": "",
+  "subscribed": true,
+  "interval": "monthly",
+  "weekStartDay": "sunday",
+  "backupInterval": "monthly",
+  "showDisabledCategories": true,
+  "showDisabledAccounts": true
+}

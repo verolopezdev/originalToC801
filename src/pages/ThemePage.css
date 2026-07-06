@@ -1,0 +1,8 @@
+.themes-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.themes-toggle ion-toggle {
+  margin-left: 10px;
+}

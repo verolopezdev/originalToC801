@@ -1,0 +1,57 @@
+.card-select-interval {
+  position: relative;
+  text-align: end;
+  width: auto;
+  color: white;
+  z-index: 9999; /* Ensure it's above the swiper */
+}
+
+.card-select-interval .interval-label {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+.card-select-interval .interval-chevron {
+  font-size: 14px;
+  padding-left: 5px;
+  color: white;
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.5));
+}
+
+.card-select-interval .interval-dropdown {  
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  left: -45px;
+  width: 145px;
+  z-index: 10000 !important;
+  text-align: left;
+  background-color: var(--ion-item-background); 
+  opacity: 1; 
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.card-select-interval .interval-item {
+  color: var(--ion-text-color);
+  padding: 10px;
+}
+
+.card-select-interval .interval-item-selected {
+  background-color: var(--ion-color-primary-selected);
+}
+
+/* Apply border-radius to top corners of the first item */
+.card-select-interval .interval-item-selected:first-child {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+/* Apply border-radius to bottom corners of the last item */
+.card-select-interval .interval-item-selected:last-child {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}

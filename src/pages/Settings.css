@@ -1,0 +1,45 @@
+.profile-settings {
+  margin-bottom: 36px;
+}
+
+.profile-avatar-bar {
+  display: flex;
+  align-items: end;
+}
+
+.profile-avatar-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid var(--ion-avatar-inner-border);
+  box-shadow: 0 0 0 1px var(--ion-avatar-outer-border); /* Gray border around the white border */
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.profile-avatar  {     
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: var( --ion-avatar-background);
+  border: 2px solid var(--ion-avatar-inner-border);
+  box-shadow: 0 0 0 1px var(--ion-avatar-outer-border); /* Gray border around the white border */
+  background-color: var( --ion-avatar-background);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.3em;
+  font-weight: 300;
+  margin-right: 10px;
+}
+
+.profile-name {
+  align-items: center;
+}
+
+.profile-name p {
+  font-size: 1.1em;
+}

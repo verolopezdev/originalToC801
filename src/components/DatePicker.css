@@ -1,0 +1,9 @@
+
+.date-picker-modal::part(content) {
+  background: rgba(var(--ion-background-color), 0.5); /* purple with transparency */
+}
+
+.date-picker-wrapper {
+  padding: 5px;
+  opacity: 1;
+}

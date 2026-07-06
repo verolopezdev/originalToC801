@@ -1,0 +1,16 @@
+.color-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  place-items: center;
+  margin-top: 20px;
+} 
+
+.color-picker-btn {
+  --ripple-color: transparent; /* Effectively hides the ripple */
+  --ripple-radius: 50%; /* Ensure ripple effect is circular */
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+}

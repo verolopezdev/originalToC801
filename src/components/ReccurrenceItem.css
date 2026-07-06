@@ -1,0 +1,83 @@
+.reccurrence {
+  align-items: start; /* Vertically align items */
+}
+
+.reccurrence-title {  
+  font-size: 1.2em;
+  line-height: 1.2em;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.reccurrence-list-data {  
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.recurrence-due-date {
+  font-style: italic;
+  font-size: 16px;
+  line-height: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.due-data {
+  display: flex;
+  justify-content: flex-end; /* aligns children to the right */
+  align-items: center;       /* vertically centers if needed */
+  font-style: italic;
+}
+
+.status-label {
+  max-width: 110px;        /* width for wrapping */
+  line-height: 1.2;
+}
+
+.status-label-no-wrap {
+  display: flex;
+  align-items: center;
+  line-height: 1.2;
+}
+
+.status-label-no-wrap ion-icon {
+  margin-right: 3px;
+  font-size: 16px; /* keep icon size consistent */
+  color: inherit;
+}
+
+.status-text {
+  display: inline; /* icon is inline with text */
+  white-space: normal; /* allow wrapping */
+}
+
+.status-text ion-icon {
+  vertical-align: text-bottom; /* align icon with text baseline */
+  margin-right: 3px;
+  font-size: 16px; /* keep icon size consistent */
+  color: inherit;
+}
+
+.overdue {
+  color: var(--ion-color-danger);
+}
+
+.due-today {
+  color: var(--orange);
+}
+
+.due-soon {
+  color: var(--ion-color-warning);
+}
+
+.due-later {
+  color: var(--ion-color-success);
+}
+
+.finalized {
+  color: var(--ion-color-note);
+}
+
+

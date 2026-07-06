@@ -1,0 +1,285 @@
+.transaction {
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* Left and right adjust to content, center takes remaining space */
+  gap: 8px; /* Optional: Adjust spacing between columns */
+  align-items: center; /* Vertically align items */
+  padding: 10px;
+  border: 1px solid var(--app-step-250);
+  background-color: var(--ion-item-background); /* Optional: Background color */
+  border-radius: 10px; /* Optional: Rounded corners */
+  margin-bottom: 16px;
+  color: var(--ion-text-color);
+}
+
+.transaction.active {
+  border: 1px solid var(--ion-color-primary);
+}
+
+/* Styling for individual columns */
+.left-col,
+.center-col,
+.right-col {
+  display: flex;
+  flex-direction: column; /* Align items vertically */
+  justify-content: center; /* Align content in the center (vertically) */
+}
+
+.center-col {
+  text-align: left; /* Align text to the left */
+  font-size: 1rem;
+  color: var(--ion-text-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+  color: var(--ion-text-color);
+  min-width: 0; /* <- important to allow shrinkage in flex */
+}
+
+.center-col-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  min-width: 0; /* <- CRUCIAL for flex children! */
+  overflow: hidden; /* ADD THIS */
+}
+
+.category-wrapper {
+  overflow: hidden;
+}
+
+.transaction-note {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  /* CRITICAL inside flex */
+  min-width: 0;
+  flex-shrink: 1;
+  flex-grow: 1;
+}
+
+.right-col {
+  text-align: right; /* Align text to the right */
+}
+
+.right-col ion-icon {
+  font-size: 1.2em;
+  color: var(--ion-color-note);
+}
+
+.expense-data {
+  font-size: 1em;
+  letter-spacing: 1px;
+}
+
+.invisible {
+  color: var(--ion-item-background);  
+}
+
+.trip-radio {
+  padding-right: 5px;
+}
+
+.installment-label {
+  padding-left: 5px;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--ion-color-note);
+}
+
+.card-label {
+  font-style: italic;
+  color: var(--ion-color-note);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+.projected {
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+
+/* ---- ACCORDION WITH CATEGORY HEADER AND EXPENSES ITEMS (Activity - category mode)---- */
+.transaction-category__item  {
+  padding-bottom: 2px !important;
+  margin-top: 3px;
+}
+
+/* * Ensure the custom content wrapper also has no top margin 
+ * for the content to visually butt up against the header.
+ */
+ .transaction-category__item .category-content-wrapper {
+  margin-top: 0; 
+}
+
+.transaction-category__icon {
+  display: grid;
+  grid-template-columns: auto 1fr; /* Left adjusts to content, center takes remaining space */
+  gap: 16px; /* Optional: Adjust spacing between columns */
+  align-items: center; /* Vertically align items */
+  font-size: 1rem;
+  color: var(--ion-text-color);
+  padding: 12px 0 12px 0;
+}
+
+.transaction-category__left-col,
+.transaction-category__center-col {
+  display: flex;
+  flex-direction: column; /* Align items vertically */
+  justify-content: center; /* Align content in the center (vertically) */
+}
+
+.transaction-category__wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  min-width: 0; /* <- CRUCIAL for flex children! */
+  margin-bottom: 5px;
+}
+
+.transaction-category__center-col {
+  text-align: left; /* Align text to the left */
+  color: var(--ion-text-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: var(--ion-text-color);
+  min-width: 0; /* <- important to allow shrinkage in flex */
+}
+
+
+.transaction-category__percentage {
+  font-style: italic;
+  color: var(--ion-color-note);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+
+/* for individual items inside accordion in TransactionListByCategory */
+.transaction-category__row {
+  display: flex;
+  align-items: center; /* Vertically align all items */
+  width: auto; /* Ensure it spans the full width of its parent */
+  padding: 14px 0; /* Add some padding/spacing */
+  border-top: 1px solid var(--icon-picker-border);
+  margin-left: 10px;
+  margin-right: 10px;
+}
+/* Override the border for the FIRST .transaction-row */
+.transaction-category__row:first-child {
+  border-top: none;
+}
+
+/* Override the border for the LAST .transaction-row */
+.transaction-category__row:last-child {
+  border-bottom: none;
+}
+
+/* Style the First and Last elements (Fixed Width) */
+.transaction-category__amount {
+  flex-shrink: 0;   /* These elements must take only the space they need */
+  margin-left: auto; /* Pushes the amount to the far right */
+  white-space: nowrap;   /* Ensure the text doesn't wrap */
+
+  /* Optional: Set a specific width for UI alignment if needed */
+  /* min-width: 60px; */ 
+}
+
+.transaction-category__date {
+  flex-shrink: 0; /* Prevents it from shrinking or growing */
+  text-align: right;
+  width: 45px; /* Adjust this value based on your font size and required padding */
+  white-space: nowrap;  /* Ensure the text doesn't wrap inside the fixed width */
+}
+
+
+/* 3. Style the Middle element (Ellipsis/Truncation) */
+.transaction-category__note-group {
+  /* Allow the middle element to grow and shrink, 
+    but only when needed. 
+    flex-grow: 1 makes it take up all available space.
+    flex-shrink: 1 allows it to shrink when space is constrained.
+  */
+  flex-grow: 1;
+  flex-shrink: 1;
+  margin: 0 10px; /* Add margin for spacing between the date and the amount */
+
+  /* The magic needed for ellipsis in a flex container: */
+  overflow: hidden; /* Hide the overflow */
+  white-space: nowrap; /* Prevent the content from wrapping */
+  text-overflow: ellipsis; /* Display '...' when content overflows */
+  /* Critical for Chrome/Firefox to allow shrinking with text-overflow */
+  min-width: 0; 
+}
+
+/* Optional: Additional styling for the text elements inside */
+.transaction-category__note-group .transaction-category__note {
+  font-weight: 500;
+  /* To ensure the note and the card label appear together 
+     before truncation, they should likely be spans */
+}
+
+.transaction-category__note-group .card-label {
+  margin-left: 8px;
+  opacity: 0.6;
+}
+
+/*
+ * Target: Styles for the content section of the main category accordion.
+ */
+
+ .category-content-wrapper {
+  /* 1. Make the content narrower and align it to the right */
+  /* Use a maximum width relative to the container (e.g., 95% of parent) */
+  max-width: 95%; 
+  
+  /* Use margin-left: auto to push the content to the right */
+  margin-left: auto;
+  
+  /* Ensure no vertical margin/padding interference from parent */
+  padding: 0; 
+  margin-right: 0;
+
+  /* 2. Add a border */
+  /* Adjust color and style as needed */
+  border-left: 1px solid var(--ion-color-step-200, #ccc); 
+  border-radius: 0; /* Keep square edges, or add a radius if desired */
+  
+  /* Optional: Add a little padding inside the bordered area */
+  padding-left: 5px; 
+  background-color: var(--ion-item-background);
+  /* 2. Round the bottom-left corner */
+  border-bottom-left-radius: 10px; /* Adjust the pixel value for desired roundness */
+    
+  /* 3. Round the bottom-right corner */
+  border-bottom-right-radius: 10px; /* Adjust the pixel value for desired roundness */
+}
+
+/* Optional: Slight adjustment for the expense rows inside this new wrapper 
+ to ensure proper alignment if they contain flex/grid layouts. */
+.category-content-wrapper .transaction-category__row {
+  padding-left: 0; /* Reset any previous padding if necessary */
+  padding-right: 16px; /* Ensure a good right margin/padding */
+  background-color: var(--ion-color-step-100);
+}
+
+/* Optional: Adjust the subcategory items to align with the new border */
+.category-content-wrapper .transaction-subcategory__item {
+  /* If you want the subcategory header to hug the left border of the wrapper */
+  --inner-padding-start: 0; 
+  background-color: var(--ion-item-background);
+}

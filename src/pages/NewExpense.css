@@ -1,0 +1,159 @@
+/* ---- Swiper ---- */
+.expense-slider {
+  margin-left: -16px; /* Negative margin cancels out the padding */
+  margin-right: -16px;
+  width: calc(100% + 32px); /* Ensures full width after removing padding */
+  height: 170px;
+}
+
+.swiper-wrapper {
+  height: 170px;
+}
+
+.swiper-pagination {
+  bottom: -3px !important; /* Move dots 10px lower */
+  z-index: 9999;
+  overflow: visible;
+}
+
+.swiper-pagination-bullet {
+  background-color: #999; /* Default dot color */
+  opacity: 0.5;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: var(--ion-color-primary); /* Active dot color */
+  opacity: 1;
+}
+
+.amount {
+  margin-top: -20px;
+  margin-bottom: 30px;
+}
+
+.converted-amount-code {
+  font-size: 0.8rem;
+  margin-right: 5px;
+}
+
+.converted-amount {
+  text-align: center;
+  font-size: 1.1rem;
+  opacity: 0.7;
+  margin-top: 15px;
+}
+
+/* ---- Aditional configurations ---- */
+.additional-config {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px 5px; /* Vertical 30px, Horizontal 10px */
+  place-items: start; /* Aligns items at the start of their grid cell */
+  max-width: 400px; /* Prevents full width stretching */
+  width: 100%;
+  margin-bottom: 28px;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+.aditional-btn {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: var(--ion-item-background);
+  border: 1px solid var(--app-step-250);
+
+  overflow: hidden; 
+}
+
+/* for currency symbol */
+.aditional-btn .icon {
+  font-size: 1.7em;
+  color: var(--ion-color-primary);
+}
+
+
+.aditional-btn .selected-info {
+  display: flex;
+  flex-direction: column;
+  min-height: 48px;
+  align-items: start;
+  margin-left: 15px;
+}
+
+.selected-info.empty {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.aditional-btn .selected-info .title {
+  margin: 0;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.aditional-btn .data {
+  display: block; /* Ensures span behaves as a block element */
+  white-space: nowrap; /* Prevents wrapping */
+  overflow: hidden; /* Hides overflowing content */
+  text-overflow: ellipsis; /* Adds ellipsis (...) when text overflows */
+  max-width: 130px; /* Ensures it doesn’t exceed container width */
+  font-style: italic;
+  color: var(--ion-text-color);
+}
+
+.led {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  transition: background-color 0.3s, box-shadow 0.3s;
+  margin-right: 5px;
+}
+
+.led.on {
+  background-color: var(--ion-color-primary);
+  box-shadow: 0 0 6px var(--ion-color-primary);
+}
+
+.led.off {
+  background-color: #555;
+}
+
+ion-chip.fav {
+  font-size: 16px;
+  font-style: italic;
+  text-transform: capitalize;
+  color: white;
+}
+
+ion-chip.fav ion-icon {
+  font-size: 16px;
+  margin: 0 5px 0 0;
+  color: white !important;
+}
+
+ion-chip.not-fav {
+  font-size: 16px;
+  font-style: italic;
+  text-transform: capitalize;
+  color: var(--ion-color-primary);
+  --border-color: var(--ion-color-primary);
+}
+
+ion-chip.not-fav.chip-outline {
+  border-color: var(--ion-color-primary) !important;
+}
+
+
+ion-chip.not-fav ion-icon {
+  font-size: 16px;
+  margin: 0 5px 0 0;
+  color: var(--ion-color-primary) !important;
+}

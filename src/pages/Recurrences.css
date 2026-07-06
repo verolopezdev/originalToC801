@@ -1,0 +1,62 @@
+.info-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 80%;           /* Full width of parent */
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid var(--ion-item-border);
+    background-color: var(--ion-item-background); /* Optional: Background color */
+    border-radius: 10px; /* Optional: Rounded corners */
+  }
+  
+  .info-container p {
+    flex: 1;               /* Equal space for both paragraphs */
+    margin: 0;             /* Remove default margin */
+    text-align: center;    /* Optional: center the text */
+  }
+  
+  .info-container p:first-child {
+    border-right: 1px solid #ccc; /* Gray vertical line */
+    padding-right: 10px;          /* Space from the border */
+  }
+  
+  .info-container p:last-child {
+    padding-left: 10px;           /* Space from the border */
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: center; 
+    width: 80%;           /* Full width of parent */
+  }
+  
+  .button-container ion-button {
+    flex: 1;            /* Each button takes equal width */ 
+    font-size: 12px;
+    width: 140px;
+  }
+
+  .log-type {
+    color: var(--ion-color-note);
+  }
+
+  .recurrence-amount {
+    
+    background-color: transparent;
+  }
+  
+  .view-recurrence-amount {
+    display: flex;
+    align-items: baseline;
+  }
+
+  .converted-recurrence-amount {
+    font-size: 1.1rem;
+    opacity: 0.7;
+    margin-bottom: 10px;
+  }
+
+  .estimated-amount {
+    color: var(--ion-color-note);
+  }

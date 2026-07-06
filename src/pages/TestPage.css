@@ -1,0 +1,9 @@
+
+.test button {
+  width: 250px;
+  height: 50px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  background-color: var(--ion-color-primary);
+  border-radius: 10px;
+}

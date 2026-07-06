@@ -1,0 +1,57 @@
+.account-list {
+  background: transparent;
+  width: 100%;
+  padding: 0;
+}
+
+.reorder-item-wrapper {
+  --background: var(--ion-background-color);
+  padding: 0;
+}
+
+
+/* --- 1. Base State (When Reordering is Disabled) --- */
+
+/* The main content that will slide left and fade */
+.reorder-item-content {
+  /* Set initial state */
+  transform: translateX(0);
+  opacity: 1;
+  
+  /* Apply a fast transition for a crisp effect */
+  transition: transform 0.25s ease-out, opacity 0.25s ease-out;
+  
+  /* Flex-grow ensures it takes up the available space */
+  flex-grow: 1; 
+  
+  /* Ensure content doesn't wrap oddly */
+  display: flex; 
+  align-items: center;
+}
+
+/* The reorder handle that will slide in from the right */
+.reorder-handle {
+  /* Hides the handle and positions it just off the edge */
+  opacity: 0;
+  transform: translateX(100%); /* Start completely off the right edge */
+  pointer-events: none;
+  
+  /* Apply the same fast transition */
+  transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+}
+
+/* --- 2. Enabled State (When Reordering is Active) --- */
+/* Shift the content to the left to make space for the handle */
+.reorder-item-wrapper.is-reordering .reorder-item-content {
+  /* Shrink and slide the content slightly */
+  transform: translateX(-10px); /* Adjust this value as needed */
+}
+
+/* Animate the reorder handle into view */
+.reorder-item-wrapper.is-reordering .reorder-handle {
+  /* Bring the handle fully into view */
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+

@@ -1,0 +1,33 @@
+.keypad-container {
+  height: 300px;
+}
+
+/* Grid style for the numeric keypad */
+.keypad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 columns */
+  grid-gap: 10px; /* Space between buttons */
+  width: 100%;
+  padding: 20px;
+}
+
+/* Style each button */
+.keypad-grid ion-button {
+  font-size: 24px;
+  --background: var(--numeric-keypad-btn-bg);
+  --color: blue !important;
+  
+  /* Ensure custom height is respected */
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+
+  height: 40px;
+  min-height: 40px;
+  line-height: 40px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

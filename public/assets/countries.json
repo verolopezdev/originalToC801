@@ -1,0 +1,604 @@
+[
+  {
+    "name": "Albania Lek",
+    "code": "ALL",
+    "locale": "sq-AL",
+    "symbol": "Lek",
+    "country": "Albania"
+  },
+  {
+    "name": "Euro",
+    "code": "EUR",
+    "locale": "de-AT",
+    "symbol": "€",
+    "country": "Austria"
+  },
+  {
+    "name": "Argentina Peso",
+    "code": "ARS",
+    "locale": "es-AR",
+    "symbol": "$",
+    "country": "Argentina"
+  },
+  {
+    "name": "Aruba Guilder",
+    "code": "AWG",
+    "locale": "nl-AW",
+    "symbol": "ƒ",
+    "country": "Aruba"
+  },
+  {
+    "name": "Australia Dollar",
+    "code": "AUD",
+    "locale": "en-AU",
+    "symbol": "$",
+    "country": "Australia"
+  },
+  {
+    "name": "Azerbaijan Manat",
+    "code": "AZN",
+    "locale": "az-AZ",
+    "symbol": "₼",
+    "country": "Azerbaijan"
+  },
+  {
+    "name": "Bahamas Dollar",
+    "code": "BSD",
+    "locale": "en-BS",
+    "symbol": "$",
+    "country": "Bahamas"
+  },
+  {
+    "name": "Barbados Dollar",
+    "code": "BBD",
+    "locale": "en-BB",
+    "symbol": "$",
+    "country": "Barbados"
+  },
+  {
+    "name": "Euro",
+    "code": "EUR",
+    "locale": "nl-BE",
+    "symbol": "€",
+    "country": "Belgium"
+  },
+  {
+    "name": "Belize Dollar",
+    "code": "BZD",
+    "locale": "en-BZ",
+    "symbol": "BZ$",
+    "country": "Belize"
+  },
+  {
+    "name": "Bermuda Dollar",
+    "code": "BMD",
+    "locale": "en-BM",
+    "symbol": "$",
+    "country": "Bermuda"
+  },
+  {
+    "name": "Bolivia Boliviano",
+    "code": "BOB",
+    "locale": "es-BO",
+    "symbol": "$b",
+    "country": "Bolivia"
+  },
+  {
+    "name": "Bulgaria Lev",
+    "code": "BGN",
+    "locale": "bg-BG",
+    "symbol": "лв",
+    "country": "Bulgaria"
+  },
+  {
+    "name": "Brazil Real",
+    "code": "BRL",
+    "locale": "pt-BR",
+    "symbol": "R$",
+    "country": "Brazil"
+  },
+  {
+    "name": "Canada Dollar",
+    "code": "CAD",
+    "locale": "en-CA",
+    "symbol": "$",
+    "country": "Canada"
+  },
+  {
+    "name": "Cayman Islands Dollar",
+    "code": "KYD",
+    "locale": "en-KY",
+    "symbol": "$",
+    "country": "Cayman Islands"
+  },
+  {
+    "name": "Chile Peso",
+    "code": "CLP",
+    "locale": "es-CL",
+    "symbol": "$",
+    "country": "Chile"
+  },
+  {
+    "name": "China Yuan Renminbi",
+    "code": "CNY",
+    "locale": "ii-CN",
+    "symbol": "¥",
+    "country": "China"
+  },
+  {
+    "name": "Colombia Peso",
+    "code": "COP",
+    "locale": "es-CO",
+    "symbol": "$",
+    "country": "Colombia"
+  },
+  {
+    "name": "Costa Rica Colon",
+    "code": "CRC",
+    "locale": "es-CR",
+    "symbol": "₡",
+    "country": "Costa Rica"
+  },
+  {
+    "name": "Cuba Peso",
+    "code": "CUP",
+    "locale": "es-CU",
+    "symbol": "₱",
+    "country": "Cuba"
+  },
+  {
+    "name": "Czech Republic Koruna",
+    "code": "CZK",
+    "locale": "en-CZ",
+    "symbol": "Kč",
+    "country": "Czech Republic"
+  },
+  {
+    "name": "Denmark Krone",
+    "code": "DKK",
+    "locale": "da-DK",
+    "symbol": "kr",
+    "country": "Denmark"
+  },
+  {
+    "name": "Dominican Republic Peso",
+    "code": "DOP",
+    "locale": "es-DO",
+    "symbol": "RD$",
+    "country": "Dominican Republic"
+  },
+  {
+    "name": "Egypt Pound",
+    "code": "EGP",
+    "locale": "ar-EG",
+    "symbol": "£",
+    "country": "Egypt"
+  },
+  {
+    "name": "El Salvador Colon",
+    "code": "SVC",
+    "locale": "es-SV",
+    "symbol": "$",
+    "country": "El Salvador"
+  },
+  {
+    "name": "Euro",
+    "code": "EUR",
+    "locale": "et-EE",
+    "symbol": "€",
+    "country": "Estonia"
+  },
+  {
+    "name": "Fiji Dollar",
+    "code": "FJD",
+    "locale": "en-FJ",
+    "symbol": "$",
+    "country": "Fiji"
+  },
+  {
+    "name": "Euro",
+    "code": "EUR",
+    "locale": "fi-FI",
+    "symbol": "€",
+    "country": "Finland"
+  },
+  {
+    "name": "Euro",
+    "code": "EUR",
+    "locale": "fr-FR",
+    "symbol": "€",
+    "country": "France"
+  },
+  {
+    "name": "Euro",
+    "code": "EUR",
+    "locale": "de-DE",
+    "symbol": "€",
+    "country": "Germany"
+  },
+  {
+    "name": "Euro",
+    "code": "EUR",
+    "locale": "el-GR",
+    "symbol": "€",
+    "country": "Greece"
+  },
+  {
+    "name": "Guatemala Quetzal",
+    "code": "GTQ",
+    "locale": "es-GT",
+    "symbol": "Q",
+    "country": "Guatemala"
+  },
+  {
+    "name": "Guyana Dollar",
+    "code": "GYD",
+    "locale": "en-GY",
+    "symbol": "$",
+    "country": "Guyana"
+  },
+  {
+    "name": "Honduras Lempira",
+    "code": "HNL",
+    "locale": "es-HN",
+    "symbol": "L",
+    "country": "Honduras"
+  },
+  {
+    "name": "Hong Kong Dollar",
+    "code": "HKD",
+    "locale": "zh-Hans-HK",
+    "symbol": "$",
+    "country": "Hong Kong"
+  },
+  {
+    "name": "Hungary Forint",
+    "code": "HUF",
+    "locale": "hu-HU",
+    "symbol": "Ft",
+    "country": "Hungary"
+  },
+  {
+    "name": "Iceland Krona",
+    "code": "ISK",
+    "locale": "is-IS",
+    "symbol": "kr",
+    "country": "Iceland"
+  },
+  {
+    "name": "Euro",
+    "code": "EUR",
+    "locale": "ga-IE",
+    "symbol": "€",
+    "country": "Ireland"
+  },
+  {
+    "name": "India Rupee",
+    "code": "INR",
+    "locale": "en-IN",
+    "symbol": "₹",
+    "country": "India"
+  },
+  {
+    "name": "Indonesia Rupiah",
+    "code": "IDR",
+    "locale": "id-ID",
+    "symbol": "Rp",
+    "country": "Indonesia"
+  },
+  {
+    "name": "Israel Shekel",
+    "code": "ILS",
+    "locale": "ar-IL",
+    "symbol": "₪",
+    "country": "Israel"
+  },
+  {
+    "name": "Euro",
+    "code": "EUR",
+    "locale": "it-IT",
+    "symbol": "€",
+    "country": "Italy"
+  },
+  {
+    "name": "Jamaica Dollar",
+    "code": "JMD",
+    "locale": "en-JM",
+    "symbol": "J$",
+    "country": "Jamaica"
+  },
+  {
+    "name": "Euro",
+    "code": "EUR",
+    "locale": "lt-LT",
+    "symbol": "€",
+    "country": "Lithuania"
+  },
+  {
+    "name": "Euro",
+    "code": "EUR",
+    "locale": "lb-LU",
+    "symbol": "€",
+    "country": "Luxembourg"
+  },
+  {
+    "name": "Malaysia Ringgit",
+    "code": "MYR",
+    "locale": "ms-Latn-MY",
+    "symbol": "RM",
+    "country": "Malaysia"
+  },
+  {
+    "name": "Euro",
+    "code": "EUR",
+    "locale": "mt-MT",
+    "symbol": "€",
+    "country": "Malta"
+  },
+  {
+    "name": "Mexico Peso",
+    "code": "MXN",
+    "locale": "es-MX",
+    "symbol": "$",
+    "country": "Mexico"
+  },
+  {
+    "name": "Moldovan Leu",
+    "code": "MDL",
+    "locale": "ro-MD",
+    "symbol": "L",
+    "country": "Moldova"
+  },
+  {
+    "name": "Mongolia Tughrik",
+    "code": "MNT",
+    "locale": "mn-Cyrl-MN",
+    "symbol": "₮",
+    "country": "Mongolia"
+  },
+  {
+    "name": "Moroccan-dirham",
+    "code": "MAD",
+    "locale": "ar-MA",
+    "symbol": " د.إ",
+    "country": "Moroccan"
+  },
+  {
+    "name": "Mozambique Metical",
+    "code": "MZN",
+    "locale": "mgh-MZ",
+    "symbol": "MT",
+    "country": "Mozambique"
+  },
+  {
+    "name": "Euro",
+    "code": "EUR",
+    "locale": "nl-NL",
+    "symbol": "€",
+    "country": "Netherlands"
+  },
+  {
+    "name": "Netherlands Antilles Guilder",
+    "code": "ANG",
+    "locale": "nl-CW",
+    "symbol": "ƒ",
+    "country": "Netherlands Antilles"
+  },
+  {
+    "name": "New Zealand Dollar",
+    "code": "NZD",
+    "locale": "en-NZ",
+    "symbol": "$",
+    "country": "New Zealand"
+  },
+  {
+    "name": "Nicaragua Cordoba",
+    "code": "NIO",
+    "locale": "es-NI",
+    "symbol": "C$",
+    "country": "Nicaragua"
+  },
+  {
+    "name": "Nigeria Naira",
+    "code": "NGN",
+    "locale": "ha-Latn-NG",
+    "symbol": "₦",
+    "country": "Nigeria"
+  },
+  {
+    "name": "Norway Krone",
+    "code": "NOK",
+    "locale": "nn-NO",
+    "symbol": "kr",
+    "country": "Norway"
+  },
+  {
+    "name": "Panama Balboa",
+    "code": "PAB",
+    "locale": "es-PA",
+    "symbol": "B/.",
+    "country": "Panama"
+  },
+  {
+    "name": "Paraguay Guarani",
+    "code": "PYG",
+    "locale": "es-PY",
+    "symbol": "Gs",
+    "country": "Paraguay"
+  },
+  {
+    "name": "Peru Sol",
+    "code": "PEN",
+    "locale": "es-PE",
+    "symbol": "S/.",
+    "country": "Peru"
+  },
+  {
+    "name": "Philippines Peso",
+    "code": "PHP",
+    "locale": "es-PH",
+    "symbol": "₱",
+    "country": "Philippines"
+  },
+  {
+    "name": "Poland Zloty",
+    "code": "PLN",
+    "locale": "pl-PL",
+    "symbol": "zł",
+    "country": "Poland"
+  },
+  {
+    "name": "Euro",
+    "code": "EUR",
+    "locale": "pt-PT",
+    "symbol": "€",
+    "country": "Portugal"
+  },
+  {
+    "name": "Qatar Riyal",
+    "code": "QAR",
+    "locale": "ar-QA",
+    "symbol": "﷼",
+    "country": "Qatar"
+  },
+  {
+    "name": "Romania Leu",
+    "code": "RON",
+    "locale": "en-RO",
+    "symbol": "lei",
+    "country": "Romania"
+  },
+  {
+    "name": "Saudi Arabia Riyal",
+    "code": "SAR",
+    "locale": "ar-SA",
+    "symbol": "﷼",
+    "country": "Saudi Arabia"
+  },
+  {
+    "name": "Serbia Dinar",
+    "code": "RSD",
+    "locale": "sr-Latn-RS",
+    "symbol": "Дин.",
+    "country": "Serbia"
+  },
+  {
+    "name": "Singapore Dollar",
+    "code": "SGD",
+    "locale": "ms-Latn-SG",
+    "symbol": "$",
+    "country": "Singapore"
+  },
+  {
+    "name": "Euro",
+    "code": "EUR",
+    "locale": "sk-SK",
+    "symbol": "€",
+    "country": "Slovakia"
+  },
+  {
+    "name": "Euro",
+    "code": "EUR",
+    "locale": "sl-SI",
+    "symbol": "€",
+    "country": "Slovenia"
+  },
+  {
+    "name": "Euro",
+    "code": "EUR",
+    "locale": "es-ES",
+    "symbol": "€",
+    "country": "Spain"
+  },
+  {
+    "name": "South Africa Rand",
+    "code": "ZAR",
+    "locale": "en-LS",
+    "symbol": "R",
+    "country": "South Africa"
+  },
+  {
+    "name": "Sweden Krona",
+    "code": "SEK",
+    "locale": "sv-SE",
+    "symbol": "kr",
+    "country": "Sweden"
+  },
+  {
+    "name": "Switzerland Franc",
+    "code": "CHF",
+    "locale": "rm-CH",
+    "symbol": "CHF",
+    "country": "Switzerland"
+  },
+  {
+    "name": "Taiwan New Dollar",
+    "code": "TWD",
+    "locale": "zh-Hant-TW",
+    "symbol": "NT$",
+    "country": "Taiwan"
+  },
+  {
+    "name": "Thailand Baht",
+    "code": "THB",
+    "locale": "th-TH",
+    "symbol": "฿",
+    "country": "Thailand"
+  },
+  {
+    "name": "Turkey Lira",
+    "code": "TRY",
+    "locale": "tr-TR",
+    "symbol": "₺",
+    "country": "Turkey"
+  },
+  {
+    "name": "Ukraine Hryvnia",
+    "code": "UAH",
+    "locale": "ru-UA",
+    "symbol": "₴",
+    "country": "Ukraine"
+  },
+  {
+    "name": "United Arab Emirates Dirham",
+    "code": "AED",
+    "locale": "ar-AE",
+    "symbol": " د.إ",
+    "country": "United Arab Emirates"
+  },
+  {
+    "name": "United Kingdom Pound",
+    "code": "GBP",
+    "locale": "en-GB",
+    "symbol": "£",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "United States Dollar",
+    "code": "USD",
+    "locale": "en-US",
+    "symbol": "$",
+    "country": "United States"
+  },
+  {
+    "name": "Uruguay Peso",
+    "code": "UYU",
+    "locale": "es-UY",
+    "symbol": "$U",
+    "country": "Uruguay"
+  },
+  {
+    "name": "Venezuela Bolívar",
+    "code": "VEF",
+    "locale": "es-VE",
+    "symbol": "Bs",
+    "country": "Venezuela"
+  },
+  {
+    "name": "Viet Nam Dong",
+    "code": "VND",
+    "locale": "vi-VN",
+    "symbol": "₫",
+    "country": "Viet Nam"
+  }
+]

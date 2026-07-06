@@ -30,7 +30,7 @@ const DefaultPage: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding-horizontal"  ref={contentRef}>
-        <h1>Testing...</h1>
+        <h1>Testing GIT CONNECTION</h1>
         <h2>Some Content</h2>
       </IonContent>
     </IonPage>

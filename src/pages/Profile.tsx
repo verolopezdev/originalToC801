@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Camera } from '@capacitor/camera';
 import { useTranslation } from 'react-i18next';
 
 
@@ -86,14 +86,17 @@ const Profile: React.FC = () => {
 
   const handleCamera = async () => {
     try {
-      const image = await Camera.getPhoto({
+      // Use the new dedicated takePhoto method
+      const image = await Camera.takePhoto({
         quality: 90,
-        resultType: CameraResultType.DataUrl,
-        source: CameraSource.Camera,
       });
 
-      if (image.dataUrl) {
-        updateUser({ avatar: image.dataUrl });
+      // On native platforms, you can use webPath for immediate rendering, 
+      // or use thumbnail for a base64 string.
+      const avatarPath = image.webPath || image.thumbnail;
+
+      if (avatarPath) {
+        updateUser({ avatar: avatarPath });
         modal.current?.dismiss();
       }
     } catch (error) {
@@ -103,15 +106,21 @@ const Profile: React.FC = () => {
 
   const handleGallery = async () => {
     try {
-      const image = await Camera.getPhoto({
-        quality: 90,
-        resultType: CameraResultType.DataUrl,
-        source: CameraSource.Photos,
+      // Use the new dedicated chooseFromGallery method
+      const gallery = await Camera.chooseFromGallery({
+        allowMultipleSelection: false, // ensures single selection like getPhoto
+        limit: 1,
       });
 
-      if (image.dataUrl) {
-        updateUser({ avatar: image.dataUrl });
-        modal.current?.dismiss();
+      // Grab the first selected item from the results array
+      if (gallery.results && gallery.results.length > 0) {
+        const image = gallery.results[0];
+        const avatarPath = image.webPath || image.thumbnail;
+
+        if (avatarPath) {
+          updateUser({ avatar: avatarPath });
+          modal.current?.dismiss();
+        }
       }
     } catch (error) {
       console.error("Gallery error:", error);

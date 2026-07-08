@@ -52,31 +52,17 @@ import './TravelMode.css';
 
 
 // Footer items
-const appPages = [
-  {
-    title: 'home',
-    url: '/dashboard',
-    iosIcon: homeOutline,
-    mdIcon: homeOutline
-  },
-  {
-    title: 'accounts',
-    url: '/accounts',
-    iosIcon: layersOutline,
-    mdIcon: layersOutline
-  },
-  {
-    title: 'Add',
-    url: '/newtrip',
-    iosIcon: add,
-    mdIcon: add
-  },
-  {
-    title: 'activity',
-    url: '/activity',
-    iosIcon: cashOutline,
-    mdIcon: cashOutline
-  }
+interface AppPage {
+  url: string;
+  icon: string;
+  title: string;
+}
+
+const appPages: AppPage[] = [
+  { title: 'dashboard', url: '/dashboard', icon: homeOutline },
+  { title: 'accounts', url: '/accounts', icon: layersOutline },
+  { title: 'Add', url: '/newexpense/0', icon: add },
+  { title: 'activity', url: '/activity', icon: cashOutline }
 ];
 
 

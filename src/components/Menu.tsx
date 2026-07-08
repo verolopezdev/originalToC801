@@ -36,56 +36,19 @@ import '../Main.css';
 
 interface AppPage {
   url: string;
-  iosIcon: string;
-  mdIcon: string;
+  icon: string;
   title: string;
 }
 
 const appPages: AppPage[] = [
-  {
-    title: 'dashboard',
-    url: '/dashboard',
-    iosIcon: gridOutline,
-    mdIcon: gridOutline
-  },
-  {
-    title: 'categories',
-    url: '/categories',
-    iosIcon: layersOutline,
-    mdIcon: layersOutline
-  },
-  {
-    title: 'settings',
-    url: '/settings',
-    iosIcon: cogOutline,
-    mdIcon: cogOutline
-  },
-  {
-    title: 'travel_mode',
-    url: '/travelmode',
-    iosIcon: airplaneOutline,
-    mdIcon: airplaneOutline
-  },
-  {
-    title: 'statistics',
-    url: '/statistics',
-    iosIcon: barChartOutline,
-    mdIcon: barChartOutline
-  },
-  {
-    title: 'help',
-    url: '/help',
-    iosIcon: helpBuoyOutline,
-    mdIcon: helpBuoyOutline
-  },
-  {
-    title: 'log_out',
-    url: '/logout',
-    iosIcon: logOutOutline,
-    mdIcon: logOutOutline
-  }
+  { title: 'dashboard', url: '/dashboard', icon: gridOutline },
+  { title: 'categories', url: '/categories', icon: layersOutline },
+  { title: 'settings', url: '/settings', icon: cogOutline },
+  { title: 'travel_mode', url: '/travelmode', icon: airplaneOutline },
+  { title: 'statistics', url: '/statistics', icon: barChartOutline },
+  { title: 'help', url: '/help', icon: helpBuoyOutline },
+  { title: 'log_out', url: '/logout', icon: logOutOutline }
 ];
-
 
 
 const Menu: React.FC = () => {
@@ -161,7 +124,7 @@ const Menu: React.FC = () => {
                   return (
                     <IonMenuToggle key={index} autoHide={false}>
                       <IonItem className={location.pathname === item.url ? 'selected' : ''} routerLink={item.url} routerDirection="forward" lines="none" detail={false}>
-                        <IonIcon aria-hidden="true" slot="start" ios={item.iosIcon} md={item.mdIcon} />
+                        <IonIcon aria-hidden="true" slot="start" icon={item.icon} />
                         <IonLabel>{item.title}</IonLabel>
                       </IonItem>
                     </IonMenuToggle>

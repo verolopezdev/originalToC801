@@ -18,8 +18,7 @@ import './Footer.css';
 interface FooterProps {
   appPages: Array<{
     url: string;
-    iosIcon: string;
-    mdIcon: string;
+    icon: string;
     title: string;
   }>;
 }
@@ -49,7 +48,7 @@ const Footer: React.FC<FooterProps> = ({ appPages }) => {
                   >
                     <IonFab horizontal="center">
                       <IonFabButton>
-                        <IonIcon ios={appPage.iosIcon} md={appPage.mdIcon} />
+                        <IonIcon icon={appPage.icon} />
                       </IonFabButton>
                     </IonFab>
                   </div>
@@ -70,11 +69,7 @@ const Footer: React.FC<FooterProps> = ({ appPages }) => {
                   className="icon-text"
                   key={index}
                 >
-                  <IonIcon
-                    aria-hidden="true"
-                    ios={appPage.iosIcon}
-                    md={appPage.mdIcon}
-                  />
+                  <IonIcon aria-hidden="true" icon={appPage.icon} />
                   <span>{appPage.title}</span>
                 </div>
               </IonRouterLink>

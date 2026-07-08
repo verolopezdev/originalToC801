@@ -83,7 +83,7 @@ const SliderTotalCard: React.FC<SliderTotalCardProps> = ({
 
           {/* Top bar */}
           <div className='top-bar'>
-            <div className='card-data'>
+            <div className='card-data'> 
               {/* Account name */}
               <div className="card-title">
                 {(title === "Cash" ? t('accounts.default_account_name') : title) || t('accounts.card_name')}

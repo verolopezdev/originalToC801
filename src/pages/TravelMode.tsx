@@ -61,7 +61,7 @@ interface AppPage {
 const appPages: AppPage[] = [
   { title: 'dashboard', url: '/dashboard', icon: homeOutline },
   { title: 'accounts', url: '/accounts', icon: layersOutline },
-  { title: 'Add', url: '/newexpense/0', icon: add },
+  { title: 'Add', url: '/newtrip', icon: add },
   { title: 'activity', url: '/activity', icon: cashOutline }
 ];
 

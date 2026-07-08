@@ -219,6 +219,7 @@
     "subcategory_deleted": "Subcategory '{{source}}' has been permanently deleted and expenses moved to Categoryless.",
     "subcat_merge_success": "Subcategory successfully merged into '{{target}}'.",
     "subcat_name": "Subcategory name",
+    "subcategory_updated": "Subcategory updated successfully",
     "system_category_warning": "This is a system category and cannot be edited.",
     "system_category_advice": "You can merge it by moving its expenses to another category or subcategory.",
     "uncategorized": "Uncategorized",

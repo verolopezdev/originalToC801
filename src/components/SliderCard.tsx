@@ -24,13 +24,18 @@ const SliderCard: React.FC<SliderCardProps> = ({ color, title, identifier, logo 
             <i className={`fa-solid ${logo}`}></i>    
           </div>
 
-          <div className='top-bar'>
-            <div className="card-title">
-              {(title === "Cash" ? t('accounts.default_account_name') : title) || t('accounts.card_name')}
-            </div>
-            <div className="card-identifier">
-              {identifier}
-            </div>  
+          <div className='top-bar'> 
+            <div className='card-data'> 
+              {/* Account name */}
+              <div className="card-title">
+                {(title === "Cash" ? t('accounts.default_account_name') : title) || t('accounts.card_name')}
+              </div>
+
+              {/* Account identifier */}
+              <div className="card-identifier">
+                {identifier}
+              </div>
+            </div> 
           </div>
         </div>
       </div>

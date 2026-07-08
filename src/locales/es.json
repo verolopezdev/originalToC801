@@ -219,6 +219,7 @@
     "subcategory_deleted": "La subcategoría '{{source}}' ha sido eliminada permanentemente y los gastos se han movido a 'Sin categoría'.",
     "subcat_merge_success": "Subcategoría fusionada correctamente en '{{target}}'.",
     "subcat_name": "Nombre de la subcategoría",
+    "subcategory_updated": "Subcategoría actualizada correctamente",
     "system_category_warning": "Esta es una categoría del sistema y no se puede editar.",
     "system_category_advice": "Puedes fusionarla moviendo sus gastos a otra categoría o subcategoría.",
     "uncategorized": "Sin clasificar",

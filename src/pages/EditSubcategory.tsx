@@ -284,8 +284,8 @@ const EditSubcategory: React.FC = () => {
       setSubcategoryColor(color);
       setSubcategoryIcon("fa-house");
       openInfoModal({
-        content: t('categories.subcat_merge_success', {
-          target: targetName
+        content: t('categories.subcategory_updated', {
+          target: targetName  
         }),
   
         destination: '/categories' // Assuming this navigates to the main list

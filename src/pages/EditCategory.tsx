@@ -312,24 +312,23 @@ const EditCategory: React.FC = () => {
   // Favourite category
   const handleFavourite = async (categoryId: number, favouriteCategory: boolean) => {
     if (!categoryId) return;
-
-    // Toggle favouriteCategory state
+    
     const newFavState = !favouriteCategory;
-
+  
     setToastMessage(newFavState ? t('categories.added_to_favs') : t('categories.removed_from_favs'));
     setShowToast(true);
-
+  
+    // Fix: Change db.accounts to db.categories and update local component state
+    setIsFavouriteCategory(newFavState);
+  
     await db.transaction(
       'rw', 
-      db.accounts,
+      db.categories,
       async (tx) => {
-        // Update category's fav state
-        await db.categories.update(categoryId, { favouriteCategory: newFavState });
+        await tx.categories.update(categoryId, { favouriteCategory: newFavState });
       }
     );
-
-  }
-
+  };
 
 
   const openPopover = (event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>) => {

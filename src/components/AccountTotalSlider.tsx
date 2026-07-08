@@ -81,7 +81,7 @@ const AccountTotalSlider: React.FC<AccountTotalSliderProps> = ({
       >
         {modifiedAccounts?.map((account) => (
           <SwiperSlide key={account.accountId}>
-            <SliderTotalCard         
+            <SliderTotalCard          
               title={account.accountName}
               color={account.activeAccount ? account.accountColor : "neutral"}
               identifier={account.accountIdentifier}

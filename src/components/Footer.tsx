@@ -84,7 +84,7 @@ const Footer: React.FC<FooterProps> = ({ appPages }) => {
               menu="appMenu" // this links to your custom menu
               autoHide={false} // optional, prevents it from hiding automatically
             /> 
-            <span className='menu-name'>{t('common.menu')}</span>
+            <span className='menu-name'>{t('common.menu')}</span> 
           </div>
         </div>
       </IonToolbar>

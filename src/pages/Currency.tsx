@@ -269,6 +269,7 @@ const Currency: React.FC = () => {
           <p>{t('currency.primary_currency_prompt')}</p>
           <IonItem
             button
+            detail={false}
             disabled={hasDefaultCurrencyExpense || alternativeCurrencies.length > 0}
             onClick={() => setIsDefCurrencyModalOpen(true)}
           >

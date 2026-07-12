@@ -686,6 +686,7 @@ const EditSubcategory: React.FC = () => {
           <div className='mt-10'>
           <IonItem 
             button 
+            detail={false}
             onClick={() => setIsOpenCategoryModal(true)}
             disabled={!isActiveSubcategory}
           >

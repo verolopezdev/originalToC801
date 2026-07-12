@@ -71,36 +71,6 @@ const Category: React.FC<CategoryProps> = ({
   const link = getLink(destination);
 
 
-  const handlePressStart = async (e: React.TouchEvent | React.MouseEvent) => {
-    e.preventDefault(); // Prevent default touch behavior (especially on iOS)
-
-    timerRef.current = setTimeout(async () => {      
-      wasLongPressRef.current = true;
-
-      const message = await toggleFavorite(); // returns toast message
-      setToastMessage(message);
-      setToastOpen(true);
-    }, 400); // You can lower this to 400 if needed
-  };
-  
-  const handlePressEnd = (e: React.TouchEvent | React.MouseEvent) => {
-    e.preventDefault(); // Prevents things like text selection, tap delay
-
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = null;
-  
-    if (!wasLongPressRef.current) {
-      setTimeout(() => {
-        history.push(`${link}${categoryId}`);
-      }, 100);
-    }
-  
-    setTimeout(() => {
-      wasLongPressRef.current = false;
-    }, 0);
-  };
-  
-
   const handleClick = () => {
     if (!wasLongPressRef.current) {
       history.push(`${link}${categoryId}`);
@@ -144,10 +114,6 @@ const Category: React.FC<CategoryProps> = ({
       ) : (
           <div 
             className="category-container centered-container"
-            onTouchStart={(e) => handlePressStart(e)}
-            onTouchEnd={(e) => handlePressEnd(e)}
-            onMouseDown={(e) => handlePressStart(e)}
-            onMouseUp={(e) => handlePressEnd(e)}
             onClick={handleClick}
           >
             <CategoryIcon categoryColor={categoryColor} iconName={iconName} />

@@ -725,6 +725,7 @@ const key =
           </div>
           <IonItem 
             button 
+            detail={false}
             onClick={() => setIsOpenCategoryModal(true)}
             disabled={!isActiveCategory || categoryIdNum === 1}
           >

@@ -48,12 +48,6 @@
     "symbol": "$"
   },
   {
-    "name": "Belarus Ruble",
-    "code": "BYR",
-    "locale": "ru-BY",
-    "symbol": "Br"
-  },
-  {
     "name": "Belize Dollar",
     "code": "BZD",
     "locale": "en-BZ",
@@ -172,12 +166,6 @@
     "code": "EGP",
     "locale": "ar-EG",
     "symbol": "£"
-  },
-  {
-    "name": "El Salvador Colon",
-    "code": "SVC",
-    "locale": "es-SV",
-    "symbol": "$"
   },
   {
     "name": "Euro",
@@ -594,12 +582,6 @@
     "symbol": "лв"
   },
   {
-    "name": "Venezuela Bolívar",
-    "code": "VEF",
-    "locale": "es-VE",
-    "symbol": "Bs"
-  },
-  {
     "name": "Viet Nam Dong",
     "code": "VND",
     "locale": "vi-VN",
@@ -610,11 +592,5 @@
     "code": "YER",
     "locale": "ar-YE",
     "symbol": "﷼"
-  },
-  {
-    "name": "Zimbabwe Dollar",
-    "code": "ZWD",
-    "locale": "sn-ZW",
-    "symbol": "Z$"
   }
 ]

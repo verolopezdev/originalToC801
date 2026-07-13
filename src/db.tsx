@@ -1,66 +1,48 @@
 import Dexie, { type EntityTable } from 'dexie';
-import { incrementChangeCount } from './services/BackupService'; // Adjust path as needed
+import dexieCloud from 'dexie-cloud-addon';
+import { incrementChangeCount } from './services/BackupService';
 
 // GLOBAL FLAGS
 let isPopulating = false;
-export const TABLE_NAMES = ['users', 'accounts', 'categories', 'subcategories', 'expenses', 'trips', 'historicCurrencyList', 'alternativeCurrencies', 'recurringSeries'];
+export const TABLE_NAMES = [
+  'users',
+  'accounts',
+  'categories',
+  'subcategories',
+  'expenses',
+  'trips',
+  'historicCurrencyList',
+  'alternativeCurrencies',
+  'recurringSeries',
+];
 
-
-
-// FOR TESTING PURPOSES to bypass the changes hooks on writing expenses ------
 export let isSeeding = false;
 
 export const setIsSeeding = (value: boolean) => {
   isSeeding = value;
 };
 
-/**
- * Wipes all data from the trackable tables for testing.
- * Uses the isSeeding flag to bypass backup hooks.
- */
 export const clearAllData = async () => {
   try {
-    // 1. Enable the bypass flag so hooks don't count these as "changes"
     setIsSeeding(true);
-
-    // 2. Run deletion in a transaction
     await db.transaction('rw', db.tables, async () => {
-      await Promise.all(
-        db.tables.map(table => table.clear())
-      );
+      await Promise.all(db.tables.map((table) => table.clear()));
     });
-
     console.log("🗑️ Database cleared successfully.");
   } catch (error) {
     console.error("❌ Failed to clear database:", error);
     throw error;
   } finally {
-    // 3. Always turn the flag back off
     setIsSeeding(false);
   }
 };
 
-
-/**
- * Completely destroys the database.
- * Use this to test the "First Load" or "Restore from File" scenarios.
- */
 export const deleteDatabaseEntirely = async () => {
   try {
     console.log("Shutting down DB connections...");
-    
-    // 1. Tell Dexie to close and stop all pending operations
     db.close();
-
-    // 2. Add a tiny delay to let the browser's IndexedDB engine 
-    // settle the connection state before the delete command hits
-    await new Promise(resolve => setTimeout(resolve, 100));
-
-    // 2. Delete the database
-    // We use the global Dexie class here to ensure we aren't 
-    // fighting with the instance we just closed
+    await new Promise((resolve) => setTimeout(resolve, 100));
     await Dexie.delete('DB');
-
     console.log("🧨 Database 'DB' deleted from storage.");
   } catch (error) {
     console.error("❌ Failed to delete database:", error);
@@ -68,16 +50,9 @@ export const deleteDatabaseEntirely = async () => {
   }
 };
 
-
-/**
- * Deletes the first 3 records from the expenses table.
- * Useful for testing UI lists.
- */
 export const deleteRecords = async () => {
   try {
-    setIsSeeding(true); // Bypass backup hooks
-
-    // 1. Get the IDs of the first 3 records
+    setIsSeeding(true);
     const idsToDelete = await db.expenses.limit(10).primaryKeys();
 
     if (idsToDelete.length === 0) {
@@ -85,9 +60,7 @@ export const deleteRecords = async () => {
       return;
     }
 
-    // 2. Bulk delete those IDs
     await db.expenses.bulkDelete(idsToDelete);
-
     console.log(`🗑️ Deleted ${idsToDelete.length} expenses.`);
   } catch (error) {
     console.error("❌ Failed to delete expenses:", error);
@@ -95,8 +68,6 @@ export const deleteRecords = async () => {
     setIsSeeding(false);
   }
 };
-// end for testing -----------------------------------------------------------
-
 
 export interface DbCounts {
   totalRecords: number;
@@ -106,14 +77,14 @@ export interface DbCounts {
 export const getLiveRecordCount = async (): Promise<DbCounts> => {
   const tableCounts = {
     users: await db.users.count(),
-    accounts: await db.accounts.count(), 
+    accounts: await db.accounts.count(),
     categories: await db.categories.count(),
     subcategories: await db.subcategories.count(),
     expenses: await db.expenses.count(),
     trips: await db.trips.count(),
     historicCurrencyList: await db.historicCurrencyList.count(),
     alternativeCurrencies: await db.alternativeCurrencies.count(),
-    recurringSeries: await db.recurringSeries.count(), 
+    recurringSeries: await db.recurringSeries.count(),
   };
 
   const totalRecords = Object.values(tableCounts).reduce(
@@ -132,22 +103,11 @@ interface Metadata {
   value: string;
 }
 
-export type SubscriptionPlan =
-  | "free"
-  | "monthly"
-  | "quarterly"
-  | "yearly";
+export type SubscriptionPlan = "free" | "monthly" | "quarterly" | "yearly";
 
-/**
- * What each field is for
-isPremium: What your app checks to enable or disable premium features.
-subscriptionPlan: Which subscription the user has (monthly, quarterly, or yearly), useful for UI like "Current Plan: Yearly."
-subscriptionProductId: The RevenueCat/App Store product ID (e.g. premium_yearly). This can help if you ever rename plans or need to distinguish between products.
-subscriptionExpirationDate: Lets you show "Renews on July 15" or "Expired on..."
-subscriptionLastVerified: Indicates when you last synchronized with RevenueCat, which can help with debugging or deciding when to refresh.
- */
 export interface User {
-  userId: number;
+  userId?: string;
+  realmId?: string;
   name: string;
   lastName: string;
   email: string;
@@ -166,7 +126,8 @@ export interface User {
 }
 
 interface Account {
-  accountId: number;
+  accountId?: string;
+  realmId?: string;
   accountName: string;
   accountIdentifier: string;
   accountColor: string;
@@ -177,7 +138,8 @@ interface Account {
 }
 
 interface Category {
-  categoryId: number;
+  categoryId?: string;
+  realmId?: string;
   categoryName: string;
   categoryColor: string;
   categoryIcon: string;
@@ -188,64 +150,67 @@ interface Category {
 }
 
 interface Subcategory {
-  subcategoryId: number;
+  subcategoryId?: string;
+  realmId?: string;
   subcategoryName: string;
   subcategoryColor: string;
   subcategoryIcon: string;
   activeSubcategory: boolean;
   favouriteSubcategory: boolean;
-  parentCategoryId: number;
+  parentCategoryId: string;
 }
 
 export interface Expense {
-  expenseId: number;
-  userId: number;
+  expenseId?: string;
+  realmId?: string;
+  userId: string;
   dueDate?: string;
   deletionDate?: string;
-  expenseDate: string;  
+  expenseDate: string;
   expenseNote: string;
-  accountId: number;
-  categoryId: number;
-  subcategoryId: number;
-  expenseAmountDefault: number; 
+  accountId: string;
+  categoryId: string;
+  subcategoryId: string;
+  expenseAmountDefault: number;
   expenseAmountTrip: number;
-  expenseAmountAlt: number; 
-  expenseCurrencyCode: string; 
-  expenseLocale: string; 
-  tripId: number | null; 
-  seriesId?: number; 
-  installmentIndex?: number;      
-  totalInstallments?: number;     
-  autoLogged?: boolean; 
-  isActive: number; 
+  expenseAmountAlt: number;
+  expenseCurrencyCode: string;
+  expenseLocale: string;
+  tripId: string | null;
+  seriesId?: string;
+  installmentIndex?: number;
+  totalInstallments?: number;
+  autoLogged?: boolean;
+  isActive: number;
 }
 
 export type FrequencyUnit = 'week' | 'month' | 'year';
 
-export interface RecurringSeries {    
-  seriesId: number;
-  userId: number;
-  startDate: string;                  
-  interval: number;                   
-  unit: FrequencyUnit;                
-  totalOccurrences: number | null;    
-  endDate: string | null;              
-  isActive: number;                    
+export interface RecurringSeries {
+  seriesId?: string;
+  realmId?: string;
+  userId: string;
+  startDate: string;
+  interval: number;
+  unit: FrequencyUnit;
+  totalOccurrences: number | null;
+  endDate: string | null;
+  isActive: number;
   logAutomatically: boolean;
-  accountId: number;
-  categoryId: number;
-  subcategoryId: number;
+  accountId: string;
+  categoryId: string;
+  subcategoryId: string;
   note: string;
-  estimatedAmount: number;              
-  amountDefault: number;               
-  amountAlt: number;                   
+  estimatedAmount: number;
+  amountDefault: number;
+  amountAlt: number;
   currencyCode: string;
   locale: string;
-  lastLoggedDate: string;             
-  lastLoggedInstallmentIndex: number; 
-  originalNextDueDate: string | null;     
-  nextDueDate: string | null;          
-  moved?: Record<number, string>;     
+  lastLoggedDate: string;
+  lastLoggedInstallmentIndex: number;
+  originalNextDueDate: string | null;
+  nextDueDate: string | null;
+  moved?: Record<number, string>;
 }
 
 export interface ParsedExpense extends Omit<Expense, 'expenseDate'> {
@@ -253,7 +218,8 @@ export interface ParsedExpense extends Omit<Expense, 'expenseDate'> {
 }
 
 interface Trip {
-  tripId: number;
+  tripId?: string;
+  realmId?: string;
   tripName: string;
   tripIcon: string;
   fromDate: Date;
@@ -262,13 +228,13 @@ interface Trip {
 }
 
 interface HistoricCurrencyList {
-  id: string;            
-  currencies: string[];  
-  updatedAt: number;     
+  id: string;
+  currencies: string[];
+  updatedAt: number;
 }
 
 export interface AlternativeCurrency {
-  code: string;                 
+  code: string;
   name: string;
   symbol: string;
   locale: string;
@@ -276,7 +242,8 @@ export interface AlternativeCurrency {
   thousandSeparator: string;
 }
 
-const db = new Dexie('DB') as Dexie & {
+// 1. Initialize Dexie with the addon attached so schema annotations (@) remain valid
+const db = new Dexie('DB', { addons: [dexieCloud] }) as Dexie & {
   metadata: EntityTable<Metadata, 'key'>;
   users: EntityTable<User, 'userId'>;
   accounts: EntityTable<Account, 'accountId'>;
@@ -291,42 +258,45 @@ const db = new Dexie('DB') as Dexie & {
 
 db.version(1).stores({
   metadata: 'key',
-  users: '++userId, email',
-  accounts: '++accountId, userId, sortOrder', 
-  categories: '++categoryId, &categoryName',
-  subcategories: '++subcategoryId, &subcategoryName, parentCategoryId',
-  expenses: '++expenseId, isActive, userId, expenseDate, accountId, categoryId, subcategoryId, expenseCurrencyCode, tripId, [seriesId+expenseDate], [seriesId+installmentIndex], [seriesId+isActive+dueDate], [seriesId+dueDate]',
-  trips: '++tripId, tripName, tripIcon, fromDate, toDate, currencyCode',
+  users: '@userId, email, realmId',
+  accounts: '@accountId, userId, sortOrder, realmId',
+  categories: '@categoryId, &categoryName, realmId',
+  subcategories: '@subcategoryId, &subcategoryName, parentCategoryId, realmId',
+  expenses: '@expenseId, isActive, userId, expenseDate, accountId, categoryId, subcategoryId, expenseCurrencyCode, tripId, seriesId, realmId',
+  trips: '@tripId, tripName, tripIcon, fromDate, toDate, currencyCode, realmId',
   historicCurrencyList: 'id',
   alternativeCurrencies: 'code',
-  recurringSeries: 'seriesId, userId, startDate, interval, unit, totalOccurrences, isActive, lastLoggedDate, moved, categoryId, subcategoryId, accountId', 
+  recurringSeries: '@seriesId, userId, startDate, interval, unit, totalOccurrences, isActive, lastLoggedDate, moved, categoryId, subcategoryId, accountId, realmId',
 });
 
-// --- HOOK IMPLEMENTATION ---
+// 2. Helper to activate Cloud Sync dynamically when user upgrades
+export const enableDexieCloud = (databaseUrl = 'https://zxzf58e25.dexie.cloud') => {
+  db.cloud.configure({
+    databaseUrl,
+    requireAuth: true,
+  });
+  console.log("☁️ Dexie Cloud enabled.");
+};
 
+// HOOK SETUP
 const setupHooks = () => {
-  // Tables we want to track for backups
   const trackableTables = ['expenses', 'categories', 'accounts', 'trips', 'recurringSeries'];
 
-  // 1. Keep track of whether we've logged the bypass warning
   let hasLoggedBypass = false;
 
-  trackableTables.forEach(tableName => {
+  trackableTables.forEach((tableName) => {
     const table = db.table(tableName);
 
     const handleChange = () => {
       const isBypassed = isPopulating || isSeeding;
 
       if (isBypassed) {
-        // 2. Only log if we haven't already logged it during this bypass cycle
         if (!hasLoggedBypass) {
           console.log(`⚠️ Hooks Bypassed (Not counting changes) - Seeding: ${isSeeding}`);
           hasLoggedBypass = true;
         }
       } else {
-        // 3. Reset the lock when flags are false, so it can log again on the next seed/restore
         hasLoggedBypass = false;
-        
         console.log("-> Counting change...");
         incrementChangeCount();
       }
@@ -337,96 +307,125 @@ const setupHooks = () => {
     table.hook('deleting', handleChange);
   });
 };
-// --- END HOOKS ---
 
-
-db.on('ready', () => {
-  console.log(`✅ [DB Status] Database ready.`); 
-  // Initialize hooks
+// INITIALIZATION / SEEDING
+db.on('ready', async () => {
+  console.log(`✅ [DB Status] Database ready.`);
   setupHooks();
-});
 
+  // Check if Premium status is already active from previous sessions
+  const user = await db.users.toCollection().first();
+  if (user?.isPremium) {
+    enableDexieCloud();
+  }
 
-db.on("populate", (transaction) => {
-  isPopulating = true; 
-  console.log('⚠️ Hooks Bypassed (Not counting changes) - Seeding default data...');
+  // Seed initial local data if database is empty
+  const count = await db.users.count();
+  if (count === 0) {
+    isPopulating = true;
+    console.log('⚠️ Seeding initial default data...');
 
-  const installationId = crypto.randomUUID();
+    try {
+      const installationId = crypto.randomUUID();
 
-  transaction.table("metadata").add({
-    key: "installationId",
-    value: installationId,
-  });
-
-  transaction.table("metadata").add({
-    key: "createdAt",
-    value: Date.now().toString(),
-  });
-
-  transaction.table("users").add({
-    userId: 1,
-    name: "",
-    lastName: "",
-    email: "",
-    avatar: "",
-    interval: "monthly",
-    showDisabledAccounts: true,
-    showDisabledCategories: true,
-    weekStartDay: "sunday",
-    isPremium: false,
-    subscriptionPlan: "free",
-  });
-
-
-  
-  try {
-  
-    transaction.table("accounts").add({
-      accountName: "Cash",
-      accountIdentifier: "",
-      accountColor: "cyan", 
-      accountLogo: "fa-money-bill-1-wave", 
-      activeAccount: true,
-      userId: "user@email.com",
-      sortOrder: 0,
-    });
-
-    const defaultCategories = [
-      { name: "Categoryless", color: "categoryless", icon: "fa-bolt-lightning" },
-      { name: "Housing", color: "red", icon: "fa-house" },
-      { name: "Utilities", color: "redOrange", icon: "fa-bolt" },
-      { name: "Groceries", color: "orange", icon: "fa-cart-shopping" },
-      { name: "Transportation", color: "yellowOrange", icon: "fa-car" },
-      { name: "Healthcare", color: "yellow", icon: "fa-suitcase-medical" },
-      { name: "Communications", color: "yellowGreen", icon: "fa-phone" },
-      { name: "Dining & Takeout", color: "cyan", icon: "fa-utensils" },
-      { name: "Entertainment", color: "skyBlue", icon: "fa-film" },
-      { name: "Shopping", color: "blue", icon: "fa-bag-shopping" },
-      { name: "Fitness", color: "indigo", icon: "fa-dumbbell" },
-      { name: "Personal Care", color: "violet", icon: "fa-scissors" },
-      { name: "Pets", color: "magenta", icon: "fa-shield-dog" },
-      { name: "Education", color: "pink", icon: "fa-book" },
-      { name: "Travel", color: "crimson", icon: "fa-plane" },
-    ];
-
-    defaultCategories.forEach(cat => {
-      transaction.table("categories").add({
-        categoryName: cat.name,
-        categoryColor: cat.color,
-        categoryIcon: cat.icon,
-        activeCategory: true,
-        favouriteCategory: false,
-        systemCategory: true,
-        subcategories: false
+      await db.metadata.put({
+        key: "installationId",
+        value: installationId,
       });
-    });
-  } finally {
-    // Crucial: Use a small timeout or wait for the transaction to finish 
-    // to ensure hooks don't fire the millisecond seeding ends.
-    setTimeout(() => { isPopulating = false; }, 1000);
-    console.log('🎉 Initial population executed.');
+
+      await db.metadata.put({
+        key: "createdAt",
+        value: Date.now().toString(),
+      });
+
+      await db.users.add({
+        name: "",
+        lastName: "",
+        email: "",
+        avatar: "",
+        interval: "monthly",
+        showDisabledAccounts: true,
+        showDisabledCategories: true,
+        weekStartDay: "sunday",
+        isPremium: false,
+        subscriptionPlan: "free",
+      } as User);
+
+      await db.accounts.add({
+        accountName: "Cash",
+        accountIdentifier: "",
+        accountColor: "cyan",
+        accountLogo: "fa-money-bill-1-wave",
+        activeAccount: true,
+        userId: "local-user",
+        sortOrder: 0,
+      } as Account);
+
+      const defaultCategories = [
+        { name: "Categoryless", color: "categoryless", icon: "fa-bolt-lightning" },
+        { name: "Housing", color: "red", icon: "fa-house" },
+        { name: "Utilities", color: "redOrange", icon: "fa-bolt" },
+        { name: "Groceries", color: "orange", icon: "fa-cart-shopping" },
+        { name: "Transportation", color: "yellowOrange", icon: "fa-car" },
+        { name: "Healthcare", color: "yellow", icon: "fa-suitcase-medical" },
+        { name: "Communications", color: "yellowGreen", icon: "fa-phone" },
+        { name: "Dining & Takeout", color: "cyan", icon: "fa-utensils" },
+        { name: "Entertainment", color: "skyBlue", icon: "fa-film" },
+        { name: "Shopping", color: "blue", icon: "fa-bag-shopping" },
+        { name: "Fitness", color: "indigo", icon: "fa-dumbbell" },
+        { name: "Personal Care", color: "violet", icon: "fa-scissors" },
+        { name: "Pets", color: "magenta", icon: "fa-shield-dog" },
+        { name: "Education", color: "pink", icon: "fa-book" },
+        { name: "Travel", color: "crimson", icon: "fa-plane" },
+      ];
+
+      for (const cat of defaultCategories) {
+        await db.categories.add({
+          categoryName: cat.name,
+          categoryColor: cat.color,
+          categoryIcon: cat.icon,
+          activeCategory: true,
+          favouriteCategory: false,
+          systemCategory: true,
+          subcategories: false,
+        } as Category);
+      }
+
+      console.log('🎉 Initial population completed via db.on("ready").');
+    } catch (err) {
+      console.error("❌ Failed to seed default data:", err);
+    } finally {
+      isPopulating = false;
+    }
   }
 });
 
 export type { Account, Category, Subcategory, Trip };
 export { db };
+
+
+
+/*
+How to trigger the upgrade when purchasing Premium
+In your subscription/checkout success component, call enableDexieCloud() and update the user record:
+
+TypeScript
+import { db, enableDexieCloud } from './db';
+
+const handleUpgradeToPremium = async () => {
+  // 1. Enable cloud sync configuration
+  enableDexieCloud();
+
+  // 2. Update local DB user record
+  const user = await db.users.toCollection().first();
+  if (user?.userId) {
+    await db.users.update(user.userId, {
+      isPremium: true,
+      subscriptionPlan: 'monthly',
+    });
+  }
+
+  // 3. Prompt user authentication for Dexie Cloud login
+  await db.cloud.login();
+};
+*/

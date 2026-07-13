@@ -2,18 +2,14 @@ import React, { createContext, useContext, ReactNode } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, User } from '../db';
 
-// Define context type
 interface UserContextType {
   user: User;
   updateUser: (updates: Partial<User>) => Promise<void>;
   resetUser: () => Promise<void>;
 }
 
-
-// Create context
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-// Default values used for reset
 const defaultUser: Omit<User, "userId"> = {
   name: '',
   lastName: '',
@@ -23,7 +19,7 @@ const defaultUser: Omit<User, "userId"> = {
   interval: 'monthly',
   weekStartDay: 'sunday',
   localInterval: 'monthly',
-  language: '',
+  language: 'en',
   showDisabledCategories: true,
   showDisabledAccounts: true,
   favourites: 0,
@@ -33,26 +29,32 @@ const defaultUser: Omit<User, "userId"> = {
 };
 
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // 1. Fetch the user record dynamically instead of looking for numerical ID 1
   const user = useLiveQuery(
-    () => db.users.get(1),
-    [],
-    undefined
+    () => db.users.toCollection().first(),
+    []
   );
 
   const updateUser = async (updates: Partial<User>) => {
-    await db.users.update(1, updates);
+    if (!user?.userId) return;
+    await db.users.update(user.userId, updates);
   };
 
   const resetUser = async () => {
+    if (!user?.userId) return;
     await db.users.put({
-      userId: 1,
+      userId: user.userId, // Maintain existing string UUID
       ...defaultUser,
     });
   };
 
-  // Wait until the user has been loaded
+  // 2. While loading, show a visible indicator instead of returning null (blank page)
   if (!user) {
-    return null; // or your loading spinner
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <p>Loading user context...</p>
+      </div>
+    );
   }
 
   return (
@@ -68,7 +70,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   );
 };
 
-// Custom hook
 export const useUser = () => {
   const context = useContext(UserContext);
 

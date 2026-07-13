@@ -44,3 +44,7 @@ caps-lock.json
 local.properties
 /.bundle/
 vendor/bundle/
+
+# Dexie Cloud secrets and configuration
+dexie-cloud.json
+dexie-cloud.key

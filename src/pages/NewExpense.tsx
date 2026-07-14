@@ -9,7 +9,6 @@ import { useTranslation } from 'react-i18next';
 import useBackButtonModalReset from "../hooks/useBackButtonModalReset";
 import { useCurrency } from '../context/CurrencyContext';
 import { useUser } from '../context/UserContext'; // Import the useUser hook
-import { useExpense } from '../context/ExpenseContext';
 import { useTrip } from '../context/TripContext';
 import { useExchangeRates } from '../context/ExchangeRateContext';
 import { RecurrenceSettings, useRecurringExpense } from '../hooks/useRecurringExpense'; 
@@ -71,14 +70,14 @@ import '../Main.css';
 import './NewExpense.css';
 
 
-function useCategory(categoryId?: number) {
+function useCategory(categoryId?: string) {
   return useLiveQuery(async () => {
     if (!categoryId) return undefined;
     return db.categories.get(categoryId); // Fetch parent category by its ID
   }, [categoryId]);
 }
 
-function useSubcategory(subcategoryId?: number | null) {
+function useSubcategory(subcategoryId?: string | null) {
   return useLiveQuery(async () => {
     if (!subcategoryId) return undefined;
     return db.subcategories.get(subcategoryId); // Fetch parent category by its ID
@@ -125,7 +124,6 @@ const NewExpense: React.FC = () => {
   const { addExpenseWithRecurrence } = useRecurringExpense();
   const { openDatePicker } = useDatePicker();
   const { passedAccountId } = useParams<{ passedAccountId: string }>(); // passed expense id to fill the form, always a string
-  const accId = Number(passedAccountId);
   const { currency, allSelectedCurrencies } = useCurrency(); 
   const { convertCurrency, getExchangeRate } = useExchangeRates();
   
@@ -133,16 +131,16 @@ const NewExpense: React.FC = () => {
   const [selectedTrip, setSelectedTrip] = useState<Trip>();
   const [tripCurrencyCode, setTripCurrencyCode] = useState<string>('');
   const [isTravelMode, setIsTravelMode] = useState<boolean>(false);
-  const [tripId, setTripId] = useState<number | null>(null);
+  const [tripId, setTripId] = useState<string | null>(null);
   const accounts: Account[] | undefined = useLiveQuery(
     () => db.accounts.orderBy('sortOrder').toArray()
   );
   const today = new Date();
 
-  const [selectedAccountId, setSelectedAccountId] = useState<number>(0);
+  const [selectedAccountId, setSelectedAccountId] = useState<string>('');
   const [amountInCents, setAmountInCents] = useState(0);
-  const [categoryId, setCategoryId] = useState<number>(1);
-  const [subcategoryId, setSubcategoryId] = useState<number>(0);
+  const [categoryId, setCategoryId] = useState<string>('');
+  const [subcategoryId, setSubcategoryId] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<Date>(today);  
   const [expenseCurrencyCode, setExpenseCurrencyCode] = useState<string>('');
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyData>(defaultCurrency);
@@ -240,17 +238,29 @@ const NewExpense: React.FC = () => {
 
   // Initialize state from currency context
   useIonViewWillEnter(() => {
+    const initDefaultCategory = async () => {
+      // Fetches the very first record in the categories table
+      const defaultCategory = await db.categories.toCollection().first();
+      
+      if (defaultCategory?.categoryId) {
+        setCategoryId(defaultCategory.categoryId);
+      }
+    };
+
+    initDefaultCategory();
+
     // Priority 1: Account passed via route parameter (for editing/pre-selection)
-    if(accId > 0) {
-      setSelectedAccountId(accId)
+    if(passedAccountId !== '0') {
+      setSelectedAccountId(passedAccountId)
     } 
     // Priority 2: The first account from the sorted list (sortOrder 0)
     else {
       // Use the memoized ID of the first account in the sorted list
-      setSelectedAccountId(firstSortedAccountId); 
+      // Fallback to empty string if firstSortedAccountId is undefined
+      setSelectedAccountId(firstSortedAccountId ?? '');
     }
 
-    setSubcategoryId(0);
+    setSubcategoryId('');
     setAmountInCents(0);
     setSelectedDate(today);
     setNote('');
@@ -268,7 +278,7 @@ const NewExpense: React.FC = () => {
   const category = useCategory(categoryId);
   const subcategory = useSubcategory(subcategoryId);
 
-  const handleCategorySelect = ({ categoryId, subcategoryId }: { categoryId: number; subcategoryId: number }) => {  
+  const handleCategorySelect = ({ categoryId, subcategoryId }: { categoryId: string; subcategoryId: string }) => {  
     setCategoryId(categoryId); // Update the parent category ID
     setSubcategoryId(subcategoryId);
     setIsOpenCategoryModal(false); // Close the modal
@@ -289,10 +299,10 @@ const NewExpense: React.FC = () => {
 
   // New code block to find the ID of the first sorted account
   const firstSortedAccountId = useMemo(() => {
-    if (!sortedAccounts) return 0;
+    if (!sortedAccounts) return '0';
     // sortedAccounts is already sorted by user.defaultAccount (if present) 
     // and then by sortOrder. The first element is the one we want.
-    return sortedAccounts.length > 0 ? sortedAccounts[0].accountId : 0;
+    return sortedAccounts.length > 0 ? sortedAccounts[0].accountId : '0';
   }, [sortedAccounts]);
 
 
@@ -308,7 +318,7 @@ const NewExpense: React.FC = () => {
   };
 
   // Handle selected card id change from SliderComponent
-  const handleAccountSelect = (accountId: number) => {
+  const handleAccountSelect = (accountId: string) => {
     setSelectedAccountId(accountId); // Update the state with the selected account id
   };
 
@@ -359,7 +369,7 @@ const NewExpense: React.FC = () => {
     if (!selectedTripId) return;
   
     if (tripId) {
-      setTripId(0);
+      setTripId('0');
       showToast(t('expenses.save_as_regular_exp'), 'info');
 
     } else {
@@ -418,6 +428,12 @@ const NewExpense: React.FC = () => {
 
   // Create new expense record in database
   async function addNewExpense() {  
+    // Guard clause to ensure userId exists
+    if (!user?.userId) {
+      console.error("User ID is not loaded yet");
+      return;
+    }
+
     let amountDefault = amountInCents; // case 1: regular expense in default currency
     let amountAlt = 0;
     let amountTrip = 0;
@@ -474,7 +490,7 @@ const NewExpense: React.FC = () => {
 
     try {
       await addExpenseWithRecurrence({  
-        userId: 1,
+        userId: user.userId,
         expenseNote: note,
         accountId: selectedAccountId,
         categoryId,
@@ -494,6 +510,9 @@ const NewExpense: React.FC = () => {
       openFailureModal();
     }
   }
+
+  console.log("Category id: ", categoryId);
+  console.log("Subcategory id: ", subcategoryId);
 
 
   return (

@@ -9,7 +9,6 @@ import { useTranslation } from 'react-i18next';
 import useScrollToTop from '../hooks/useScrollToTop';
 import { useUser } from '../context/UserContext'; // Import the useUser hook
 import { useKeyboardAutoClose } from '../hooks/useKeyboardAutoClose';
-import { useExpense } from '../context/ExpenseContext';
 
 
 // App components
@@ -45,19 +44,19 @@ import {
 const EditAccount: React.FC = () => {
   const contentRef = useScrollToTop(); // use the custom hook 
   const { t } = useTranslation();
+  const { user } = useUser();
   
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [popoverEvent, setPopoverEvent] = useState<MouseEvent | null>(null);
   
   const { accountId } = useParams<{ accountId: string }>();
-  const account = useLiveQuery(() => db.accounts.get(Number(accountId)), [accountId]);
-  const passedAccountId = Number(accountId);
+  const account = useLiveQuery(() => db.accounts.get(accountId), [accountId]);
+  const passedAccountId = accountId;
   const [accountName, setAccountName] = useState<string>('');
   const [accountIdentifier, setAccountIdentifier] = useState<string>('');
   const [accountLogo, setAccountLogo] = useState<string>("");
   const [accountColor, setAccountColor] = useState<string>('');
   const [isActiveAccount, setIsActiveAccount] = useState<boolean>(true);
-  const userId = "user@email.com";
   const [hasExpenses, setHasExpenses] = useState<boolean>(false);
 
 
@@ -106,7 +105,7 @@ const EditAccount: React.FC = () => {
   }, [passedAccountId]);
   
   
-  async function hasExpensesOrRecurrencesForAccount(accountId: number): Promise<boolean> {
+  async function hasExpensesOrRecurrencesForAccount(accountId: string): Promise<boolean> {
     // 1. Check RecurringSeries first
     const hasRecurrence = await db.recurringSeries
       .where("accountId")
@@ -203,7 +202,7 @@ const EditAccount: React.FC = () => {
   };
 
 
-  async function updateAccount(accountId: number) {
+  async function updateAccount(accountId: string) {
     try {
       // Check if account exists
       const existingAccount = await db.accounts.get(accountId);
@@ -223,7 +222,7 @@ const EditAccount: React.FC = () => {
             accountIdentifier,
             accountColor,
             accountLogo,
-            userId,
+            userId: user.userId,
           });
         }
       ); 
@@ -238,7 +237,7 @@ const EditAccount: React.FC = () => {
   }
 
   // Enable or disable account
-  const changeActiveAccount = async (accountId: number, activeAccount: boolean) => {
+  const changeActiveAccount = async (accountId: string, activeAccount: boolean) => {
     if (!accountId) return;
   
     const newActiveState = !activeAccount;
@@ -310,7 +309,7 @@ const EditAccount: React.FC = () => {
 
 
   // Delete account
-  const handleDeleteAccount = async (accountId: number) => {
+  const handleDeleteAccount = async (accountId: string) => {
     try {
       // 🚨 CRITICAL FIX: Define an atomic transaction encompassing all necessary tables 🚨
       await db.transaction(
@@ -430,7 +429,7 @@ const EditAccount: React.FC = () => {
           <div>
             {/* Screen Header */}
             <div className='centered-container mb-20'>
-              <h2 className='screen-title'>{t('accounts.editAccountTitle')}</h2>
+              <h2 className='screen-title'>{t('accounts.edit_account_title')}</h2>
             </div>
     
             {/* Show Default Card */}

@@ -66,8 +66,8 @@ const ViewTrip: React.FC = () => {
   const { checkTrip, travelMode, selectedTripId } = useTrip();
 
   const { tripId } = useParams<{ tripId: string }>(); // expense id to fill the form
-  const trip = useLiveQuery(() => db.trips.get(Number(tripId)), [tripId]);  
-  const passedTripId = Number(tripId);
+  const trip = useLiveQuery(() => db.trips.get(tripId), [tripId]);  
+  const passedTripId = tripId;
   const [tripIcon, setTripIcon] = useState<string>("fa-plane-departure");
   const [tripName, setTripName] = useState<string>('');
   const [fromDate, setFromDate] = useState(new Date());
@@ -153,7 +153,7 @@ const ViewTrip: React.FC = () => {
   
 
   // Delete expense
-  async function deleteTrip(tripId: number) {
+  async function deleteTrip(tripId: string) {
     try {
       // Check if category exists
       const existingTrip = await db.trips.get(tripId);

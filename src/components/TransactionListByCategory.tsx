@@ -23,7 +23,6 @@ import { useCurrency } from '../context/CurrencyContext';
 
 
 // Utils
-import { getDateRangeForInterval } from "../utils/getDateRangeForInterval";
 import { formatPercentage } from "../utils/chartFunctions";
 
 
@@ -34,14 +33,14 @@ import "../pages/Statistics.css";
 
 
 interface SubcategoryGroup {
-  subcategoryId: number;
+  subcategoryId: string;
   expenses: ParsedExpense[];
   total: number;
 }
 
 
 interface CategoryGroup {
-  categoryId: number;
+  categoryId: string;
   expenses: ParsedExpense[];
   total: number;
   subcategories: SubcategoryGroup[]; // New structure
@@ -53,7 +52,7 @@ interface Props {
   start: Dayjs; 
   end: Dayjs;   
   selectedDate: Dayjs;
-  accountId?: number;
+  accountId?: string;
   upToToday?: boolean;
 }
 
@@ -70,13 +69,6 @@ const TransactionListByCategory: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation();
   
-  /* const { start, end } = getDateRangeForInterval(
-    selectedInterval,
-    selectedDate,
-    upToToday 
-  );
- */
-
   const { checkExpense } = useExpense();
   const { currency } = useCurrency();
   const router = useIonRouter();
@@ -93,9 +85,9 @@ const TransactionListByCategory: React.FC<Props> = ({
   const subcategories = useLiveQuery(() => db.subcategories.toArray());
   const accounts = useLiveQuery(() => db.accounts.toArray());
 
-  const getCategory = (categoryId: number) => categories?.find((c) => c.categoryId === categoryId);
-  const getSubcategory = (subcategoryId: number) => subcategories?.find((sc) => sc.subcategoryId === subcategoryId);
-  const getAccountName = (accountId: number) => accounts?.find((ac) => ac.accountId === accountId)?.accountName || "";
+  const getCategory = (categoryId: string) => categories?.find((c) => c.categoryId === categoryId);
+  const getSubcategory = (subcategoryId: string) => subcategories?.find((sc) => sc.subcategoryId === subcategoryId);
+  const getAccountName = (accountId: string) => accounts?.find((ac) => ac.accountId === accountId)?.accountName || "";
 
   // Helper function to calculate the expense amount
   const getAmount = (exp: ParsedExpense): number => {
@@ -135,7 +127,7 @@ const TransactionListByCategory: React.FC<Props> = ({
         : allResults;
 
       // Group by categoryId
-      const groupedMap: Record<number, ParsedExpense[]> = {};
+      const groupedMap: Record<string, ParsedExpense[]> = {};
       filtered.forEach((exp) => {
         const catId = exp.categoryId;
         if (!groupedMap[catId]) groupedMap[catId] = [];
@@ -148,13 +140,13 @@ const TransactionListByCategory: React.FC<Props> = ({
       // Convert to array, calculate category totals, and group by subcategory
       const groupedArray: CategoryGroup[] = Object.entries(groupedMap).map(
         ([categoryIdStr, expenses]) => {
-          const categoryId = Number(categoryIdStr);
+          const categoryId = categoryIdStr;
           
           // Calculate category total
           const categoryTotal = expenses.reduce((sum, exp) => sum + getDefaultAmount(exp), 0);
           
           // --- NEW LOGIC: Group by subcategory and calculate subcategory totals ---
-          const subcategoryMap: Record<number, ParsedExpense[]> = {};
+          const subcategoryMap: Record<string, ParsedExpense[]> = {};
             expenses.forEach((exp) => {
             // Use 0 for expenses without a subcategory
               const subcatId = exp.subcategoryId || 0; 
@@ -165,7 +157,7 @@ const TransactionListByCategory: React.FC<Props> = ({
             // Convert subcategory map to array and calculate totals
             const subcategoriesArray: SubcategoryGroup[] = Object.entries(subcategoryMap).map(
               ([subcategoryIdStr, subcategoryExpenses]) => {
-                const subcategoryId = Number(subcategoryIdStr);
+                const subcategoryId = subcategoryIdStr;
                 const subcategoryTotal = subcategoryExpenses.reduce((sum, exp) => sum + getDefaultAmount(exp), 0);
 
                 return {
@@ -235,7 +227,7 @@ const TransactionListByCategory: React.FC<Props> = ({
 
         // Check if all expenses in this category lack a subcategory
         const isDefaultOnly = 
-          subcategories.length === 1 && subcategories[0].subcategoryId === 0;
+          subcategories.length === 1 && subcategories[0].subcategoryId === '0';
 
         // Function to render the individual expense rows (used for both paths)
         const renderExpenseRows = (expList: ParsedExpense[]) => (
@@ -298,7 +290,7 @@ const TransactionListByCategory: React.FC<Props> = ({
                 </div>
                 <div className="transaction-category__center-col">
                   <div className="transaction-category__wrapper">
-                    {category.categoryId !== 0
+                    {category.categoryId !== ''
                       ? category.categoryName
                       : t('categories.no_cat')}
                     <span className="transaction-category__percentage">({percentage})</span>
@@ -323,7 +315,7 @@ const TransactionListByCategory: React.FC<Props> = ({
                 <IonAccordionGroup  multiple={false}>
                   {subcategories.map(({ subcategoryId, expenses: subExpenses, total: subTotal }) => {
                     const subcategory = getSubcategory(subcategoryId);
-                    const subcategoryName = subcategoryId !== 0 && subcategory 
+                    const subcategoryName = subcategoryId !== '' && subcategory 
                       ? subcategory.subcategoryName
                       : t('categories.no_subcat');
                     

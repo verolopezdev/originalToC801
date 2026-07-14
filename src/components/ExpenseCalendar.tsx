@@ -160,7 +160,7 @@ const ExpenseCalendar: React.FC<ExpenseCalendarProps> = ({ currentDate, weekStar
 
                   const bgColor =
                     isFuture ||
-                    expense.expenseId === -1 ||
+                    expense.expenseId === '-1' ||
                     expense.isActive === 0
                       ? 'neutral'
                       : getExpenseColor(expense);

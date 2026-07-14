@@ -17,7 +17,7 @@ import '../pages/TravelMode.css';
 
 
 interface TripDataProps {
-  tripId: number;
+  tripId: string;
   tripIcon: string;
   fromDate: Date;
   toDate: Date;

@@ -19,7 +19,7 @@ import { airplane } from "ionicons/icons";
 interface CategoryProps {
   categoryColor: string;
   iconName: string; 
-  tripId?: number | null;
+  tripId?: string | null;
   autoLogged?: boolean;
   isTransaction?: boolean;
   isReportsCategory?: boolean;
@@ -40,7 +40,7 @@ const Category: React.FC<CategoryProps> = ({
       <div className={`category  ${isTransaction ? 'transaction-category' : ''} ${isReportsCategory ? 'reports-category' : ''} ${categoryColor}-bg`}>  
         <i className={`fas ${iconName}`}></i>
       </div>
-      {tripId && tripId !== 0 && (
+      {tripId && tripId !== '' && (
         <IonIcon icon={airplane} className="travel-icon" />
       )}
       {typeof autoLogged === 'boolean' && ( // renders the span only if autoLogged is defined (either true or false)

@@ -188,7 +188,7 @@ const Categories: React.FC = () => {
             {filteredCategories?.map((category) => (
               <CategoryOption       
                 key={category.categoryId}
-                categoryId={category.categoryId} 
+                categoryId={category.categoryId}  
                 categoryName={
                   category.systemCategory
                     ? t(`categories.${category.categoryName}`)

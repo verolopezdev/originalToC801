@@ -43,7 +43,6 @@ import {
   IonIcon,
   IonModal,
   IonPage,
-  IonTitle,
   IonToolbar,
   useIonViewWillEnter
 } from '@ionic/react';
@@ -66,7 +65,7 @@ import '../Main.css';
 import './NewExpense.css';
 
 
-function useCategory(categoryId?: number) {
+function useCategory(categoryId?: string) {
 	return useLiveQuery(async () => {
 		if (!categoryId) return undefined;
 		return db.categories.get(categoryId); // Fetch parent category by its ID
@@ -74,7 +73,7 @@ function useCategory(categoryId?: number) {
 }
 
 
-function useSubcategory(subcategoryId?: number | null) {
+function useSubcategory(subcategoryId?: string | null) {
 	return useLiveQuery(async () => {
 		if (!subcategoryId) return undefined;
 		return db.subcategories.get(subcategoryId); // Fetch parent category by its ID
@@ -111,23 +110,22 @@ const EditRecurrence: React.FC = () => {
   const { openDatePicker } = useDatePicker(); // 👈 access the date picker
   
   const contentRef = useScrollToTop(); // use the custom hook 
-  const { user } = useUser(); 
+  const { userId } = useUser(); 
 	const { currency, allSelectedCurrencies } = useCurrency(); 
   const [exchangeRate, setExchangeRate] = useState<number>(1);
   
   const { seriesId } = useParams<{ seriesId: string }>(); // passed series id to fill the form, always a string
-	const [passedRecurrenceId, setPassedRecurrenceId] = useState<number>(Number(seriesId));
+	const [passedRecurrenceId, setPassedRecurrenceId] = useState<string>(seriesId);
 	const today = new Date();
 	const [startDate, setStartDate] = useState<Date>(today); 
   const [originalDueDate, setOriginalDueDate] = useState<Date>(today);
   const [nextDueDate, setNextDueDate] = useState<Date>(today);
-	const [categoryId, setCategoryId] = useState<number>(1);
+	const [categoryId, setCategoryId] = useState<string>('');
 
-  const [accountId, setAccountId] = useState<number>(0);
-	const [subcategoryId, setSubcategoryId] = useState<number>(0);
+  const [accountId, setAccountId] = useState<string>('');
+	const [subcategoryId, setSubcategoryId] = useState<string>('');
   const [showFavourites, setShowFavourites] = useState(false); // State to toggle between favourites and all categories
   const [note, setNote] = useState<string>('');
-  const [amountDefault, setAmountDefault] = useState<number>(0);
   const [amountAlt, setAmountAlt] = useState<number>(0);
   const [currencyCode, setCurrencyCode] = useState<string>('');
 	const [selectedCurrency, setSelectedCurrency] = useState<CurrencyType>(defaultCurrency);
@@ -142,7 +140,6 @@ const EditRecurrence: React.FC = () => {
 	const [isFormValid, setIsFormValid] = useState<boolean>(true); // Change to false when validating form
 	
 	// Modal variables
-	const [dateIsOpen, setDateIsOpen] = useState(false); // controls date modal open/close
 	const [isOpenCategoryModal, setIsOpenCategoryModal] = useState(false);
 	const [isAlternativeModalOpen, setIsAlternativeModalOpen] = useState<boolean>(false);
 	const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
@@ -172,7 +169,7 @@ const EditRecurrence: React.FC = () => {
 		if (!seriesId) return;
 	
 		async function initializeRecurrenceFields(seriesId: string) {
-			const series = await getRecurringSeriesById(Number(seriesId));
+			const series = await getRecurringSeriesById(seriesId);
 			if(!series) return;
 			setPassedRecurrenceId(series.seriesId);
 			const recurrenceStartDate = new Date(series.startDate);
@@ -285,7 +282,7 @@ const EditRecurrence: React.FC = () => {
 	const category = useCategory(categoryId);
 	const subcategory = useSubcategory(subcategoryId);
 
-	const handleCategorySelect = ({ categoryId, subcategoryId }: { categoryId: number; subcategoryId: number }) => {
+	const handleCategorySelect = ({ categoryId, subcategoryId }: { categoryId: string; subcategoryId: string }) => {
 		setCategoryId(categoryId); // Update the parent category ID
 		setSubcategoryId(subcategoryId);
 		setIsOpenCategoryModal(false); // Close the modal
@@ -303,7 +300,7 @@ const EditRecurrence: React.FC = () => {
 	
 
 	// Handle selected card id change from SliderComponent
-	const handleAccountSelect = (accountId: number) => {
+	const handleAccountSelect = (accountId: string) => {
 	  setAccountId(accountId); // Update the state with the selected account id
 	};
 
@@ -421,7 +418,7 @@ const EditRecurrence: React.FC = () => {
   }
 
   // Update expense record in database
-  async function updateRecurrence(passedRecurrenceId: number, forceInactive: boolean) {
+  async function updateRecurrence(passedRecurrenceId: string, forceInactive: boolean) {
     // Check if recurrence exists
     const existingRecurrence = await db.recurringSeries.get(passedRecurrenceId);
     if (!existingRecurrence) {
@@ -444,7 +441,7 @@ const EditRecurrence: React.FC = () => {
           if(isBeforeOrToday(nextDueDate.toISOString())) {
         
             await tx.expenses.add({  
-              userId: 1,
+              userId,
               expenseNote: note,
               accountId: accountId,
               categoryId,

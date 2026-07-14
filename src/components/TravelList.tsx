@@ -111,7 +111,7 @@ const TravelList: React.FC<TravelListProps> = ({ onTripCountChange }) => {
               {trips.map((trip) => (
                 <TravelItem 
                   key={trip.tripId}
-                  tripId={trip.tripId}
+                  tripId={trip.tripId}  
                   tripName={trip.tripName}
                   tripIcon={trip.tripIcon}
                   fromDate={trip.fromDate}

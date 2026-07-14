@@ -91,7 +91,7 @@ const statistics: React.FC = () => {
   const [showInfo, setShowInfo] = useState<boolean>(false);
   const [infoMsg, setInfoMsg] = useState<string>('');
 
-  const [visibleCategories, setVisibleCategories] = useState<number[]>([]);
+  const [visibleCategories, setVisibleCategories] = useState<string[]>([]);
 
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -255,7 +255,7 @@ const statistics: React.FC = () => {
   useEffect(() => {
     if (!expenses?.length) return;
   
-    const totals: Record<number, number> = {};
+    const totals: Record<string, number> = {};
   
     for (const exp of expenses) {
       totals[exp.categoryId] =
@@ -264,7 +264,7 @@ const statistics: React.FC = () => {
   
     const sorted = Object.entries(totals)
       .map(([categoryId, total]) => ({
-        categoryId: Number(categoryId),
+        categoryId: categoryId,
         total
       }))
       .sort((a, b) => b.total - a.total)
@@ -276,7 +276,7 @@ const statistics: React.FC = () => {
   }, [expenses]);
 
 
-  const handleToggleCategory = (categoryId: number) => {
+  const handleToggleCategory = (categoryId: string) => {
     setVisibleCategories((prev) => {
       if (prev.includes(categoryId)) {
         if (prev.length > 1) return prev.filter((id) => id !== categoryId);

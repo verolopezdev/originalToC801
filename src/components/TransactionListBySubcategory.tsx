@@ -23,7 +23,7 @@ import "../Main.css";
 import "./TransactionItem.css";
 
 interface SubcategoryGroup {
-  subcategoryId: number;
+  subcategoryId: string;
   expenses: ParsedExpense[];
   total: number;
 }
@@ -43,10 +43,10 @@ const SubcategoryExpenseList: React.FC<Props> = ({ groupedExpenses, parentCatego
   const subcategories = useLiveQuery(() => db.subcategories.toArray());
   const accounts = useLiveQuery(() => db.accounts.toArray());
 
-  const getSubcategory = (subcategoryId: number) =>
+  const getSubcategory = (subcategoryId: string) =>
     subcategories?.find((sc) => sc.subcategoryId === subcategoryId);
 
-  const getAccountName = (accountId: number) =>
+  const getAccountName = (accountId: string) =>
     accounts?.find((ac) => ac.accountId === accountId)?.accountName || "";
 
   const getAmount = (exp: ParsedExpense): number =>
@@ -106,7 +106,7 @@ const SubcategoryExpenseList: React.FC<Props> = ({ groupedExpenses, parentCatego
       {groupedExpenses.map(({ subcategoryId, expenses, total }) => {
         const subcategory = getSubcategory(subcategoryId);
         const subcategoryName =
-          subcategoryId !== 0 && subcategory
+          subcategoryId !== '' && subcategory
             ? subcategory.subcategoryName
             : t('categories.no_subcat');
         const iconName =

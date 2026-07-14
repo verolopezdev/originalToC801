@@ -26,17 +26,17 @@ import '../pages/Categories.css';
 
 
 type Subcategory = {
-  subcategoryId: number;
+  subcategoryId: string;
   subcategoryName: string;
   subcategoryColor: string;
   subcategoryIcon: string;
   activeSubcategory: boolean;
   favouriteSubcategory: boolean;
-  parentCategoryId: number;
+  parentCategoryId: string;
 }
 
 type Category = {
-  categoryId: number;
+  categoryId: string;
   categoryName: string;
   categoryColor: string;
   categoryIcon: string;
@@ -48,14 +48,14 @@ type Category = {
 
 
 interface CategoryPickerProps {
-  selectedCategory?:  number;
-  selectedSubcategory?: number;
-  onCategorySelect: (selection: { categoryId: number; categoryName: string; subcategoryId: number, subcategoryName: string }) => void;
+  selectedCategory?:  string;
+  selectedSubcategory?: string;
+  onCategorySelect: (selection: { categoryId: string; categoryName: string; subcategoryId: string, subcategoryName: string }) => void;
   excludeFirst?: boolean; // Optionally exclude the first category
   showFavourites?: boolean; // Show only favourite categories & subcategories 
   onlyCategories?: boolean; // ✅ New prop
-  currentCategoryId?: number; // The ID of the category currently being edited/merged 
-  currentSubcategoryId?: number; // The ID of the subcategory currently being edited/merged
+  currentCategoryId?: string; // The ID of the category currently being edited/merged 
+  currentSubcategoryId?: string; // The ID of the subcategory currently being edited/merged
 }
 
 
@@ -79,7 +79,7 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
   let parentCategory: any = null; // Holds data for parent category
   
   // State for managing subcategory modal
-  const [selectedCategoryForSub, setSelectedCategoryForSub] = useState<number | null>(null); // Parent category Id that has subcategories
+  const [selectedCategoryForSub, setSelectedCategoryForSub] = useState<string | null>(null); // Parent category Id that has subcategories
   const [filteredSubcategories, setFilteredSubcategories] = useState<Subcategory[]>([]); // Saves all subcategories for a parent category
 
   // Get all active categories
@@ -94,7 +94,7 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
       setActiveSubcategories(allSubcategories.filter(cat => cat.activeSubcategory));
 
       // This opens subcategory modal if selectedSubcategory has content
-      if (selectedSubcategory && selectedSubcategory > 0 && allSubcategories.length > 0) {
+      if (selectedSubcategory && selectedSubcategory !== '' && allSubcategories.length > 0) {
         const subcategory = allSubcategories.find(sub => sub.subcategoryId === selectedSubcategory);
     
         if (subcategory) {
@@ -111,7 +111,7 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
 
 
   // Get subcategories for selected parent category
-  async function fetchSubcategories(categoryId: number | null): Promise<Subcategory[]> {
+  async function fetchSubcategories(categoryId: string | null): Promise<Subcategory[]> {
     if (categoryId !== null) {
       const result = await db.subcategories
         .where("parentCategoryId")
@@ -192,7 +192,7 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
   }, [excludeFirst]);
 
 
-  const handleClick = async (categoryId: number, categoryName: string, subcategoryId: number, subcategoryName: string, hasSubcategories: boolean) => {
+  const handleClick = async (categoryId: string, categoryName: string, subcategoryId: string, subcategoryName: string, hasSubcategories: boolean) => {
     if (!onlyCategories && hasSubcategories) {
       setSelectedCategoryForSub(categoryId);
     } else {
@@ -249,7 +249,7 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
                 <div
                   key={category.categoryId} 
                   className={`category-container centered-container ${category.categoryId === selectedCategory && !selectedSubcategory ? "selected-category" : ""}`} // ✅ Check for selectedSubcategory
-                  onClick={() => handleClick(category.categoryId, category.categoryName, 0, '', category.subcategories)}  
+                  onClick={() => handleClick(category.categoryId, category.categoryName, '', '', category.subcategories)}  
                 >
                   <CategoryIcon categoryColor={category.color} iconName={category.icon} />
                   <div className="category-name">
@@ -284,7 +284,7 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
               <div
                 key={category.categoryId} 
                 className={`category-container centered-container ${category.categoryId === selectedCategory && !selectedSubcategory ? "selected-category" : ""}`} // ✅ Check for selectedSubcategory
-                onClick={() => handleClick(category.categoryId, category.categoryName, 0, '', category.subcategories)}
+                onClick={() => handleClick(category.categoryId, category.categoryName, '', '', category.subcategories)}
               >
                 <CategoryIcon categoryColor={category.categoryColor} iconName={category.categoryIcon} />
                 <div className="category-name">
@@ -303,7 +303,7 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
                 <div className="centered-container">
                   <div
                     className={`category-container ${parentCategory.categoryId === selectedCategory && !selectedSubcategory ? "selected-category" : ""}`} // ✅ Check for selectedSubcategory
-                    onClick={() => handleClick(parentCategory.categoryId, parentCategory.categoryName, 0, '', false)}
+                    onClick={() => handleClick(parentCategory.categoryId, parentCategory.categoryName, '', '', false)}
                   >
                     <CategoryIcon categoryColor={parentCategory.color} iconName={parentCategory.icon} />
                     <div className="category-name">

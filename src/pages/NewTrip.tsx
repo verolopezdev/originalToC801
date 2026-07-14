@@ -38,10 +38,14 @@ import {
 
 // Ion icon components
 import { 
+  add,
   calendarOutline,
   caretDownOutline,
+  cashOutline,
   chevronForwardOutline,
   closeOutline,
+  homeOutline,
+  layersOutline,
 } from 'ionicons/icons';
 
 
@@ -49,7 +53,7 @@ import {
 import CategoryPreview from '../components/CategoryPreview';
 import IconPicker from '../components/IconPicker';
 import Modal from '../components/Modal';
-import DatePicker from '../components/DatePicker';
+import Footer from '../components/Footer';
 
 
 // Styles
@@ -74,12 +78,27 @@ const defaultCurrency: CurrencyData = {
   decimalSeparator: '.',
 };
 
+// Footer items
+interface AppPage {
+  url: string;
+  icon: string;
+  title: string;
+}
+
+const appPages: AppPage[] = [
+  { title: 'dashboard', url: '/dashboard', icon: homeOutline },
+  { title: 'accounts', url: '/accounts', icon: layersOutline },
+  { title: 'Add', url: '/newexpense/0', icon: add },
+  { title: 'activity', url: '/activity', icon: cashOutline }
+];
+
+
 
 
 const NewTrip: React.FC = () => {
   const contentRef = useScrollToTop(); // use the custom hook 
   const { t } = useTranslation();
-  const { user, updateUser } = useUser(); // Access user context
+  const { userId } = useUser(); // Access user context
   const { currency } = useCurrency();
   const { openDatePicker } = useDatePicker();
   
@@ -275,6 +294,7 @@ const NewTrip: React.FC = () => {
         db.trips,
         async (tx) => {
           await tx.trips.add({
+            userId,
             tripName,
             tripIcon,
             fromDate,
@@ -294,6 +314,11 @@ const NewTrip: React.FC = () => {
   }
 
 
+  // Translate footer menu item titles
+  const translatedMenuItems = appPages.map((item) => ({
+    ...item,
+    title: t(`common.${item.title}`, { defaultValue: item.title }),
+  }));
   
   
   
@@ -457,28 +482,6 @@ const NewTrip: React.FC = () => {
           destination={modalConfig.destination}
         />
 
-        {/* Modal containing DatePicker "from" date */}
-        {/* <IonModal 
-          isOpen={fromDateIsOpen} 
-          onDidDismiss={() => setFromDateIsOpen(false)} 
-          backdropDismiss={true}
-        >
-          <div className="centered-modal-content">
-            <DatePicker prevDate={fromDate} onDateChange={handleDateSelect} />
-          </div>
-        </IonModal> */}
-
-        {/* Modal containing DatePicker "to" date*/}
-        {/* <IonModal 
-          isOpen={toDateIsOpen} 
-          onDidDismiss={() => setToDateIsOpen(false)} 
-          backdropDismiss={true}
-        >
-          <div className="centered-modal-content">
-            <DatePicker prevDate={toTempDate} onDateChange={handleDateSelect} disableUpTo={fromDate} />
-          </div>
-        </IonModal> */}
-
 
         
         {/* modal for travel currency selection */}
@@ -535,6 +538,7 @@ const NewTrip: React.FC = () => {
 
         
       </IonContent>
+      <Footer appPages={translatedMenuItems} />
     </IonPage>
   );
 };

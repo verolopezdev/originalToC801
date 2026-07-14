@@ -62,7 +62,7 @@ export function getNextDate(
   } 
 
 
-  export async function getRecurringSeriesById(seriesId: number): Promise<RecurringSeries | undefined> {
+  export async function getRecurringSeriesById(seriesId: string): Promise<RecurringSeries | undefined> {
     return await db.recurringSeries.get(seriesId);
   }
   

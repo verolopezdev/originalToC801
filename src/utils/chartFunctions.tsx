@@ -11,7 +11,7 @@ import autoTable from 'jspdf-autotable';
 export async function getExpensesInRange(
   startDate: string,
   endDate: string,
-  categoryId?: number,
+  categoryId?: string,
 ): Promise<Expense[]> {
   return db.expenses
     .where("expenseDate")
@@ -21,26 +21,6 @@ export async function getExpensesInRange(
 }
 
 
-/*
-export async function getExpensesWithSubcategories( 
-  startDate: string,
-  endDate: string,
-  categoryId?: number
-): Promise<(Expense & { subcategory: Subcategory | null })[]> {
-  const expenses = await db.expenses
-    .where("expenseDate")
-    .between(startDate, endDate, true, true)
-    .and(e => e.isActive === 1 && (!categoryId || e.categoryId === categoryId))
-    .toArray();
-
-  const subcategories = await db.subcategories.toArray();
-
-  return expenses.map(exp => ({
-    ...exp,
-    subcategory: subcategories.find(s => s.subcategoryId === exp.subcategoryId) || null,
-  }));
-}
-*/
 
 
 export const getExpensesWithCategories = async (startDate: Date, endDate: Date) => {
@@ -119,34 +99,6 @@ export const formatNumberCompact = (value: number): string => {
 };
 
 
-/*
-const monthNames = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-];
-
-/**
- * Returns a tick formatter for months that dynamically skips labels
- * if there isn’t enough space.
- * @param totalMonths total number of months in the chart
- 
-export const getMonthTickFormatter = (totalMonths: number) => {
-  return (value: number, index: number) => {
-    const monthLabel = monthNames[value - 1] ?? value.toString();
-
-    // Always show first and last month
-    if (index === 0 || index === totalMonths - 1) return monthLabel;
-
-    // Calculate skip step to show roughly 6 labels max
-    const skipStep = Math.ceil(totalMonths / 6);
-    if (index % skipStep === 0) return monthLabel;
-
-    return "";
-  };
-};
-*/
-
-
 // Export expenses to CSV file
 export interface ExportCurrency {
   code: string;
@@ -189,12 +141,12 @@ export async function exportExpensesToCSV(
   const separator = decimalSeparator === "," ? ";" : ",";
 
   // Lookup maps
-  const categoryMap = categories.reduce<Record<number, string>>((acc, cat) => {
+  const categoryMap = categories.reduce<Record<string, string>>((acc, cat) => {
     acc[cat.categoryId] = cat.categoryName;
     return acc;
   }, {});
 
-  const accountMap = accounts.reduce<Record<number, string>>((acc, accItem) => {
+  const accountMap = accounts.reduce<Record<string, string>>((acc, accItem) => {
     acc[accItem.accountId] = accItem.accountName;
     return acc;
   }, {});
@@ -392,12 +344,12 @@ export const exportExpensesToPDF = async (
   /*
     3. Build lookup maps for categories & accounts
   */
-  const categoryMap = categories.reduce<Record<number, string>>((acc, cat) => {
+  const categoryMap = categories.reduce<Record<string, string>>((acc, cat) => {
     acc[cat.categoryId] = cat.categoryName;
     return acc;
   }, {});
   
-  const accountMap = accounts.reduce<Record<number, string>>((acc, accItem) => {
+  const accountMap = accounts.reduce<Record<string, string>>((acc, accItem) => {
     acc[accItem.accountId] = accItem.accountName;
     return acc;
   }, {});

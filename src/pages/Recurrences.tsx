@@ -28,7 +28,6 @@ import {
   IonIcon,
   IonPage,
   IonPopover, 
-  IonTitle,
   IonToolbar 
 } from '@ionic/react';
 
@@ -36,13 +35,11 @@ import {
 // Icons
 import { 
   add,
-  barChartOutline, 
   calendarOutline, 
   cashOutline, 
   ellipsisVertical,
   eyeOffOutline,
   eyeOutline,
-  home,
   homeOutline,
   layersOutline,
 } from 'ionicons/icons';
@@ -75,9 +72,9 @@ const Reccurrences: React.FC = () => {
 	const categories = useLiveQuery(() => db.categories.toArray());
 	const subcategories = useLiveQuery(() => db.subcategories.toArray());
 	const accounts = useLiveQuery(() => db.accounts.toArray());
-	const getCategory = (categoryId: number) => categories?.find(c => c.categoryId === categoryId);
-	const getSubcategory = (subcategoryId: number) => subcategories?.find(sc => sc.subcategoryId === subcategoryId);
-	const getAccountName = (accountId : number) => accounts?.find(ac => ac.accountId === accountId);
+	const getCategory = (categoryId: string) => categories?.find(c => c.categoryId === categoryId);
+	const getSubcategory = (subcategoryId: string) => subcategories?.find(sc => sc.subcategoryId === subcategoryId);
+	const getAccountName = (accountId : string) => accounts?.find(ac => ac.accountId === accountId);
   const [activeRecurrences, setActiveRecurrences] = useState<RecurringSeries[]>([]);
   const [inactiveRecurrences, setInactiveRecurrences] = useState<RecurringSeries[]>([]);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -85,7 +82,7 @@ const Reccurrences: React.FC = () => {
   const [showInactiveRecurrences, setShowInactiveRecurrences] = useState<boolean>(false);
   const firstInactiveRef = useRef<HTMLDivElement | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [overdueExpenses, setOverdueExpenses] = useState<Record<number, Expense | null>>({});
+  const [overdueExpenses, setOverdueExpenses] = useState<Record<string, Expense | null>>({});
 
   
   //This useEffect hook is responsible for fetching all active recurring expenses, determining if any of them are overdue, 
@@ -116,7 +113,7 @@ const Reccurrences: React.FC = () => {
   
       // ✅ Step 3: Update state in one go
       // This initializes an empty object that will store our results. The key will be the seriesId (a number), and the value will be the overdue Expense object or null.
-      const map: Record<number, Expense | null> = {};
+      const map: Record<string, Expense | null> = {};
       allActiveRecurrencies.forEach((rec, idx) => {
         map[rec.seriesId] = results[idx];
       });

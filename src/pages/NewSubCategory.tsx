@@ -57,7 +57,7 @@ const NewSubCategory: React.FC = () => {
   const { themeColor } = useTheme();
   const color = themeColor.split("-")[1]; // Extracts color name to initialize selectedColor
   const { categoryId } = useParams<{ categoryId: string }>(); // category id to fill the form
-  const parentCategoryId = Number(categoryId);
+  const parentCategoryId = categoryId;
   const [parentColor, setParentColor] = useState<string>(color);
   const [parentIcon, setParentIcon] = useState<string>("fa-house");
   const [parentName, setParentName] = useState<string>('');

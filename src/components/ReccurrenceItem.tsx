@@ -25,7 +25,7 @@ import './ReccurrenceItem.css';
 
 
 interface ReccurrenceItemProps {
-  seriesId: number;
+  seriesId: string;
   categoryIcon: string;
   categoryColor: string; 
   categoryName: string;

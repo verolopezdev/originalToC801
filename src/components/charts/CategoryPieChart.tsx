@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 interface CategoryPieChartProps {
   groupedExpenses: {
-    subcategoryId: number;
+    subcategoryId: string;
     total: number;
   }[];
   parentCategoryColor: string;

@@ -119,7 +119,7 @@ const Activity: React.FC = () => {
       .toArray();
 
     // Use a Set to collect unique account IDs efficiently
-    const accountIds = new Set<number>();
+    const accountIds = new Set<string>();
     expensesInPeriod.forEach(exp => {
       accountIds.add(exp.accountId);
     });
@@ -136,7 +136,7 @@ const Activity: React.FC = () => {
     // 1. All Active accounts
     // 2. Any Disabled account that has an expense in the current period (i.e., its ID is in usedAccountIdsInPeriod)
     const activeAndUsedAccounts = allAccounts.filter(account => {
-      const isUsed = usedAccountIdsInPeriod?.includes(account.accountId);
+      const isUsed = usedAccountIdsInPeriod?.includes(account.accountId!);
       // Include if: (Active) OR (Disabled AND used in this period)
       return account.activeAccount || isUsed;
     });

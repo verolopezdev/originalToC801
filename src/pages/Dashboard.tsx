@@ -80,8 +80,13 @@ const Dashboard: React.FC = () => {
   const contentRef = useScrollToTop(); // use the custom hook 
   const { travelMode, checkTrip, selectedTripId } = useTrip();
   const { overallSeverity } = useExpense();
-  const trip = useLiveQuery(() => db.trips.get(Number(selectedTripId)), [selectedTripId]);
-  const [tripId, setTripId] = useState<number>(0);
+
+  const trip = useLiveQuery(async () => {
+    if (!selectedTripId) return undefined;
+    return await db.trips.get(selectedTripId);
+  }, [selectedTripId]);
+
+  const [tripId, setTripId] = useState<string>('');
   const [tripIcon, setTripIcon] = useState<string>("fa-plane-departure");
   const [tripName, setTripName] = useState<string>('');
   const [fromDate, setFromDate] = useState(new Date());

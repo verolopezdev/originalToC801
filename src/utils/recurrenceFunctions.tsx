@@ -163,7 +163,7 @@ export const getDueInfo = (
 
 // Called from Recurrences.tsx and ViewRecurrence.tsx
 export const getOldestOverdueExpenseForSeries = async (   
-  seriesId: number
+  seriesId: string
 ): Promise<Expense | null> => {
   const todayISO = dayjs().endOf('day').toISOString();
 
@@ -178,7 +178,7 @@ export const getOldestOverdueExpenseForSeries = async (
 
 
 
-export const getMostRecentExpenseForSeries = async (seriesId: number): Promise<Expense | undefined> => {
+export const getMostRecentExpenseForSeries = async (seriesId: string): Promise<Expense | undefined> => {
   return await db.expenses
     .where('[seriesId+expenseDate]') // compound index recommended
     .between([seriesId, Dexie.minKey], [seriesId, Dexie.maxKey])

@@ -26,17 +26,17 @@ interface TransactionItemProps {
   categoryName: string;
   accountName: string;
   expenseNote: string; 
-  expenseId: number;
+  expenseId: string;
   expenseAmount: number; 
   expenseDate: Date; 
   expenseCurrencyCode: string;
-  tripId?: number | null;
+  tripId?: string | null;
   installmentIndex?: number;
   totalInstallments?: number;
   planner?: boolean;
   autoLogged?: boolean;
   isActive?: number; 
-  seriesId?: number; 
+  seriesId?: string; 
   estimatedAmount?: number;
 }
 
@@ -81,7 +81,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
   return (
     <IonRouterLink
       routerLink={
-        expenseId === -1 // is a projected expense, navigate to edit recurrence
+        expenseId === '-1' // is a projected expense, navigate to edit recurrence
             ? `/viewrecurrence/${seriesId}`
             : `/editexpense/${expenseId}` // is an actual expense
       }
@@ -113,7 +113,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
         </div>
         <div className='right-col'>
           <div className='expense-data'>
-            {estimatedAmount && estimatedAmount > 0 && expenseId === -1 ? (
+            {estimatedAmount && estimatedAmount > 0 && expenseId === '-1' ? (
               <div className='disabled'>
                 <span className='projected'>(est)</span>
                 <FormatAmount amount={estimatedAmount/100} currencyCode={expenseCurrencyCode} />  

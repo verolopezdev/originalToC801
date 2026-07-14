@@ -80,8 +80,8 @@ const EditTrip: React.FC = () => {
   const { t } = useTranslation();
   
   const { tripId } = useParams<{ tripId: string }>(); // expense id to fill the form
-  const trip = useLiveQuery(() => db.trips.get(Number(tripId)), [tripId]);
-  const [passedTripId, setPassedTripId] = useState<number>(Number(tripId));
+  const trip = useLiveQuery(() => db.trips.get(tripId), [tripId]);
+  const [passedTripId, setPassedTripId] = useState<string>(tripId);
   
   const { currency } = useCurrency();
   const [originalTrip, setOriginalTrip] = useState<Trip | null>(null);
@@ -301,7 +301,7 @@ const EditTrip: React.FC = () => {
 
   
   // Create new account record in database
-  async function updateTrip(tripId: number) {
+  async function updateTrip(tripId: string) {
     // Check if trip exists
     const existingTrip = await db.trips.get(tripId);
 

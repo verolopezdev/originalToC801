@@ -35,7 +35,7 @@ import {
 } from '@ionic/react';
 
 interface SubcategoryGroup {
-  subcategoryId: number;
+  subcategoryId: string;
   expenses: ParsedExpense[];
   total: number;  
 }
@@ -66,7 +66,7 @@ const StatisticsCategory: React.FC = () => {
   const date = dayjs(`${year}-${month}-01`).toDate();
   const monthName = dayjs(date).format("MMMM");
 
-  const category = useLiveQuery(() => db.categories.get(Number(categoryId)), [categoryId]);
+  const category = useLiveQuery(() => db.categories.get(categoryId), [categoryId]);
   const categoryName = category?.categoryName ? category.categoryName : '';
   const categoryColor = category?.categoryColor ? category.categoryColor : 'categoryless';
   const categoryIcon = category?.categoryIcon ? category.categoryIcon : 'fa-bolt-lightning';
@@ -103,11 +103,11 @@ const StatisticsCategory: React.FC = () => {
       const allResults = await db.expenses
         .where("expenseDate")
         .between(startOfMonth, endOfMonth, true, false)
-        .and((exp) => exp.isActive === 1 && exp.categoryId === Number(categoryId))
+        .and((exp) => exp.isActive === 1 && exp.categoryId === categoryId)
         .sortBy("expenseDate");
 
       // Group by subcategoryId
-      const subcategoryMap: Record<number, ParsedExpense[]> = {};
+      const subcategoryMap: Record<string, ParsedExpense[]> = {};
       allResults.forEach((exp) => {
         const subcatId = exp.subcategoryId || 0;
         if (!subcategoryMap[subcatId]) subcategoryMap[subcatId] = [];
@@ -119,7 +119,7 @@ const StatisticsCategory: React.FC = () => {
 
       const subcategoriesArray: SubcategoryGroup[] = Object.entries(subcategoryMap).map(
         ([subcategoryIdStr, expenses]) => {
-          const subcategoryId = Number(subcategoryIdStr);
+          const subcategoryId = subcategoryIdStr;
           const total = expenses.reduce((sum, exp) => sum + getAmount(exp), 0);
           return { subcategoryId, expenses, total };
         }

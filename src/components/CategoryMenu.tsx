@@ -19,8 +19,8 @@ import './Menu.css';
 
 interface CategoryMenuProps {
   categories: Category[];
-  visibleCategories: number[]; // use IDs instead of names
-  onToggleCategory: (categoryId: number) => void;
+  visibleCategories: string[]; // use IDs instead of names
+  onToggleCategory: (categoryId: string) => void;
 }
 
 const CategoryMenu: React.FC<CategoryMenuProps> = ({
@@ -47,7 +47,7 @@ const CategoryMenu: React.FC<CategoryMenuProps> = ({
       <IonContent className="ion-padding">
         <div>
           {categories
-            .filter((cat) => cat.categoryId > 0)
+            .filter((cat) => cat.categoryId !== '')
             .map((cat) => {
               const isChecked = visibleCategories.includes(cat.categoryId);
 

@@ -32,7 +32,7 @@ import {
 
 
 interface TravelItemProps {
-  tripId: number;
+  tripId: string;
   tripName: string;
   tripIcon: string;
   fromDate: Date;

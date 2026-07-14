@@ -35,7 +35,7 @@ import '../Main.css';
 
 const NewAccount: React.FC = () => {
   const contentRef = useScrollToTop(); // use the custom hook 
-  const { user, updateUser } = useUser(); // Access user context
+  const { userId } = useUser(); // Access user context
   const { t } = useTranslation();
   const { themeColor } = useTheme();
   const color = themeColor.split("-")[1]; // Extracts color name to initialize selectedColor
@@ -59,7 +59,6 @@ const NewAccount: React.FC = () => {
   const [accountIdentifier, setAccountIdentifier] = useState<string>('');
   const [accountLogo, setAccountLogo] = useState<string>("fa-globe");
   const [accountColor, setAccountColor] = useState<string>(color);
-  const [userId, setUserId] = useState<string>('user@email.com');
 
   useKeyboardAutoClose(); 
   
@@ -84,7 +83,7 @@ const NewAccount: React.FC = () => {
       // Set error to null if the field is empty and it's not 'cardIdentifier'
       setErrors((prevErrors) => ({
         ...prevErrors,
-        [field]: field === 'cardIdentifier' ? null : t('profile.emptyField'),
+        [field]: field === 'cardIdentifier' ? null : t('common.empty_field'),
       }));
     } else if (!validationFn(value)) {
       setErrors((prevErrors) => ({ ...prevErrors, [field]: errorMessage }));

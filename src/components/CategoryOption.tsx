@@ -31,7 +31,7 @@ import "../Main.css";
 import "./CategoryOption.css";
 
 interface CategoryProps {
-  categoryId?: number;
+  categoryId?: string;
   categoryName?: string;
   destination?: string; // "edit" if empty, "subcategory" to create new 
   isDisabled?: boolean;

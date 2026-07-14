@@ -20,7 +20,7 @@ import { useExpense } from '../context/ExpenseContext';
 
 
 interface Props {
-  tripId: number;
+  tripId: string;
   onTotalChange?: (total: number) => void;
 }
 
@@ -42,8 +42,8 @@ const TripExpensesList: React.FC<Props> = ({
 
   const categories = useLiveQuery(() => db.categories.toArray());
   const subcategories = useLiveQuery(() => db.subcategories.toArray());
-  const getCategory = (categoryId: number) => categories?.find(c => c.categoryId === categoryId);
-  const getSubcategory = (subcategoryId: number) => subcategories?.find(sc => sc.subcategoryId === subcategoryId);
+  const getCategory = (categoryId: string) => categories?.find(c => c.categoryId === categoryId);
+  const getSubcategory = (subcategoryId: string) => subcategories?.find(sc => sc.subcategoryId === subcategoryId);
 
 
   useEffect(() => {

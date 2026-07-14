@@ -41,7 +41,7 @@ import {
 
 
 interface TransactionItemProps {
-  expenseId: number;
+  expenseId: string;
   expenseAmount: number; 
   expenseAmountDefault?: number;
 	dueDate: Date;
@@ -51,7 +51,7 @@ interface TransactionItemProps {
   installmentIndex?: number;
   totalInstallments?: number;
 	paymentStatus: number;
-  seriesId: number;
+  seriesId: string;
 }
 
 const ExpenseItem: React.FC<TransactionItemProps> = ({
@@ -213,7 +213,7 @@ const ExpenseItem: React.FC<TransactionItemProps> = ({
             {paymentStatus === 1 ? ( // Paid amount
               <>
                 <div className='expense-item-amount'>
-                  {expenseId === -1 && (<span className='projected'>{t('common.estimated_short')}</span>)}
+                  {expenseId === '-1' && (<span className='projected'>{t('common.estimated_short')}</span>)}
                   <FormatAmount amount={expenseAmount/100} currencyCode={expenseCurrencyCode} />  
                 </div>
                 {expenseAmountDefault !== undefined && (

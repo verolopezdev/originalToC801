@@ -80,7 +80,7 @@ export async function getOverallStatus(): Promise<Severity> {
  * Returns 'overdue', 'due-today', 'due-soon', 'due-later', or 'finalized'
  * Called from ViewRecurrence
  */
-export async function getSeriesSeverity(seriesId: number) {
+export async function getSeriesSeverity(seriesId: string) {
   const now = dayjs();
   const todayStart = now.startOf('day');
 
@@ -113,7 +113,7 @@ const series = await db.recurringSeries.get(seriesId);
 
 
 
-export async function hasInactiveExpense(seriesId: number): Promise<boolean> {
+export async function hasInactiveExpense(seriesId: string): Promise<boolean> {
   if (!seriesId) {
     console.warn("[hasInactiveExpense] No seriesId provided.");
     return false;

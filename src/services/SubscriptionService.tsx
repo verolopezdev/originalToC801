@@ -2,7 +2,7 @@ import { db } from '../db';
 
 
 export async function refreshSubscription() {
-  const user = await db.users.get(1);
+  const user = await db.users.get('1');
 
   if (!user) return;
 
@@ -50,7 +50,7 @@ export async function refreshSubscription() {
     }
   }
 
-  await db.users.update(1, {
+  await db.users.update('1', {
     isPremium,
     subscriptionExpirationDate: expiration,
   });

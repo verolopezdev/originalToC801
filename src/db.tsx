@@ -17,6 +17,7 @@ export const TABLE_NAMES = [
 ];
 
 export let isSeeding = false;
+export const CATEGORYLESS_ID = 'system_categoryless';
 
 export const setIsSeeding = (value: boolean) => {
   isSeeding = value;
@@ -106,7 +107,7 @@ interface Metadata {
 export type SubscriptionPlan = "free" | "monthly" | "quarterly" | "yearly";
 
 export interface User {
-  userId?: string;
+  userId: string;
   realmId?: string;
   name: string;
   lastName: string;
@@ -126,7 +127,7 @@ export interface User {
 }
 
 interface Account {
-  accountId?: string;
+  accountId: string;
   realmId?: string;
   accountName: string;
   accountIdentifier: string;
@@ -138,7 +139,7 @@ interface Account {
 }
 
 interface Category {
-  categoryId?: string;
+  categoryId: string;
   realmId?: string;
   categoryName: string;
   categoryColor: string;
@@ -150,7 +151,7 @@ interface Category {
 }
 
 interface Subcategory {
-  subcategoryId?: string;
+  subcategoryId: string;
   realmId?: string;
   subcategoryName: string;
   subcategoryColor: string;
@@ -161,7 +162,7 @@ interface Subcategory {
 }
 
 export interface Expense {
-  expenseId?: string;
+  expenseId: string;
   realmId?: string;
   userId: string;
   dueDate?: string;
@@ -187,7 +188,7 @@ export interface Expense {
 export type FrequencyUnit = 'week' | 'month' | 'year';
 
 export interface RecurringSeries {
-  seriesId?: string;
+  seriesId: string;
   realmId?: string;
   userId: string;
   startDate: string;
@@ -218,7 +219,8 @@ export interface ParsedExpense extends Omit<Expense, 'expenseDate'> {
 }
 
 interface Trip {
-  tripId?: string;
+  tripId: string;
+  userId: string;
   realmId?: string;
   tripName: string;
   tripIcon: string;
@@ -262,7 +264,7 @@ db.version(1).stores({
   accounts: '@accountId, userId, sortOrder, realmId',
   categories: '@categoryId, &categoryName, realmId',
   subcategories: '@subcategoryId, &subcategoryName, parentCategoryId, realmId',
-  expenses: '@expenseId, isActive, userId, expenseDate, accountId, categoryId, subcategoryId, expenseCurrencyCode, tripId, seriesId, realmId',
+  expenses: '@expenseId, isActive, userId, expenseDate, accountId, categoryId, subcategoryId, expenseCurrencyCode, tripId, seriesId, realmId, [seriesId+expenseDate], [seriesId+installmentIndex], [seriesId+isActive+dueDate], [seriesId+dueDate]',
   trips: '@tripId, tripName, tripIcon, fromDate, toDate, currencyCode, realmId',
   historicCurrencyList: 'id',
   alternativeCurrencies: 'code',
@@ -270,7 +272,7 @@ db.version(1).stores({
 });
 
 // 2. Helper to activate Cloud Sync dynamically when user upgrades
-export const enableDexieCloud = (databaseUrl = 'https://zxzf58e25.dexie.cloud') => {
+export const enableDexieCloud = (databaseUrl = 'https://zxzf58e25.dexie.cloud') => {  
   db.cloud.configure({
     databaseUrl,
     requireAuth: true,

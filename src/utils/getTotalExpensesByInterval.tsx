@@ -7,7 +7,7 @@ export async function getTotalExpensesByInterval(
   interval: "weekly" | "monthly" | "yearly",
   currentDate: Dayjs,
   onlyUntilToday = false, // used in DashboardMainCard
-  accountId?: number,
+  accountId?: string,
 ) {
   const { start, end } = getDateRangeForInterval(
     interval,
@@ -38,7 +38,7 @@ export async function getTotalExpensesByInterval(
 export async function getTotalExpensesForPeriod(
   start: Dayjs,
   end: Dayjs,
-  accountId?: number,
+  accountId?: string,
 ) {
    
 

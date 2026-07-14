@@ -30,7 +30,7 @@ const PrintableMonthlyChart: React.FC<PrintableMonthlyChartProps> = React.memo((
   const { data, maxExpenseValue } = useMemo(() => { // 👈 Renamed to simplify
     if (!expenses || !expenses.length) return { data: [], maxExpenseValue: 0 };
     
-    const totals: Record<number, number> = {};
+    const totals: Record<string, number> = {};
     let totalExpenses = 0;
     let maxExpense = 0; // 👈 Track the largest expense value
     
@@ -41,7 +41,7 @@ const PrintableMonthlyChart: React.FC<PrintableMonthlyChartProps> = React.memo((
     });
 
     const chartData = Object.entries(totals).map(([categoryId, total]) => {
-      const category = categories?.find(c => c.categoryId === Number(categoryId));
+      const category = categories?.find(c => c.categoryId === categoryId);
 
       // Update max expense
       maxExpense = Math.max(maxExpense, total); 

@@ -35,7 +35,7 @@ const MonthlyChart: React.FC<MonthlyChartProps> = React.memo(({ expenses, catego
   const { data, maxExpenseValue } = useMemo(() => { // 👈 Renamed to simplify
     if (!expenses || !expenses.length) return { data: [], maxExpenseValue: 0 };
     
-    const totals: Record<number, number> = {};
+    const totals: Record<string, number> = {};
     let totalExpenses = 0;
     let maxExpense = 0; // 👈 Track the largest expense value
     
@@ -46,7 +46,7 @@ const MonthlyChart: React.FC<MonthlyChartProps> = React.memo(({ expenses, catego
     });
 
     const chartData = Object.entries(totals).map(([categoryId, total]) => {
-      const category = categories?.find(c => c.categoryId === Number(categoryId));
+      const category = categories?.find(c => c.categoryId === categoryId);
     
       maxExpense = Math.max(maxExpense, total);
     
@@ -57,7 +57,7 @@ const MonthlyChart: React.FC<MonthlyChartProps> = React.memo(({ expenses, catego
           : category.categoryName;
     
       return {
-        categoryId: Number(categoryId),
+        categoryId,
         name,
         value: total,
         color: resolveCategoryColor(category?.categoryColor || "#8884d8"),

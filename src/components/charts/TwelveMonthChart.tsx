@@ -22,7 +22,7 @@ import '../../pages/Statistics.css';
 interface TwelveMonthChartProps {
   expenses: Expense[];
   categories: Category[];
-  visibleCategoryIds: number[]; // 👈 Updated prop name and type (Category IDs)
+  visibleCategoryIds: string[]; // 👈 Updated prop name and type (Category IDs)
 }
 
 
@@ -31,50 +31,71 @@ const TwelveMonthChart: React.FC<TwelveMonthChartProps> = React.memo(({
   categories,
   visibleCategoryIds
 }) => {
+  
   const { currency } = useCurrency();
   const { t, i18n } = useTranslation();
   
   // Internal state for toggling categories. Initialize with the prop.
   // We use useState here because the legend allows local toggling,
   // which should override the initial prop value.
-  const [currentVisibleIds, setCurrentVisibleIds] = useState<number[]>([]); 
+  const [currentVisibleIds, setCurrentVisibleIds] = useState<string[]>([]); 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
 
 
-  // --- Build chartData for the last 12 months (Oct → Sep) ---
+  // --- Build chartData for the last 12 months ---
   const chartData = useMemo(() => {
     if (!expenses.length || !categories.length) return [];
   
-    // Build month-year points from expenses
     const points: Record<string, any> = {};
+    const today = new Date();
   
-    // First, create all months with 0 values
-    for (let i = 0; i < 12; i++) {
-      const d = new Date();
-      d.setMonth(d.getMonth() - (12 - i));
+    // 1. Build keys for the last 12 months: "YYYY-M"
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
       const year = d.getFullYear();
       const month = d.getMonth() + 1;
       const key = `${year}-${month}`;
+  
       points[key] = { year, month };
-      categories.forEach(cat => {
-        if (cat.categoryId > 0) points[key][cat.categoryId] = 0;
+  
+      // Initialize category keys
+      categories.forEach((cat) => {
+        const catIdStr = String(cat.categoryId);
+        if (catIdStr) {
+          points[key][catIdStr] = 0;
+        }
       });
     }
   
-    // Then add expense amounts
-    for (const exp of expenses as Expense[]) { // <-- Type assertion here
-      const d = new Date(exp.expenseDate);
-      const key = `${d.getFullYear()}-${d.getMonth() + 1}`;
-      if (!points[key]) continue;
-      points[key][exp.categoryId] += exp.expenseAmountDefault / 100;
+    // Track matched expenses for debugging
+    let matchedCount = 0;
+  
+    // 2. Aggregate expenses
+    for (const exp of expenses) {
+      if (!exp.expenseDate) continue;
+  
+      // Robust Date Parsing (Handles ISO strings, timestamps, or Date objects)
+      const expDate = new Date(exp.expenseDate);
+      if (isNaN(expDate.getTime())) continue; // Skip invalid dates
+  
+      const year = expDate.getFullYear();
+      const month = expDate.getMonth() + 1;
+      const key = `${year}-${month}`;
+  
+      const expCatId = String(exp.categoryId);
+  
+      // Add amount if month key and category ID match
+      if (points[key] && points[key][expCatId] !== undefined) {
+        // Make sure expenseAmountDefault is treated as a number
+        const amount = Number(exp.expenseAmountDefault || 0) / 100;
+        points[key][expCatId] += amount;
+        matchedCount++;
+      }
     }
-
-    // Return array ordered by month
+      
     return Object.values(points);
   }, [expenses, categories]);
-
-
     
   // set top 3 as default visible
   useEffect(() => {
@@ -87,7 +108,6 @@ const TwelveMonthChart: React.FC<TwelveMonthChartProps> = React.memo(({
   const maxValue = useMemo(() => {
     const allValues = chartData.flatMap(d =>
       categories
-        .filter(cat => cat.categoryId > 1)
         .map(cat => d[cat.categoryId] || 0)
     );
     return allValues.length ? Math.max(...allValues) * 1.1 : 100; // 10% padding
@@ -133,7 +153,6 @@ const TwelveMonthChart: React.FC<TwelveMonthChartProps> = React.memo(({
       prev === e.activeTooltipIndex ? null : e.activeTooltipIndex
     );
   };
-
 
   
   return (
@@ -225,7 +244,6 @@ const TwelveMonthChart: React.FC<TwelveMonthChartProps> = React.memo(({
 
 
                   {categories
-                    .filter(cat => cat.categoryId > 0)
                     .map(cat =>
                       currentVisibleIds.includes(cat.categoryId) ? (
                         <Line

@@ -12,6 +12,7 @@ import useBackButtonModalReset from "../hooks/useBackButtonModalReset";
 import useScrollToTop from '../hooks/useScrollToTop';
 import { useKeyboardAutoClose } from '../hooks/useKeyboardAutoClose';
 import { useExpense } from '../context/ExpenseContext';
+import { useUser } from '../context/UserContext';
 
 
 // Ionic's components
@@ -61,7 +62,7 @@ import Modal from '../components/Modal';
 import '../Main.css';
 
 
-function useParentCategory(parentCategoryId?: number) {
+function useParentCategory(parentCategoryId?: string) {
   return useLiveQuery(async () => {
     if (!parentCategoryId) return undefined;
     return db.categories.get(parentCategoryId); // Fetch parent category by its ID
@@ -70,9 +71,9 @@ function useParentCategory(parentCategoryId?: number) {
 
 
 const EditSubcategory: React.FC = () => {
-  const CATEGORYLESS_ID = 1; 
   const contentRef = useScrollToTop(); // use the custom hook 
   const { checkExpense } = useExpense();
+  const { userId, categorylessId } = useUser();
   const { t } = useTranslation();
   
   const { themeColor } = useTheme();
@@ -84,8 +85,8 @@ const EditSubcategory: React.FC = () => {
   const { categoryId } = useParams<{ categoryId: string }>(); // category id to fill the form
 
   // Fetch subcategory by ID
-  const subcategory = useLiveQuery(() => db.subcategories.get(Number(categoryId)), [categoryId]);
-  const subcategoryId = Number(categoryId); // Convert to number
+  const subcategory = useLiveQuery(() => db.subcategories.get(categoryId), [categoryId]);
+  const subcategoryId = categoryId; // Convert to number
 
   // Fetch parent category using subcategory's parentCategoryId 
   const parentCategory = useParentCategory(subcategory?.parentCategoryId);  
@@ -99,7 +100,7 @@ const EditSubcategory: React.FC = () => {
     [categoryId]
   );
 
-  const handleParentSelect = ({ categoryId, subcategoryId }: { categoryId: number; subcategoryId: number }) => {  
+  const handleParentSelect = ({ categoryId, subcategoryId }: { categoryId: string; subcategoryId: string }) => {  
     setParentCategoryId(categoryId); // Update the parent category ID
     setIsOpenParentModal(false); // Close the modal
   };
@@ -107,7 +108,7 @@ const EditSubcategory: React.FC = () => {
   const [subcategoryColor, setSubcategoryColor] = useState<string>(color);
   const [subcategoryIcon, setSubcategoryIcon] = useState<string>("fa-house");
   const [subcategoryName, setSubcategoryName] = useState<string>('');
-  const [parentCategoryId, setParentCategoryId] = useState<number>(0);
+  const [parentCategoryId, setParentCategoryId] = useState<string>('');
   const [parentColor, setParentColor] = useState<string>(color);
   const [parentIcon, setParentIcon] = useState<string>("fa-house");
   const [parentName, setParentName] = useState<string>('');
@@ -133,8 +134,8 @@ const EditSubcategory: React.FC = () => {
   // Icon picker modal is now the Merge Modal:
   const [isMergeModalOpen, setIsMergeModalOpen] = useState(false); // New state for Merge Modal
   const [isOpenCategoryMergeModal, setIsOpenCategoryMergeModal] = useState(false);
-  const [targetCategoryId, setTargetCategoryId] = useState<number | null>(null); // To store the selected target category ID
-  const [targetSubcategoryId, setTargetSubcategoryId] = useState<number>(0); 
+  const [targetCategoryId, setTargetCategoryId] = useState<string | null>(null); // To store the selected target category ID
+  const [targetSubcategoryId, setTargetSubcategoryId] = useState<string>(''); 
   const [targetName, setTargetName] = useState<string>('');
   const [agreedToMerge, setAgreedToMerge] = useState(false);
   // Delete modal variables
@@ -256,7 +257,7 @@ const EditSubcategory: React.FC = () => {
   
 
   // Update record
-  async function updateSubcategory(subcategoryId: number) {
+  async function updateSubcategory(subcategoryId: string) {
     try {
       // Check if category exists
       const existingSubcategory = await db.subcategories.get(subcategoryId);
@@ -297,7 +298,7 @@ const EditSubcategory: React.FC = () => {
   }
 
   // Update activeCategory
-  const changeActiveSubcategory = async (subcategoryId: number, activeSubcategory: boolean) => {
+  const changeActiveSubcategory = async (subcategoryId: string, activeSubcategory: boolean) => {
 
     if (!subcategoryId) return;
 
@@ -318,7 +319,7 @@ const EditSubcategory: React.FC = () => {
 
 
   // Favourite category
-  const handleFavourite = async (subcategoryId: number, favouriteSubcategory: boolean) => {
+  const handleFavourite = async (subcategoryId: string, favouriteSubcategory: boolean) => {
     if (!categoryId) return;
 
     // Toggle favouriteCategory state
@@ -350,12 +351,12 @@ const EditSubcategory: React.FC = () => {
   };
 
 
-  const handleTargetCategorySelect = (selection: { categoryId: number; categoryName: string; subcategoryId: number; subcategoryName: string; }) => {
+  const handleTargetCategorySelect = (selection: { categoryId: string; categoryName: string; subcategoryId: string; subcategoryName: string; }) => {
     // We only care about the categoryId for the merge operation
     setTargetCategoryId(selection.categoryId); 
     console.log("target category: ", selection.categoryId);
     
-    if (selection.subcategoryId > 0) {
+    if (selection.subcategoryId !== '') {
       // Case: User selected a SUBcategory
       setTargetSubcategoryId(selection.subcategoryId);
       // Display name includes the parent category for context
@@ -363,7 +364,7 @@ const EditSubcategory: React.FC = () => {
       console.log("target subcategory: ", selection.subcategoryId);
     } else {
       // Case: User selected a main CATEGORY
-      setTargetSubcategoryId(0); 
+      setTargetSubcategoryId(''); 
       setTargetName(selection.categoryName); 
     }  
   
@@ -506,13 +507,13 @@ const EditSubcategory: React.FC = () => {
         await tx.expenses
           .where('subcategoryId')
           .equals(subcategoryId)
-          .modify({ categoryId: CATEGORYLESS_ID, subcategoryId: 0 }); // Move to new category and reset subcategory
+          .modify({ categoryId: categorylessId, subcategoryId: '' }); // Move to new category and reset subcategory
 
         // 3. Check recurrences: Update all recurrences from the current category to Categoryless (ID 1)
         await tx.recurringSeries
           .where('categoryId')
           .equals(parentCategoryId)
-          .modify({ categoryId: CATEGORYLESS_ID, subcategoryId: 0 }); // Update to new category and reset subcategory 
+          .modify({ categoryId: categorylessId, subcategoryId: '' }); // Update to new category and reset subcategory 
     
         // 4. Delete Source Subcategory
         await tx.subcategories.delete(subcategoryId);

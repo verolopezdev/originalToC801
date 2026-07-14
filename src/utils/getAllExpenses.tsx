@@ -51,7 +51,7 @@ export const getAllExpenses = async (startDate: string, endDate: string): Promis
         effectiveDate.isSameOrBefore(endOfMonth)
       ) {
         generatedExpenses.push({
-          expenseId: -1,
+          expenseId: '-1',
           userId: series.userId,
           expenseDate: effectiveDate.toISOString(), // use moved date if available
           expenseNote: series.note,

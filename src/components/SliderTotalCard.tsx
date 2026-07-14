@@ -27,7 +27,7 @@ interface SliderTotalCardProps {
   selectedInterval: "weekly" | "monthly" | "yearly";
   setSelectedInterval: (interval: "weekly" | "monthly" | "yearly") => void;
   currentDate: Dayjs;
-  accountId?: number;
+  accountId?: string;
   start: Dayjs; 
   end: Dayjs;   
 }

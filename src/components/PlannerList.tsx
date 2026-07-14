@@ -55,14 +55,14 @@ const PlannerList: React.FC<Props> = ({
   const todayStart = dayjs().startOf('day');
   const { start, end } = getDateRangeForInterval(selectedInterval, currentDate); // Get start & end date for the selected period
   const accounts = useLiveQuery(() => db.accounts.toArray());
-  const getCategory = (categoryId: number) => categories?.find(c => c.categoryId === categoryId);
-  const getSubcategory = (subcategoryId: number) => subcategories?.find(sc => sc.subcategoryId === subcategoryId);
-  const getAccountName = (accountId : number) => accounts?.find(ac => ac.accountId === accountId);
+  const getCategory = (categoryId: string) => categories?.find(c => c.categoryId === categoryId);
+  const getSubcategory = (subcategoryId: string) => subcategories?.find(sc => sc.subcategoryId === subcategoryId);
+  const getAccountName = (accountId : string) => accounts?.find(ac => ac.accountId === accountId);
 	const [expenses, setExpenses] = useState<Expense[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
   // NEW: State to store recurring series data, keyed by seriesId
-  const [recurringSeriesMap, setRecurringSeriesMap] = useState<Record<number, RecurringSeries>>({});
+  const [recurringSeriesMap, setRecurringSeriesMap] = useState<Record<string, RecurringSeries>>({});
   // State to control when the "No transactions" message is allowed to show
   const [showFallback, setShowFallback] = useState(false);
 
@@ -101,7 +101,7 @@ const PlannerList: React.FC<Props> = ({
 
       // 1. Identify unique seriesIds from the loaded expenses
       const seriesIds = Array.from(new Set(
-        loadedExpenses.map(exp => exp.seriesId).filter(id => id !== undefined && id !== null) as number[]
+        loadedExpenses.map(exp => exp.seriesId).filter(id => id !== undefined && id !== null) as string[]
       ));
 
       // 2. Fetch the corresponding RecurringSeries data
@@ -113,7 +113,7 @@ const PlannerList: React.FC<Props> = ({
         const seriesMap = seriesData.reduce((acc, series) => {
           acc[series.seriesId] = series;
           return acc;
-        }, {} as Record<number, RecurringSeries>);
+        }, {} as Record<string, RecurringSeries>);
 
         setRecurringSeriesMap(seriesMap);
 

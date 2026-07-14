@@ -22,17 +22,17 @@ export interface RecurrenceSettings {
 }
 
 export interface ExpenseBase { 
-  userId: number;
+  userId: string;
   expenseNote: string;
-  accountId: number;
-  categoryId: number;
-  subcategoryId: number;
+  accountId: string;
+  categoryId: string;
+  subcategoryId: string;
   expenseAmountDefault: number;
   expenseAmountTrip: number;
   expenseAmountAlt: number;
   expenseCurrencyCode: string;
   expenseLocale: string;
-  tripId: number | null;
+  tripId: string | null;
   installmentIndex?: number;
 }
 
@@ -95,7 +95,7 @@ export const useRecurringExpense = () => {
           return;
         }
 
-        const seriesId = Date.now();
+        const seriesId = `rcr_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
         const isFutureExpense = dayjs(selectedDate).isAfter(dayjs());
 
         // Save recurring series metadata regardless of endCondition
@@ -165,10 +165,10 @@ export const useRecurringExpense = () => {
 
   const updateExpenseWithRecurrence = useCallback(
     async (
-      expenseId: number,
+      expenseId: string,
       base: ExpenseBase,
       selectedDate: Date,
-      existingSeriesId?: number,
+      existingSeriesId?: string,
     ) => {
 
       const newDate = selectedDate.toISOString();
@@ -228,7 +228,7 @@ export const useRecurringExpense = () => {
   // log a single expense manually, with optional overrides
   const logExpenseForSeries = useCallback(
     async (
-      seriesId: number, 
+      seriesId: string, 
       baseOverride?: Partial<ExpenseBase>, 
       markDeleted: boolean = false
     ): Promise<boolean> => {
@@ -244,7 +244,7 @@ export const useRecurringExpense = () => {
         // Get last logged expense for series
         const lastExpense = await tx.expenses
           .where('seriesId')
-          .equals(series.seriesId)
+          .equals(series.seriesId!) // !treat it as defined
           .reverse()
           .sortBy('installmentIndex')
           .then(res => res[0]);
@@ -263,7 +263,7 @@ export const useRecurringExpense = () => {
         // Prevent duplicates
         const existing = await tx.expenses
           .where('[seriesId+installmentIndex]')
-          .equals([series.seriesId, nextIndex])
+          .equals([series.seriesId!, nextIndex])
           .first();
 
         if (existing) {
@@ -320,7 +320,7 @@ export const useRecurringExpense = () => {
           nextInstallmentIso = nextInstallmentDate.toISOString();
         } else {
           nextInstallmentIso = null;
-          const hasOverdue = await getOldestOverdueExpenseForSeries(series.seriesId);
+          const hasOverdue = await getOldestOverdueExpenseForSeries(series.seriesId!);
           activeStatus = hasOverdue ? 2 : 0;
         }
 
@@ -356,7 +356,7 @@ export const useRecurringExpense = () => {
   // Pay off OR just stop remaining installments
   const finalizeRemainingInstallments = useCallback(
     async (
-      seriesId: number,
+      seriesId: string,
       options?: {
         payoff?: boolean; // true = log payoff expense, false = just cancel
         baseOverride?: Partial<ExpenseBase>;
@@ -376,7 +376,7 @@ export const useRecurringExpense = () => {
         // Get last logged expense for series
         const lastExpense = await tx.expenses
           .where('seriesId')
-          .equals(series.seriesId)
+          .equals(series.seriesId!)
           .reverse()
           .sortBy('installmentIndex')
           .then(res => res[0]);

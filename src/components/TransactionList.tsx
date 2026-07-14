@@ -23,7 +23,7 @@ interface Props {
   start: Dayjs; 
   end: Dayjs;   
   reverse?: boolean;
-  accountId?: number;
+  accountId?: string;
   fixedLimit?: number; // Optional: if set, loads only this many records (e.g., 10 for Dashboard)
 }
 
@@ -51,9 +51,9 @@ const TransactionList: React.FC<Props> = ({
   const categories = useLiveQuery(() => db.categories.toArray());
   const subcategories = useLiveQuery(() => db.subcategories.toArray());
   const accounts = useLiveQuery(() => db.accounts.toArray());
-  const getCategory = (categoryId: number) => categories?.find(c => c.categoryId === categoryId);
-  const getSubcategory = (subcategoryId: number) => subcategories?.find(sc => sc.subcategoryId === subcategoryId);
-  const getAccountName = (accountId : number) => accounts?.find(ac => ac.accountId === accountId);
+  const getCategory = (categoryId: string) => categories?.find(c => c.categoryId === categoryId);
+  const getSubcategory = (subcategoryId: string) => subcategories?.find(sc => sc.subcategoryId === subcategoryId);
+  const getAccountName = (accountId : string) => accounts?.find(ac => ac.accountId === accountId);
 
   // Effect to load all transactions when dependencies change
   useEffect(() => {

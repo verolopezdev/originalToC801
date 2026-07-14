@@ -1,6 +1,5 @@
 import React from "react";
 import { useTranslation } from 'react-i18next';
-import { Preferences } from '@capacitor/preferences'; // Ensure this is imported
 
 import { 
   IonItem,
@@ -19,8 +18,8 @@ import { db, setIsSeeding } from "../db"; // adjust path to your Dexie DB
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import { Capacitor } from "@capacitor/core";
 import { useCurrency } from '../context/CurrencyContext';
-import { useUser } from '../context/UserContext'; // Import the useUser hook
-import Footer from '../components/Footer'
+import { useUser } from '../context/UserContext';
+import Footer from '../components/Footer';
 
 // Ion icon components
 import { 
@@ -31,37 +30,22 @@ import {
 } from 'ionicons/icons';
 
 // Footer items
-const appPages = [
-  {
-    title: 'home',
-    url: '/dashboard',
-    iosIcon: homeOutline,
-    mdIcon: homeOutline
-  },
-  {
-    title: 'accounts',
-    url: '/accounts',
-    iosIcon: layersOutline,
-    mdIcon: layersOutline
-  },
-  {
-    title: 'Add',
-    url: '/newcategory',
-    iosIcon: add,
-    mdIcon: add
-  },
-  {
-    title: 'activity',
-    url: '/activity',
-    iosIcon: cashOutline,
-    mdIcon: cashOutline
-  }
-];
+interface AppPage {
+  url: string;
+  icon: string;
+  title: string;
+}
 
+const appPages: AppPage[] = [
+  { title: 'dashboard', url: '/dashboard', icon: homeOutline },
+  { title: 'accounts', url: '/accounts', icon: layersOutline },
+  { title: 'Add', url: '/newexpense/0', icon: add },
+  { title: 'activity', url: '/activity', icon: cashOutline }
+];
 
 type Language = "en" | "es" | "fr" | "pt";
 
-type MerchantsByCategory = Record<number, string[]>;
+type MerchantsByCategory = Record<string, string[]>;
 
 type Translation = {
   rent: string;
@@ -78,41 +62,76 @@ type Translation = {
 
 type Translations = Record<Language, Translation>;
 
+interface SeedContext {
+  accountId: any;
+  findCatId: (name: string) => any;
+}
+
+// ----------------------------------------------------------------------
+// Async Helper: Resolves prerequisite data (Account ID & Categories)
+// ----------------------------------------------------------------------
+const getSeedContext = async (): Promise<SeedContext | null> => {
+  // 1. Fetch default account
+  const accounts = await db.accounts.limit(1).toArray();
+  if (accounts.length === 0) {
+    alert("No accounts found. Please create an account before seeding expenses.");
+    return null;
+  }
+  const accountId = accounts[0].accountId;
+
+  // 2. Fetch categories
+  const categories = await db.categories.toArray();
+  if (categories.length === 0) {
+    alert("No categories found. Please setup categories first.");
+    return null;
+  }
+
+  // 3. Category ID mapping helper
+  const findCatId = (name: string): any => {
+    const found = categories.find(
+      (c) => c.categoryName?.toLowerCase() === name.toLowerCase()
+    );
+    return found ? found.categoryId : categories[0].categoryId;
+  };
+
+  return { accountId, findCatId };
+};
+
+// ----------------------------------------------------------------------
+// Main Component
+// ----------------------------------------------------------------------
 const SeedExpensesPage: React.FC = () => {
   const { currency } = useCurrency();
   const { t } = useTranslation();
-  
-  const [years, setYears] = React.useState<number>(1); // Default to 1 year
+  const { userId } = useUser();
+  const [years, setYears] = React.useState<number>(1);
   const [showToast, setShowToast] = React.useState(false);
 
-  // Translate footer menu items
   const translatedMenuItems = appPages.map((item) => ({
     ...item,
     title: t(`common.${item.title}`, { defaultValue: item.title }),
   }));
-  
 
   const seedExpenses = async () => {
     try {
-      // 1. SILENCE THE HOOKS
       setIsSeeding(true);
-      
-      // 2. Wrap everything in a Read/Write transaction
-      // We include expenses, recurringSeries, and changes in the scope
+
+      // Fetch dynamic Database Context
+      const context = await getSeedContext();
+      if (!context) return;
+
+      const { accountId, findCatId } = context;
+
       await db.transaction('rw', [db.expenses, db.recurringSeries], async () => {
-        
-        // Clear existing data within the transaction
         await db.expenses.clear();
-  
+
         const expenses: any[] = [];
-        let expenseId = 1;
-  
         const now = new Date();
         const totalMonths = years * 12;
-  
+
         const currencyCode = currency.defaultCurrency?.code || "USD";
         const locale = currency.defaultCurrency?.locale || "en-US";
-  
+
         const language: Language = locale.startsWith("es")
           ? "es"
           : locale.startsWith("fr")
@@ -120,7 +139,7 @@ const SeedExpensesPage: React.FC = () => {
           : locale.startsWith("pt")
           ? "pt"
           : "en";
-  
+
         const base = {
           rent: 95000,
           utilities: [4500, 6200, 5800],
@@ -135,7 +154,7 @@ const SeedExpensesPage: React.FC = () => {
           healthcare: [1800, 3200, 5400, 8900],
           travel: [12000, 24000],
         };
-  
+
         const translations: Translations = {
           en: {
             rent: "Apartment Rent",
@@ -148,18 +167,18 @@ const SeedExpensesPage: React.FC = () => {
             personalCare: "Personal Care",
             healthcare: "Healthcare",
             merchants: {
-              2: ["Apartment Rent"],
-              3: ["BrightEnergy", "AquaFlow Utilities"],
-              4: ["FreshMart", "CityMarket", "Local Harvest"],
-              5: ["Metro Transit", "CityRide"],
-              6: ["City Pharmacy", "Health Clinic", "Dental Center"],
-              7: ["HomeNet Mobile"],
-              8: ["Urban Coffee Co.", "Green Fork Bistro", "Daily Bites"],
-              9: ["Streamio", "TuneBox"],
-              10: ["Urban Style", "Trendora"],
-              11: ["FitPlus"],
-              12: ["Wellness Spa", "CarePoint"],
-              15: ["AirFly", "Hotel Lumière"],
+              rent: ["Apartment Rent"],
+              utilities: ["BrightEnergy", "AquaFlow Utilities"],
+              groceries: ["FreshMart", "CityMarket", "Local Harvest"],
+              transport: ["Metro Transit", "CityRide"],
+              healthcare: ["City Pharmacy", "Health Clinic", "Dental Center"],
+              phone: ["HomeNet Mobile"],
+              dining: ["Urban Coffee Co.", "Green Fork Bistro", "Daily Bites"],
+              entertainment: ["Streamio", "TuneBox"],
+              shopping: ["Urban Style", "Trendora"],
+              fitness: ["FitPlus"],
+              personalCare: ["Wellness Spa", "CarePoint"],
+              travel: ["AirFly", "Hotel Lumière"],
             }
           },
           es: {
@@ -173,18 +192,18 @@ const SeedExpensesPage: React.FC = () => {
             personalCare: "Cuidado personal",
             healthcare: "Salud",
             merchants: {
-              2: ["Alquiler"],
-              3: ["BrightEnergy", "AquaFlow Servicios"],
-              4: ["FreshMart", "CityMarket", "Local Harvest"],
-              5: ["Metro Transit", "CityRide"],
-              6: ["Farmacia Central", "Clínica Salud", "Centro Dental"],
-              7: ["HomeNet Móvil"],
-              8: ["Urban Coffee Co.", "Green Fork Bistro", "Daily Bites"],
-              9: ["Streamio", "TuneBox"],
-              10: ["Urban Style", "Trendora"],
-              11: ["FitPlus"],
-              12: ["Wellness Spa", "CarePoint"],
-              15: ["AirFly", "Hotel Lumière"],
+              rent: ["Alquiler"],
+              utilities: ["BrightEnergy", "AquaFlow Servicios"],
+              groceries: ["FreshMart", "CityMarket", "Local Harvest"],
+              transport: ["Metro Transit", "CityRide"],
+              healthcare: ["Farmacia Central", "Clínica Salud", "Centro Dental"],
+              phone: ["HomeNet Móvil"],
+              dining: ["Urban Coffee Co.", "Green Fork Bistro", "Daily Bites"],
+              entertainment: ["Streamio", "TuneBox"],
+              shopping: ["Urban Style", "Trendora"],
+              fitness: ["FitPlus"],
+              personalCare: ["Wellness Spa", "CarePoint"],
+              travel: ["AirFly", "Hotel Lumière"],
             }
           },
           fr: {
@@ -198,18 +217,18 @@ const SeedExpensesPage: React.FC = () => {
             personalCare: "Soins personnels",
             healthcare: "Santé",
             merchants: {
-              2: ["Loyer"],
-              3: ["BrightEnergy", "AquaFlow Services"],
-              4: ["FreshMart", "CityMarket", "Local Harvest"],
-              5: ["Metro Transit", "CityRide"],
-              6: ["Pharmacie Centrale", "Clinique Santé", "Centre Dentaire"],
-              7: ["HomeNet Mobile"],
-              8: ["Urban Coffee Co.", "Green Fork Bistro", "Daily Bites"],
-              9: ["Streamio", "TuneBox"],
-              10: ["Urban Style", "Trendora"],
-              11: ["FitPlus"],
-              12: ["Wellness Spa", "CarePoint"],
-              15: ["AirFly", "Hotel Lumière"],
+              rent: ["Loyer"],
+              utilities: ["BrightEnergy", "AquaFlow Services"],
+              groceries: ["FreshMart", "CityMarket", "Local Harvest"],
+              transport: ["Metro Transit", "CityRide"],
+              healthcare: ["Pharmacie Centrale", "Clinique Santé", "Centre Dentaire"],
+              phone: ["HomeNet Mobile"],
+              dining: ["Urban Coffee Co.", "Green Fork Bistro", "Daily Bites"],
+              entertainment: ["Streamio", "TuneBox"],
+              shopping: ["Urban Style", "Trendora"],
+              fitness: ["FitPlus"],
+              personalCare: ["Wellness Spa", "CarePoint"],
+              travel: ["AirFly", "Hotel Lumière"],
             }
           },
           pt: {
@@ -223,38 +242,38 @@ const SeedExpensesPage: React.FC = () => {
             personalCare: "Cuidados pessoais",
             healthcare: "Saúde",
             merchants: {
-              2: ["Aluguel"],
-              3: ["BrightEnergy", "AquaFlow Serviços"],
-              4: ["FreshMart", "CityMarket", "Local Harvest"],
-              5: ["Metro Transit", "CityRide"],
-              6: ["Farmácia Central", "Clínica Saúde", "Centro Odontológico"],
-              7: ["HomeNet Mobile"],
-              8: ["Urban Coffee Co.", "Green Fork Bistro", "Daily Bites"],
-              9: ["Streamio", "TuneBox"],
-              10: ["Urban Style", "Trendora"],
-              11: ["FitPlus"],
-              12: ["Wellness Spa", "CarePoint"],
-              15: ["AirFly", "Hotel Lumière"],
+              rent: ["Aluguel"],
+              utilities: ["BrightEnergy", "AquaFlow Serviços"],
+              groceries: ["FreshMart", "CityMarket", "Local Harvest"],
+              transport: ["Metro Transit", "CityRide"],
+              healthcare: ["Farmácia Central", "Clínica Saúde", "Centro Odontológico"],
+              phone: ["HomeNet Mobile"],
+              dining: ["Urban Coffee Co.", "Green Fork Bistro", "Daily Bites"],
+              entertainment: ["Streamio", "TuneBox"],
+              shopping: ["Urban Style", "Trendora"],
+              fitness: ["FitPlus"],
+              personalCare: ["Wellness Spa", "CarePoint"],
+              travel: ["AirFly", "Hotel Lumière"],
             }
           }
         };
-  
+
         const randomFrom = (arr: number[]) =>
           arr[Math.floor(Math.random() * arr.length)];
-  
-        const randomMerchant = (catId: number): string => {
-          const merchants = translations[language].merchants[catId];
+
+        const randomMerchant = (key: string): string => {
+          const merchants = translations[language].merchants[key];
           return (!merchants || merchants.length === 0) 
             ? "Unknown Merchant" 
             : merchants[Math.floor(Math.random() * merchants.length)];
         };
-  
-        const addExpense = (date: Date, categoryId: number, amount: number, note: string) => {
+
+        const addExpense = (date: Date, categoryId: any, amount: number, note: string) => {
           expenses.push({
-            userId: 1,
-            expenseId: expenseId++,
-            accountId: 1,
-            categoryId,
+            userId,
+            accountId, // Dynamically set from DB
+            categoryId, // Dynamically set from DB
+            // expenseId is omitted to allow Dexie Cloud auto-generation
             subcategoryId: 0,
             expenseNote: note,
             expenseAmountDefault: amount,
@@ -269,158 +288,115 @@ const SeedExpensesPage: React.FC = () => {
         };
 
         const weightedPick = <T extends { weight: number }>(items: T[]): T => {
-          const totalWeight = items.reduce(
-            (sum, item) => sum + item.weight,
-            0
-          );
-        
+          const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
           let random = Math.random() * totalWeight;
-        
           for (const item of items) {
             random -= item.weight;
-        
-            if (random <= 0) {
-              return item;
-            }
+            if (random <= 0) return item;
           }
-        
           return items[items.length - 1];
         };
-        
-        const randomDateInMonth = (
-          year: number,
-          month: number
-        ): Date => {
+
+        const randomDateInMonth = (year: number, month: number): Date => {
           const lastDay = new Date(year, month + 1, 0).getDate();
-        
-          const day =
-            Math.floor(Math.random() * lastDay) + 1;
-        
+          const day = Math.floor(Math.random() * lastDay) + 1;
           const hour = Math.floor(Math.random() * 24);
           const minute = Math.floor(Math.random() * 60);
-        
-          return new Date(
-            year,
-            month,
-            day,
-            hour,
-            minute
-          );
+          return new Date(year, month, day, hour, minute);
         };
-        
+
         const categoryDefinitions = [
           {
-            categoryId: 2,
+            categoryId: findCatId("Rent"),
             weight: 1,
             amounts: [base.rent],
-            note: () => randomMerchant(2),
+            note: () => randomMerchant("rent"),
           },
           {
-            categoryId: 3,
+            categoryId: findCatId("Utilities"),
             weight: 3,
             amounts: base.utilities,
-            note: () =>
-              `${randomMerchant(3)} – ${translations[language].monthlyBill}`,
+            note: () => `${randomMerchant("utilities")} – ${translations[language].monthlyBill}`,
           },
           {
-            categoryId: 4,
+            categoryId: findCatId("Groceries"),
             weight: 25,
             amounts: base.groceries,
-            note: () =>
-              `${randomMerchant(4)} – ${translations[language].groceries}`,
+            note: () => `${randomMerchant("groceries")} – ${translations[language].groceries}`,
           },
           {
-            categoryId: 5,
+            categoryId: findCatId("Transport"),
             weight: 20,
             amounts: base.transport,
-            note: () =>
-              `${randomMerchant(5)} – ${translations[language].transport}`,
+            note: () => `${randomMerchant("transport")} – ${translations[language].transport}`,
           },
           {
-            categoryId: 6,
+            categoryId: findCatId("Healthcare"),
             weight: 5,
             amounts: base.healthcare,
-            note: () =>
-              `${randomMerchant(6)} – ${translations[language].healthcare}`,
+            note: () => `${randomMerchant("healthcare")} – ${translations[language].healthcare}`,
           },
           {
-            categoryId: 7,
+            categoryId: findCatId("Phone"),
             weight: 2,
             amounts: [base.phone],
-            note: () =>
-              `${randomMerchant(7)} – ${translations[language].monthlyBill}`,
+            note: () => `${randomMerchant("phone")} – ${translations[language].monthlyBill}`,
           },
           {
-            categoryId: 8,
+            categoryId: findCatId("Dining"),
             weight: 18,
             amounts: base.dining,
-            note: () => randomMerchant(8),
+            note: () => randomMerchant("dining"),
           },
           {
-            categoryId: 9,
+            categoryId: findCatId("Entertainment"),
             weight: 2,
             amounts: base.entertainment,
-            note: () =>
-              `${randomMerchant(9)} – ${translations[language].subscription}`,
+            note: () => `${randomMerchant("entertainment")} – ${translations[language].subscription}`,
           },
           {
-            categoryId: 10,
+            categoryId: findCatId("Shopping"),
             weight: 8,
             amounts: base.shopping,
-            note: () =>
-              `${randomMerchant(10)} – ${translations[language].shopping}`,
+            note: () => `${randomMerchant("shopping")} – ${translations[language].shopping}`,
           },
           {
-            categoryId: 11,
+            categoryId: findCatId("Fitness"),
             weight: 1,
             amounts: [base.fitness],
-            note: () =>
-              `${randomMerchant(11)} – ${translations[language].membership}`,
+            note: () => `${randomMerchant("fitness")} – ${translations[language].membership}`,
           },
           {
-            categoryId: 12,
+            categoryId: findCatId("Personal Care"),
             weight: 3,
             amounts: base.personalCare,
-            note: () =>
-              `${randomMerchant(12)} – ${translations[language].personalCare}`,
+            note: () => `${randomMerchant("personalCare")} – ${translations[language].personalCare}`,
           },
           {
-            categoryId: 15,
+            categoryId: findCatId("Travel"),
             weight: 1,
             amounts: base.travel,
-            note: () => randomMerchant(15),
+            note: () => randomMerchant("travel"),
           },
         ];
-  
-        // Generation Loops
+
         for (let m = 0; m < totalMonths; m++) {
           const monthDate = new Date(
             now.getFullYear(),
             now.getMonth() - (totalMonths - 1) + m,
             1
           );
-        
+
           const year = monthDate.getFullYear();
           const month = monthDate.getMonth();
-        
-          // Between 70 and 90 expenses
-          const expensesThisMonth =
-            70 + Math.floor(Math.random() * 21);
-        
+          const expensesThisMonth = 70 + Math.floor(Math.random() * 21);
+
           for (let i = 0; i < expensesThisMonth; i++) {
-            const category =
-              weightedPick(categoryDefinitions);
-        
-            const date = randomDateInMonth(
-              year,
-              month
-            );
-        
-            // Prevent future expenses
-            if (date > now) {
-              continue;
-            }
-        
+            const category = weightedPick(categoryDefinitions);
+            const date = randomDateInMonth(year, month);
+
+            if (date > now) continue;
+
             addExpense(
               date,
               category.categoryId,
@@ -428,67 +404,54 @@ const SeedExpensesPage: React.FC = () => {
               category.note()
             );
           }
-        }  
+        }
 
         expenses.sort(
-          (a, b) =>
-            new Date(a.expenseDate).getTime() -
-            new Date(b.expenseDate).getTime()
+          (a, b) => new Date(a.expenseDate).getTime() - new Date(b.expenseDate).getTime()
         );
-        
-        // Final batch add
+
         await db.expenses.bulkAdd(expenses);
         console.log(`Transaction successful: Seeded ${expenses.length} expenses.`);
       });
-  
+
       setShowToast(true);
-  
+
     } catch (error) {
       console.error("Seeding transaction failed:", error);
     } finally {
-      // 2. RE-ENABLE THE HOOKS
-      // We use a tiny delay to ensure all micro-tasks from the transaction are finished
       setTimeout(() => setIsSeeding(false), 500);
     }
   };
 
-
   const downloadCSV = async () => {
     const expenses = await db.expenses.toArray();
     const categories = await db.categories.toArray();
-  
-    const categoryMap = categories.reduce<Record<number, string>>((acc, cat) => {
+
+    const categoryMap = categories.reduce<Record<string, string>>((acc, cat) => {
       acc[cat.categoryId] = cat.categoryName;
       return acc;
     }, {});
-  
-    // 🪙 Currency + locale setup
+
     const { locale, symbol, decimalSeparator, thousandSeparator } = currency.defaultCurrency || {
       locale: "en-US",
       symbol: "$",
       decimalSeparator: ".",
       thousandSeparator: ",",
     };
-  
-    // Use ; if decimal separator is a comma
+
     const separator = decimalSeparator === "," ? ";" : ",";
-  
-    // 🗓️ Sort expenses by date ascending
+
     const sortedExpenses = [...expenses].sort(
       (a, b) => new Date(a.expenseDate).getTime() - new Date(b.expenseDate).getTime()
     );
-  
-    // 💰 Format amount with symbol + thousands/decimal separators
+
     const formatAmount = (amountCents: number): string => {
       const amount = amountCents / 100;
       let [intPart, decPart] = amount.toFixed(2).split(".");
-  
-      // Add thousand separators manually
       intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandSeparator);
-  
       return `${symbol}${intPart}${decimalSeparator}${decPart}`;
     };
-  
+
     const csvRows = [
       ["date", "categoryName", "expenseNote", "amount"],
       ...sortedExpenses.map(exp => [
@@ -498,23 +461,21 @@ const SeedExpensesPage: React.FC = () => {
         formatAmount(exp.expenseAmountDefault),
       ]),
     ];
-  
-    // 🧠 Escape fields that include separators, quotes or line breaks
+
     const escapeCell = (cell: string | number) => {
       const str = String(cell);
       return str.includes(separator) || str.includes('"') || str.includes("\n")
         ? `"${str.replace(/"/g, '""')}"`
         : str;
     };
-  
+
     const csvContent = csvRows
       .map(row => row.map(escapeCell).join(separator))
       .join("\n");
-  
-    // 📁 File name with currency and date
+
     const dateStr = new Date().toISOString().split("T")[0];
     const fileName = `expenses_${currency.defaultCurrency?.code || "CUR"}_${dateStr}.csv`;
-  
+
     if (Capacitor.isNativePlatform()) {
       try {
         await Filesystem.writeFile({
@@ -542,13 +503,6 @@ const SeedExpensesPage: React.FC = () => {
     }
   };
 
-  // Helper to create a pause
-  const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
-
-
-
-
-
   return (
     <IonPage>
       <IonHeader className='page-header ion-no-border'>
@@ -566,7 +520,6 @@ const SeedExpensesPage: React.FC = () => {
 
         <IonLabel position="stacked">Years of Data</IonLabel>
         <IonItem mode="md" style={{ marginBottom: '1rem' }}>
-          
           <IonInput 
             type="number" 
             value={years} 
@@ -584,7 +537,6 @@ const SeedExpensesPage: React.FC = () => {
           Download Expenses CSV
         </IonButton>
 
-
         <IonToast
           isOpen={showToast}
           onDidDismiss={() => setShowToast(false)}
@@ -594,7 +546,6 @@ const SeedExpensesPage: React.FC = () => {
       </IonContent>
 
       <Footer appPages={translatedMenuItems} />
-
     </IonPage>
   );
 };

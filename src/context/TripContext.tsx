@@ -10,8 +10,8 @@ interface TripContextType {
   setActivateTravelMode: (value: boolean) => void;
   travelMode: boolean;
   setTravelMode: (value: boolean) => void;
-  selectedTripId: number | null;  
-  setSelectedTripId: (tripId: number | null) => void;
+  selectedTripId: string | null;  
+  setSelectedTripId: (tripId: string | null) => void;
   trips: Trip[];
   setTrips: (trips: Trip[]) => void;
 } 
@@ -29,7 +29,7 @@ export const TripProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [tripsLoaded, setTripsLoaded] = useState<boolean>(false);
   const [activateTravelMode, setActivateTravelModeState] = useState(false);
   const [travelMode, setTravelModeState] = useState(false);
-  const [selectedTripId, setSelectedTripIdState] = useState<number | null>(null);
+  const [selectedTripId, setSelectedTripIdState] = useState<string | null>(null);
 
 
   // Load persisted value on mount
@@ -86,7 +86,7 @@ export const TripProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     await Preferences.set({ key: TRAVEL_MODE_KEY, value: JSON.stringify(value) });
   };
 
-  const setSelectedTripId = async (tripId: number | null) => {
+  const setSelectedTripId = async (tripId: string | null) => {
     setSelectedTripIdState(tripId);
     await Preferences.set({ key: SELECTED_TRIP_ID_KEY, value: JSON.stringify(tripId) });
   };

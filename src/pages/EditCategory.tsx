@@ -12,6 +12,7 @@ import useBackButtonModalReset from "../hooks/useBackButtonModalReset";
 import useScrollToTop from '../hooks/useScrollToTop';
 import { useKeyboardAutoClose } from '../hooks/useKeyboardAutoClose';
 import { useExpense } from '../context/ExpenseContext';
+import { useUser } from '../context/UserContext';
 
 
 // Ionic's components
@@ -70,29 +71,28 @@ const EditCategory: React.FC = () => {
   const history = useHistory();
   const isIOS = isPlatform('ios'); // Detect iOS platform
   const { checkExpense } = useExpense();
-  const CATEGORYLESS_ID = 1; 
+  const { categorylessId } = useUser();
   
   // This will override the back button behavior (useful for custom screens)
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [popoverEvent, setPopoverEvent] = useState<MouseEvent | null>(null);
   
   const { categoryId } = useParams<{ categoryId: string }>(); // category id to fill the form
-  const category = useLiveQuery(() => db.categories.get(Number(categoryId)), [categoryId]);
-  const categoryIdNum = Number(categoryId); // Convert to number
+  const category = useLiveQuery(() => db.categories.get(categoryId), [categoryId]);
   const expensesCount = useLiveQuery(() => 
     db.expenses
       .where('categoryId')
-      .equals(categoryIdNum)
+      .equals(categoryId)
       .count(), // Returns only the count as a number
     [categoryId]
   );
   const subcategories = useLiveQuery(() =>
-    db.subcategories.where('parentCategoryId').equals(categoryIdNum).toArray()
+    db.subcategories.where('parentCategoryId').equals(categoryId).toArray()
   );  
   const { t } = useTranslation();
   const { themeColor } = useTheme();
   const color = themeColor.split("-")[1]; // Extracts color name to initialize selectedColor
-  const [passedCategoryId, setPassedCategoryId] = useState<number>(Number(categoryId))
+  const [passedCategoryId, setPassedCategoryId] = useState<string>(categoryId)
   const [categoryColor, setCategoryColor] = useState<string>(color);
   const [categoryIcon, setCategoryIcon] = useState<string>("fa-house");
   const [categoryName, setCategoryName] = useState<string>('');
@@ -117,8 +117,8 @@ const EditCategory: React.FC = () => {
   // Icon picker modal is now the Merge Modal:
   const [isMergeModalOpen, setIsMergeModalOpen] = useState(false); // New state for Merge Modal
   const [isOpenCategoryMergeModal, setIsOpenCategoryMergeModal] = useState(false);
-  const [targetCategoryId, setTargetCategoryId] = useState<number | null>(null); // To store the selected target category ID
-  const [targetSubcategoryId, setTargetSubcategoryId] = useState<number>(0); 
+  const [targetCategoryId, setTargetCategoryId] = useState<string | null>(null); // To store the selected target category ID
+  const [targetSubcategoryId, setTargetSubcategoryId] = useState<string>(''); 
   const [targetName, setTargetName] = useState<string>('');
   const [agreedToMerge, setAgreedToMerge] = useState(false);
 
@@ -133,7 +133,7 @@ const EditCategory: React.FC = () => {
   useKeyboardAutoClose();
 
 
-  // Initialize variables when account is available
+  // Initialize variables when category is available
   useEffect(() => {
     if (category) {
       setPassedCategoryId(category.categoryId);
@@ -145,7 +145,7 @@ const EditCategory: React.FC = () => {
       setIsActiveCategory(category.activeCategory);
       setIsFavouriteCategory(category.favouriteCategory);
     }
-  }, [category]); // Update state when `account` is available
+  }, [category]); // Update state when `category` is available
 
 
   useEffect(() => {
@@ -226,7 +226,7 @@ const EditCategory: React.FC = () => {
   // Function to handle the category deletion modal open
   const openDeleteModal = () => {
     // Check if category is available and not the system category
-    if (!category || categoryIdNum === 1) {
+    if (!category || categoryId === categorylessId) {
         setToastMessage(t('categories.cannot_delete_categoryless')); 
         setShowToast(true);
         return;
@@ -249,7 +249,7 @@ const EditCategory: React.FC = () => {
   
 
   // Update record
-  async function updateCategory(categoryId: number) {
+  async function updateCategory(categoryId: string) {
     try {
       // Check if category exists
       const existingCategory = await db.categories.get(categoryId);
@@ -285,7 +285,7 @@ const EditCategory: React.FC = () => {
   }
 
   // Update activeCategory
-  const changeActiveCategory = async (categoryId: number, activeCategory: boolean) => {
+  const changeActiveCategory = async (categoryId: string, activeCategory: boolean) => {
 
     if (!categoryId) return;
 
@@ -310,7 +310,7 @@ const EditCategory: React.FC = () => {
   };
 
   // Favourite category
-  const handleFavourite = async (categoryId: number, favouriteCategory: boolean) => {
+  const handleFavourite = async (categoryId: string, favouriteCategory: boolean) => {
     if (!categoryId) return;
     
     const newFavState = !favouriteCategory;
@@ -345,18 +345,18 @@ const EditCategory: React.FC = () => {
   };
 
 
-const handleTargetCategorySelect = (selection: { categoryId: number; categoryName: string; subcategoryId: number; subcategoryName: string; }) => {
+const handleTargetCategorySelect = (selection: { categoryId: string; categoryName: string; subcategoryId: string; subcategoryName: string; }) => {
   // We only care about the categoryId for the merge operation
   setTargetCategoryId(selection.categoryId); 
   
-  if (selection.subcategoryId > 0) {
+  if (selection.subcategoryId !== '') {
     // Case: User selected a SUBcategory
     setTargetSubcategoryId(selection.subcategoryId);
     // Display name includes the parent category for context
     setTargetName(`${selection.categoryName} / ${selection.subcategoryName}`); 
   } else {
     // Case: User selected a main CATEGORY
-    setTargetSubcategoryId(0); 
+    setTargetSubcategoryId(''); 
     setTargetName(selection.categoryName); 
   }  
 
@@ -376,7 +376,7 @@ const mergeCategory = async () => {
   ];
 
   // 1. Validate target category ID
-  if (!targetCategoryId || targetCategoryId === categoryIdNum) {
+  if (!targetCategoryId || targetCategoryId === categoryId) {
     setToastMessage(t('categories.invalid_target'));
     setShowToast(true);
     return;
@@ -392,23 +392,23 @@ const mergeCategory = async () => {
         // --- Transaction Logic Starts ---
 
         // A. Handle Expenses (Original Logic, adjusted to use 'tx')
-        if(targetSubcategoryId > 0) {
+        if(targetSubcategoryId !== '') {
           await tx.expenses // MUST use tx.expenses
             .where('categoryId')
-            .equals(categoryIdNum)
+            .equals(categoryId)
             .modify({ categoryId: targetCategoryId, subcategoryId: targetSubcategoryId });
 
         } else {
           // Reassign Expenses
           await tx.expenses // MUST use tx.expenses
             .where('categoryId')
-            .equals(categoryIdNum)
+            .equals(categoryId)
             .modify({ categoryId: targetCategoryId });
           
           // Reassign Subcategories (if applicable)
           await tx.subcategories // MUST use tx.subcategories
             .where('parentCategoryId')
-            .equals(categoryIdNum)
+            .equals(categoryId)
             .modify({ parentCategoryId: targetCategoryId });
         }
 
@@ -416,13 +416,13 @@ const mergeCategory = async () => {
         // This MUST be inside the transaction for atomicity.
         await tx.recurringSeries // MUST use tx.recurringSeries
           .where('categoryId')
-          .equals(categoryIdNum)
+          .equals(categoryId)
           .modify({ categoryId: targetCategoryId, subcategoryId: targetSubcategoryId });
             
         // C. INTEGRATED: Delete Source Category
         // This MUST be inside the transaction for atomicity.
-        if(categoryIdNum > 1) {
-          await tx.categories.delete(categoryIdNum); // MUST use tx.categories
+        if(categoryId !== categorylessId) {
+          await tx.categories.delete(categoryId); // MUST use tx.categories
         }
 
         // --- Transaction Logic Ends ---
@@ -476,7 +476,7 @@ const deleteCategory = async () => {
   ];
   
   // Guard clause: Should not be able to delete the Categoryless category (ID 1)
-  if (categoryIdNum === CATEGORYLESS_ID) {
+  if (categoryId === categorylessId) {
     setToastMessage(t('categories.cannot_delete_categoryless')); 
     setShowToast(true);
     return;
@@ -489,25 +489,32 @@ const deleteCategory = async () => {
       tablesToLock, // Use the array here
       async (tx) => { // Use 'tx' for all database access within this block
       // 2. Reassign Expenses: Move all expenses from the current category to Categoryless (ID 1)
+      
       await tx.expenses
         .where('categoryId')
-        .equals(categoryIdNum)
-        .modify({ categoryId: CATEGORYLESS_ID, subcategoryId: 0 }); // Move to new category and reset subcategory 
+        .equals(categoryId)
+        .modify({ 
+          categoryId: categorylessId, 
+          subcategoryId: '' // Move to new category and reset subcategory 
+        });
       
       // 2a. Check recurrences: Update all recurrences from the current category to Categoryless (ID 1)
       await tx.recurringSeries
         .where('categoryId')
-        .equals(categoryIdNum)
-        .modify({ categoryId: CATEGORYLESS_ID, subcategoryId: 0 }); // Update to new category and reset subcategory 
+        .equals(categoryId)
+        .modify({ 
+          categoryId: categorylessId, 
+          subcategoryId: '' 
+        }); // Update to new category and reset subcategory 
 
       // 3. Delete Subcategories: Delete all subcategories of the source category
       await tx.subcategories
         .where('parentCategoryId')
-        .equals(categoryIdNum)
+        .equals(categoryId)
         .delete();
 
       // 4. Delete Source Category
-      await tx.categories.delete(categoryIdNum);
+      await tx.categories.delete(categoryId);
     });
 
     checkExpense(); // Re-sync expense context/totals
@@ -576,7 +583,7 @@ const key =
                   {isActiveCategory ? (
                     <>
                       {/* Add subcategory */}
-                      {categoryIdNum > 1 && (
+                      {categoryId !== categorylessId && (
                         <IonRouterLink 
                           key={1}
                           routerLink={`/newsubcategory/${categoryId}`}
@@ -609,12 +616,12 @@ const key =
                       </li>
 
                       {/* Disable category */}
-                      {categoryIdNum > 1 && (
+                      {categoryId != categorylessId && (
                         <li 
                           className="item" 
                           onClick={() => {
                             closePopover(); // First, close the popover
-                            setTimeout(() => changeActiveCategory(categoryIdNum, isActiveCategory), 100); // Then update state after a brief delay
+                            setTimeout(() => changeActiveCategory(categoryId, isActiveCategory), 100); // Then update state after a brief delay
                           }}
                         >
                           <IonIcon icon={eyeOffOutline} /> {t('common.disable')}
@@ -627,7 +634,7 @@ const key =
                       className="item" 
                       onClick={() => {
                         closePopover(); // Close the popover first
-                        setTimeout(() => changeActiveCategory(categoryIdNum, isActiveCategory), 100); // Delay state change
+                        setTimeout(() => changeActiveCategory(categoryId, isActiveCategory), 100); // Delay state change
                       }}
                     >
                       <IonIcon icon={eyeOutline} /> {t('common.enable')}
@@ -635,7 +642,7 @@ const key =
                   )}
 
                   {/* Delete category */}
-                  {categoryIdNum > 1 && (
+                  {categoryId !== categorylessId && (
                     <li 
                       className='item' 
                       onClick={() => {
@@ -671,7 +678,7 @@ const key =
         </section>
         
         {/* Warning for Categoryless only */}
-        {categoryIdNum === 1 && (
+        {categoryId === categorylessId && (
           <IonItem className='system-danger'>
             <div className='system-warning'>
               <h5 className='title'>{t('categories.system_category_warning')}</h5>
@@ -689,18 +696,18 @@ const key =
               <input
                 type="text"
                 value={categoryName}
-                disabled={!isActiveCategory || categoryIdNum === 1}
+                disabled={!isActiveCategory || categoryId === categorylessId}
                 maxLength={20}
                 onChange={(e) => handleInputChange(e.target.value) }
                 placeholder="Category Name"
-                className={`input capitalize ${error ? 'invalid' : ''} ${categoryIdNum === 1 ? 'disabled' : ''}`}
+                className={`input capitalize ${error ? 'invalid' : ''} ${categoryId === categorylessId ? 'disabled' : ''}`}
               />
               {error && <p className="error-text">{error}</p>}
             </div>
-            {categoryIdNum > 1 && (
+            {categoryId !== categorylessId && (
               <button 
                 id="open-toast"
-                onClick={() => handleFavourite(categoryIdNum, isFavouriteCategory)}
+                onClick={() => handleFavourite(categoryId, isFavouriteCategory)}
               >
                 {isFavouriteCategory ? <IonIcon icon={heart} /> : <IonIcon icon={heartOutline} />}
               </button>
@@ -714,7 +721,7 @@ const key =
           <ColorPicker 
             onColorSelect={handleColorSelect} 
             initialColor={categoryColor} 
-            isDisabled={!isActiveCategory || categoryIdNum === 1}
+            isDisabled={!isActiveCategory || categoryId === categorylessId}
           />
         </section>
 
@@ -727,7 +734,7 @@ const key =
             button 
             detail={false}
             onClick={() => setIsOpenCategoryModal(true)}
-            disabled={!isActiveCategory || categoryIdNum === 1}
+            disabled={!isActiveCategory || categoryId === categorylessId}
           >
             <div className='list-item-select'>
               <span>{t('categories.selected_icon')}</span>
@@ -783,7 +790,7 @@ const key =
               updateCategory(passedCategoryId);
             }
           }}
-          disabled={!isFormValid || !isActiveCategory || categoryIdNum === 1} // Disable the button if the form is invalid
+          disabled={!isFormValid || !isActiveCategory || categoryId === categorylessId} // Disable the button if the form is invalid
         >
           {t('categories.update_category')}
         </IonButton>
@@ -926,7 +933,7 @@ const key =
               <div className='flex ion-align-items-center mt-20'>
                 <IonToggle
                   checked={agreedToMerge} 
-                  disabled={targetCategoryId === null || targetCategoryId === categoryIdNum} 
+                  disabled={targetCategoryId === null || targetCategoryId === categoryId} 
                   onIonChange={(e) => setAgreedToMerge(e.detail.checked)}                  
                   color="danger"
                   className='mr-10'
@@ -967,7 +974,7 @@ const key =
               </IonButton>
               <IonButton
                 onClick={mergeCategory}
-                disabled={!agreedToMerge || targetCategoryId === null || targetCategoryId === categoryIdNum} 
+                disabled={!agreedToMerge || targetCategoryId === null || targetCategoryId === categoryId} 
                 color="danger"
               >
                 {t('categories.merge')}
@@ -1001,7 +1008,7 @@ const key =
               selectedCategory={targetCategoryId ?? undefined} // Use the new target state
               selectedSubcategory={undefined} // Not relevant for this context
               onCategorySelect={handleTargetCategorySelect} // Use the new handler
-              currentCategoryId={categoryIdNum} 
+              currentCategoryId={categoryId} 
             />
           </IonContent>
         </IonModal>

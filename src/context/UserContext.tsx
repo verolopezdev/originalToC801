@@ -4,6 +4,8 @@ import { db, User } from '../db';
 
 interface UserContextType {
   user: User;
+  userId: string;
+  categorylessId: string;
   updateUser: (updates: Partial<User>) => Promise<void>;
   resetUser: () => Promise<void>;
 }
@@ -35,6 +37,13 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     []
   );
 
+  // 2. Fetch the "Categoryless" system category (first record or by name)
+  const categorylessId = useLiveQuery(async () => {
+    const category = await db.categories.toCollection().first();
+    // Alternatively: await db.categories.where('name').equals('Categoryless').first();
+    return category?.categoryId ?? '';
+  }, []);
+
   const updateUser = async (updates: Partial<User>) => {
     if (!user?.userId) return;
     await db.users.update(user.userId, updates);
@@ -49,7 +58,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   // 2. While loading, show a visible indicator instead of returning null (blank page)
-  if (!user) {
+  if (!user || categorylessId === undefined) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <p>Loading user context...</p>
@@ -61,6 +70,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     <UserContext.Provider
       value={{
         user,
+        userId: user.userId,
+        categorylessId,
         updateUser,
         resetUser,
       }}

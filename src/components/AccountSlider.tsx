@@ -12,10 +12,10 @@ import '../Main.css';
 import './AccountSlider.css';
 
 interface AccountSliderProps {
-  editAccount?: number; // In edit mode, holds expense's accountId
+  editAccount?: string; // In edit mode, holds expense's accountId
   accounts: any[]; // Array of accounts
-  passedAccount?: number;
-  onAccountSelect: (accountId: number) => void; // Callback to pass the selected account id to the parent
+  passedAccount?: string;
+  onAccountSelect: (accountId: string) => void; // Callback to pass the selected account id to the parent
 }
 
 const AccountSlider: React.FC<AccountSliderProps> = ({ editAccount, accounts, onAccountSelect }) => {

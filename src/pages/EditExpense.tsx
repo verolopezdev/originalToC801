@@ -77,7 +77,7 @@ import { getRecurringSeriesById, getDateRange } from '../utils/recurrenceUtils';
 import { getOldestOverdueExpenseForSeries } from '../utils/recurrenceFunctions';
 
 
-function useCategory(categoryId?: number) {
+function useCategory(categoryId?: string) {
   return useLiveQuery(async () => {
     if (!categoryId) return undefined;
     return db.categories.get(categoryId); // Fetch parent category by its ID
@@ -85,7 +85,7 @@ function useCategory(categoryId?: number) {
 }
 
 
-function useSubcategory(subcategoryId?: number | null) {
+function useSubcategory(subcategoryId?: string | null) {
   return useLiveQuery(async () => {
     if (!subcategoryId) return undefined;
     return db.subcategories.get(subcategoryId); // Fetch parent category by its ID
@@ -119,23 +119,23 @@ const defaultCurrency: CurrencyType = {
 
 const EditExpense: React.FC = () => {
   const { t } = useTranslation();
-  const { user } = useUser(); 
+  const { user, userId } = useUser(); 
   const { currency, allSelectedCurrencies } = useCurrency(); 
   const { convertCurrency, getExchangeRate } = useExchangeRates();
   const { updateExpenseWithRecurrence } = useRecurringExpense();
   const { travelMode, checkTrip, trips, selectedTripId } = useTrip();
   const { openDatePicker } = useDatePicker();
   
-  const [tripId, setTripId] = useState<number | null>(null);
-  const [toggledTripId, setToggledTripId] = useState<number | null>(null);  
+  const [tripId, setTripId] = useState<string | null>(null);
+  const [toggledTripId, setToggledTripId] = useState<string | null>(null);  
   const [tripName, setTripName] = useState<string>('');
   const [tripCurrencyCode, setTripCurrencyCode] = useState<string>('');
   const [isTravelMode, setIsTravelMode] = useState<boolean>(false);
   
   const { checkExpense, checkRecurrence } = useExpense();
   const { expenseId } = useParams<{ expenseId: string }>(); // passed expense id to fill the form, always a string
-  const expense = useLiveQuery(() => db.expenses.get(Number(expenseId)), [expenseId]); // get it from Dexie 
-  const [passedExpenseId, setPassedExpenseId] = useState<number>(Number(expenseId));
+  const expense = useLiveQuery(() => db.expenses.get(expenseId), [expenseId]); // get it from Dexie 
+  const [passedExpenseId, setPassedExpenseId] = useState<string>(expenseId);
 
   const accounts: Account[] | undefined = useLiveQuery(
     () => db.accounts.orderBy('sortOrder').toArray()
@@ -143,12 +143,12 @@ const EditExpense: React.FC = () => {
 
   const today = new Date();
 
-  const [selectedCardId, setSelectedCardId] = useState<number>(0);
+  const [selectedCardId, setSelectedCardId] = useState<string>('');
   // 🏆 NEW STATE: Holds the original account ID from the expense
-  const [initialExpenseAccountId, setInitialExpenseAccountId] = useState<number>(0);
+  const [initialExpenseAccountId, setInitialExpenseAccountId] = useState<string>('');
   const [amountInCents, setAmountInCents] = useState(0);
-  const [categoryId, setCategoryId] = useState<number>(1);
-  const [subcategoryId, setSubcategoryId] = useState<number>(0);
+  const [categoryId, setCategoryId] = useState<string>('');
+  const [subcategoryId, setSubcategoryId] = useState<string>('');
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [selectedDate, setSelectedDate] = useState<Date>(today);  
   const [expenseCurrencyCode, setExpenseCurrencyCode] = useState<string>('');
@@ -368,7 +368,7 @@ const EditExpense: React.FC = () => {
   const category = useCategory(categoryId);
   const subcategory = useSubcategory(subcategoryId);
 
-  const handleCategorySelect = ({ categoryId, subcategoryId }: { categoryId: number; subcategoryId: number }) => {
+  const handleCategorySelect = ({ categoryId, subcategoryId }: { categoryId: string; subcategoryId: string }) => {
     setCategoryId(categoryId); // Update the parent category ID
     setSubcategoryId(subcategoryId);
     setIsOpenCategoryModal(false); // Close the modal
@@ -415,7 +415,7 @@ const EditExpense: React.FC = () => {
 
 
   // Handle selected card id change from SliderComponent
-  const handleAccountSelect = (accountId: number) => {
+  const handleAccountSelect = (accountId: string) => {
     setSelectedCardId(accountId); // Update the state with the selected account id
   };
 
@@ -517,7 +517,7 @@ const EditExpense: React.FC = () => {
 
 
   // Call this when user wants to delete a recurring expense
-  async function handleDeleteClick(passedExpenseId: number) {
+  async function handleDeleteClick(passedExpenseId: string) {
     if (expense && !expense.seriesId) {
       // Not a recurring expense - just delete directly
       deleteExpense(passedExpenseId);
@@ -545,7 +545,7 @@ const EditExpense: React.FC = () => {
 
 
   // Delete only this instance in a recurrent series
-  async function deactivateRecurrentExpense(expenseId: number) {
+  async function deactivateRecurrentExpense(expenseId: string) {
     try {
       await db.transaction(
         'rw', 
@@ -565,7 +565,7 @@ const EditExpense: React.FC = () => {
 
 
   // Delete this and future instances in a recurrent series
-  async function deleteThisAndFutureExpenses(expenseId: number, seriesId: number) {
+  async function deleteThisAndFutureExpenses(expenseId: string, seriesId: string) {
     try {
       await db.transaction(
         'rw', 
@@ -621,7 +621,7 @@ const EditExpense: React.FC = () => {
   }
 
   // Delete all expenses from this series 
-  async function deleteEntireRecurringSeries(seriesId: number) {
+  async function deleteEntireRecurringSeries(seriesId: string) {
     try {
       const count = await db.expenses.where('seriesId').equals(seriesId).count();
       await db.transaction(
@@ -685,7 +685,7 @@ const EditExpense: React.FC = () => {
 
 
   // Update expense record in database
-  async function updateExpense(expenseId: number) {
+  async function updateExpense(expenseId: string) {
     // Check if expense exists
     const existingExpense = await db.expenses.get(expenseId);
     if (!existingExpense) {
@@ -754,7 +754,7 @@ const EditExpense: React.FC = () => {
     }
 
     const base: ExpenseBase = {
-      userId: 1,
+      userId,
       expenseNote: note,
       accountId: selectedCardId,
       categoryId,
@@ -815,7 +815,7 @@ const EditExpense: React.FC = () => {
           passedExpenseId,
           base,
           selectedDate,
-          expense?.seriesId ? expense?.seriesId : 0, // only if it's recurring
+          expense?.seriesId ? expense?.seriesId : '', // only if it's recurring
         );
       }
 
@@ -830,7 +830,7 @@ const EditExpense: React.FC = () => {
 
 
   // Delete regular expense
-  async function deleteExpense(expenseId: number) {
+  async function deleteExpense(expenseId: string) {
     try {
       // Check if expense exists
       const existingExpense = await db.expenses.get(expenseId);

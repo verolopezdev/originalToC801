@@ -49,7 +49,7 @@
   overflow: hidden;
 }
 
-.transaction-note {
+.transaction-note { 
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

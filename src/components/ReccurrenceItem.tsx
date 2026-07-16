@@ -75,7 +75,7 @@ const ReccurrenceItem: React.FC<ReccurrenceItemProps> = ({
   };
   
   const frequencyKey = frequencyMap[unit as keyof typeof frequencyMap];
-  const frequencyLabel = t(`date.${frequencyKey}`);
+  const frequencyLabel = t(`date.${frequencyKey}`); 
 
   const getIcon = (status : string) => {
     switch (status) {
@@ -99,10 +99,10 @@ const ReccurrenceItem: React.FC<ReccurrenceItemProps> = ({
           <CategoryIcon iconName={categoryIcon} categoryColor={color} autoLogged={autoLogged} isTransaction={true} />
         </div>
         <div className='center-col'>
-					<div className='flex'>
+					<div className='flex-ellipsis'>
 						{/* Expense note */}
             {expenseNote ? (
-              <div className='reccurrence-title'>
+              <div className='reccurrence-title'> 
                 {expenseNote}
               </div>
             ) : (
@@ -114,13 +114,13 @@ const ReccurrenceItem: React.FC<ReccurrenceItemProps> = ({
 					<ul className='reccurrence-list-data'>  
 						<li>{categoryName}</li>
 						<li>{accountName}</li>
-						<li>
-              {frequencyLabel}
-              {totalInstallments && ` ${t('expenses.payments_count_short', { count: totalInstallments })}`}
+            <li>
+              {t(`date.frequency.${unit}`, { count: interval })}
+              {typeof totalInstallments === 'number' && ` x ${totalInstallments}`}
               {endDate && (
                 <>
-                  {' · '}
-                  <FormattedDate date={new Date(endDate)} format="compact" />
+                  {t('expenses.config_until')}{" "}
+                  {new Date(endDate).toLocaleDateString()}
                 </>
               )}
             </li>

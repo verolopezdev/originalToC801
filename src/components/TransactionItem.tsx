@@ -96,13 +96,13 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
             {categoryName}
             <span className="card-label">{accountName}</span>
           </div>  
-          <div className="center-col-wrapper">    
+          <div className="flex-ellipsis">    
             {expenseNote ? (
               <div className="transaction-note">
                 {expenseNote}
               </div>
             ) : (
-              <IonNote className="transaction-note">{t('common.no_description')}</IonNote>  
+              <IonNote className="transaction-note">{t('common.no_description')}</IonNote>    
             )}
 
             {/* Append (1/6) if both values are present */}

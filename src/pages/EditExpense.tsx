@@ -1060,14 +1060,14 @@ const EditExpense: React.FC = () => {
         <div className="form-item">
           <div className="parent-input">
             <div className="input-container">
-              <input
-                type="text"
+              <textarea
                 value={note}
-                maxLength={30}
+                maxLength={120}
                 placeholder={t('expenses.config_note')}
-                onChange={(e) => handleNoteChange(e.target.value) }
-                className={`input ${error ? 'invalid' : ''}`}
-                />
+                onChange={(e) => handleNoteChange(e.target.value)}
+                className={`textarea ${error ? 'invalid' : ''}`}
+                rows={3} // Optional: Sets the initial visible height (defaults to 2)
+              />
               {error && <p className="error-text">{error}</p>}
             </div>
             {(tripId || travelMode) && !recurrence.isRecurring && (

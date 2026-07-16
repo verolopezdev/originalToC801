@@ -525,8 +525,9 @@ const ViewRecurrence: React.FC = () => {
 
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
         <section className='centered-container'>
-          <h2 className='screen-title'>{note}</h2>
-
+        <h2 className='screen-title'>
+          {note.length > 15 ? `${note.substring(0, 20)}...` : note}
+        </h2>
           <div className="mt-20">
             <CategoryPreview
               categoryColor={showCategoryColor}
@@ -565,12 +566,12 @@ const ViewRecurrence: React.FC = () => {
 
           <div className="info-container">
             <p>
-              {frequencyLabel}  
-              {recurrence.totalOccurrences && ` ${t('expenses.payments_count_short', { count: recurrence.totalOccurrences })}`}
-              {series && series.endDate && (
+              {t(`date.frequency.${recurrence.unit}`, { count: recurrence.interval })}
+              {typeof recurrence.totalOccurrences === 'number' && ` x ${recurrence.totalOccurrences}`}
+              {recurrence.endDate && (
                 <>
-                  {t('date.until_mid')} 
-                  <FormattedDate date={new Date(series.endDate)} format="compact" />
+                  {t('expenses.config_until')}{" "}
+                  {new Date(recurrence.endDate).toLocaleDateString()}
                 </>
               )}
             </p>

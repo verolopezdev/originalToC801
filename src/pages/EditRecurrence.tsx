@@ -620,8 +620,7 @@ const EditRecurrence: React.FC = () => {
                 <span className='data'>{t('expenses.config_only_once')}</span>
               ) : (
                 <span className='data'>
-                  {t('expenses.config_every')} {recurrence.interval > 1 ? recurrence.interval : ''} {t(`date.${recurrence.unit}`)}
-                  {recurrence.interval > 1 ? 's' : ''}
+                  {t(`date.frequency.${recurrence.unit}`, { count: recurrence.interval })}
                   {typeof recurrence.totalOccurrences === 'number' && ` x ${recurrence.totalOccurrences}`}
                   {recurrence.endDate && (
                     <>
@@ -702,14 +701,14 @@ const EditRecurrence: React.FC = () => {
         <div className="form-item">
           <div className="parent-input">
             <div className="input-container">
-              <input
-                type="text"
+              <textarea
                 value={note}
-                maxLength={30}
-                placeholder="Note"
-                onChange={(e) => handleNoteChange(e.target.value) }
-                className={`input ${error ? 'invalid' : ''}`}
-                />
+                maxLength={120}
+                placeholder={t('expenses.config_note')}
+                onChange={(e) => handleNoteChange(e.target.value)}
+                className={`textarea ${error ? 'invalid' : ''}`}
+                rows={3} // Optional: Sets the initial visible height (defaults to 2)
+              />
               {error && <p className="error-text">{error}</p>}
             </div>
           </div>

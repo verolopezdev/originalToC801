@@ -178,7 +178,36 @@ const NewExpense: React.FC = () => {
   useBackButtonModalReset(isOpenCategoryModal, setIsOpenCategoryModal);
   // Keyboard close on tap or scroll
   useKeyboardAutoClose();
+
+  // Get all active accounts
+  const sortedAccounts = useMemo(() => {
+    if (!accounts) return [];
+
+    // Filter out inactive accounts
+    const activeAccounts = accounts.filter(account => account.activeAccount);
+    console.log("Active accounts: ", activeAccounts);
+    // 2. Sort the active accounts
+    return activeAccounts;
+  }, [accounts]);
   
+  
+  // New code block to find the ID of the first sorted account
+  const firstSortedAccountId = useMemo(() => {
+    console.log("Sorted accounts: ", sortedAccounts);
+
+    if (!sortedAccounts) return '0';
+    // sortedAccounts is already sorted by user.defaultAccount (if present) 
+    // and then by sortOrder. The first element is the one we want.
+    return sortedAccounts.length > 0 ? sortedAccounts[0].accountId : '0';
+  }, [sortedAccounts]);
+  
+  console.log("First sorted account id: ", firstSortedAccountId);
+
+  useEffect(() => {
+    if (firstSortedAccountId && firstSortedAccountId !== '0' && (passedAccountId === '0' || !passedAccountId)) {
+      setSelectedAccountId(firstSortedAccountId);
+    }
+  }, [firstSortedAccountId, passedAccountId]);
 
   useEffect(() => {
     setSelectedCurrency(currency.actualCurrency);
@@ -250,14 +279,16 @@ const NewExpense: React.FC = () => {
     initDefaultCategory();
 
     // Priority 1: Account passed via route parameter (for editing/pre-selection)
-    if(passedAccountId !== '0') {
-      setSelectedAccountId(passedAccountId)
+    if (passedAccountId && passedAccountId !== '0' && passedAccountId !== '') {
+      setSelectedAccountId(passedAccountId);
     } 
-    // Priority 2: The first account from the sorted list (sortOrder 0)
+    // Priority 2: If the accounts have already loaded by the time we enter the view
+    else if (firstSortedAccountId && firstSortedAccountId !== '0') {
+      setSelectedAccountId(firstSortedAccountId);
+    } 
+    // Otherwise, let the new useEffect hook handle it when the async Dexie query finishes
     else {
-      // Use the memoized ID of the first account in the sorted list
-      // Fallback to empty string if firstSortedAccountId is undefined
-      setSelectedAccountId(firstSortedAccountId ?? '');
+      setSelectedAccountId('');
     }
 
     setSubcategoryId('');
@@ -271,6 +302,7 @@ const NewExpense: React.FC = () => {
     setResetTrigger(prev => prev + 1);
   });
 
+  
   const isAlternativeCurrency =
     expenseCurrencyCode !== currency.defaultCurrency.code;
 
@@ -285,25 +317,6 @@ const NewExpense: React.FC = () => {
   };
 
 
-  // Get all active accounts
-  const sortedAccounts = useMemo(() => {
-    if (!accounts) return [];
-
-    // Filter out inactive accounts
-    const activeAccounts = accounts.filter(account => account.activeAccount);
-    
-    // 2. Sort the active accounts
-    return activeAccounts;
-  }, [accounts]);
-
-
-  // New code block to find the ID of the first sorted account
-  const firstSortedAccountId = useMemo(() => {
-    if (!sortedAccounts) return '0';
-    // sortedAccounts is already sorted by user.defaultAccount (if present) 
-    // and then by sortOrder. The first element is the one we want.
-    return sortedAccounts.length > 0 ? sortedAccounts[0].accountId : '0';
-  }, [sortedAccounts]);
 
 
   const showToast = (message: string, type: 'info' | 'error') => {
@@ -511,9 +524,7 @@ const NewExpense: React.FC = () => {
     }
   }
 
-  console.log("Category id: ", categoryId);
-  console.log("Subcategory id: ", subcategoryId);
-
+console.log("Selected account id: ", selectedAccountId);
 
   return (
     <IonPage>
@@ -613,8 +624,7 @@ const NewExpense: React.FC = () => {
                 <span className='data'>{t('expenses.config_only_once')}</span>
               ) : (
                 <span className='data'>
-                  {t('expenses.config_every')} {recurrence.interval > 1 ? recurrence.interval : ''} {t(`date.${recurrence.unit}`)}
-                  {recurrence.interval > 1 ? 's' : ''}
+                  {t(`date.frequency.${recurrence.unit}`, { count: recurrence.interval })}
                   {typeof recurrence.totalOccurrences === 'number' && ` x ${recurrence.totalOccurrences}`}
                   {recurrence.endDate && (
                     <>
@@ -703,14 +713,14 @@ const NewExpense: React.FC = () => {
         <div className="form-item">
           <div className="parent-input">  
             <div className="input-container">
-              <input
-                type="text"
+            <textarea
                 value={note}
-                maxLength={30}
+                maxLength={120}
                 placeholder={t('expenses.config_note')}
-                onChange={(e) => handleNoteChange(e.target.value) }
-                className={`input ${error ? 'invalid' : ''}`}
-                />
+                onChange={(e) => handleNoteChange(e.target.value)}
+                className={`textarea ${error ? 'invalid' : ''}`}
+                rows={3} // Optional: Sets the initial visible height (defaults to 2)
+              />
               {error && <p className="error-text">{error}</p>}
             </div>
             {isTravelMode && (

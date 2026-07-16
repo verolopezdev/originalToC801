@@ -7,6 +7,10 @@
   line-height: 1.2em;
   font-weight: 600;
   margin-bottom: 6px;
+  /* Force single line and add ellipsis */
+  white-space: nowrap;      /* Prevents the text from wrapping to a new line */
+  overflow: hidden;         /* Hides the text that overflows the container */
+  text-overflow: ellipsis;  /* Adds the '...' at the end of the visible text */ 
 }
 
 .reccurrence-list-data {  

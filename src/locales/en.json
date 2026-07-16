@@ -309,7 +309,15 @@
     "yearly": "Yearly",
     "week-start": "Week start",
     "monday": "Monday",
-    "sunday": "Sunday"
+    "sunday": "Sunday",
+    "frequency": {
+      "week_one": "Every week",
+      "week_other": "Every {{count}} weeks",
+      "month_one": "Every month",
+      "month_other": "Every {{count}} months",
+      "year_one": "Every year",
+      "year_other": "Every {{count}} year"
+    }
   },
   "expenses": {
     "add_new_exp": "Add New Expense",

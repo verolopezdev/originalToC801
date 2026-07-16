@@ -309,7 +309,15 @@
     "yearly": "Anual",
     "week-start": "Inicio de semana",
     "monday": "Lunes",
-    "sunday": "Domingo"
+    "sunday": "Domingo",
+    "frequency": {
+      "week_one": "Cada semana",
+      "week_other": "Cada {{count}} semanas",
+      "month_one": "Cada mes",
+      "month_other": "Cada {{count}} meses",
+      "year_one": "Cada año",
+      "year_other": "Cada {{count}} años"
+    }
   },
   "expenses": {
     "add_new_exp": "Añadir nuevo gasto",

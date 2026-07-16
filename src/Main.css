@@ -595,6 +595,10 @@ body {
   align-items: center;
 }
 
+.flex-ellipsis {
+  width: 100%;
+}
+
 hr {
   background-color: var(--neutral); 
   height: 1px; 
@@ -1493,12 +1497,26 @@ ion-textarea {
   transition: border-color 0.3s ease;
 }
 
-.input:focus {
+.textarea {
+  padding: 8px 12px;
+  border: none; /* Remove all borders */
+  border-bottom: 1px solid var(--input-border-color); /* Add only bottom border */
+  border-radius: 0; /* Remove border radius */
+  font-size: 14px;
+  width: 100%;
+  background-color: var(--ion-background-color);
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+.input:focus,
+.textarea:focus {
   border-color: var(--ion-color-primary);;
   outline: none;
 }
 
-.input.invalid {
+.input.invalid,
+.textarea.invalid {
   border-color: var(--error-msg-color) !important;
 }
 

@@ -1472,7 +1472,7 @@ ion-textarea {
   font-weight: bold; /* bolder label for form labels only */
 }
 
-.input-container {
+.input-container {  
   margin: 0;
   display: flex;
   flex-direction: column;
@@ -1527,6 +1527,16 @@ ion-textarea {
   line-height: 14px;
   margin-top: 4px;
   margin-bottom: 0px;
+}
+
+ion-searchbar.custom {
+  --background: var(--ion-item-background);
+  --color: var(--ion-text-color);
+  --placeholder-color: var(--ion-color-note);
+  --icon-color: var(--ion-color-note);
+  --clear-button-color: var(--ion-color-note);
+  --border-radius: 10px;
+  background-color: var(--ion-background-color);
 }
 
 

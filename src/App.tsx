@@ -33,6 +33,7 @@ import ExportData from './pages/ExportData';
 import FileExplorer from './pages/FileExplorer';
 import GetPremium from './pages/GetPremium';
 import HelpPage from './pages/HelpPage';
+import LoginScreen from './pages/LoginScreen';
 import LogOut from './pages/LogOut';
 import LogRecurrenceExpense from './pages/LogRecurrenceExpense';
 import Menu from './components/Menu';
@@ -56,6 +57,7 @@ import ThemePage from './pages/ThemePage';
 import TravelMode from './pages/TravelMode';
 import ViewRecurrence from './pages/ViewRecurrence';
 import ViewTrip from './pages/ViewTrip';
+import WelcomeScreen from "./pages/WelcomeScreen";
 
 
 
@@ -181,6 +183,7 @@ const App: React.FC = () => {
                                 <Route path="/exportdata" component={ExportData} exact />
                                 <Route path="/getpremium" component={GetPremium} exact />
                                 <Route path="/help" component={HelpPage} exact />
+                                <Route exact path="/login" component={LoginScreen} />
                                 <Route path="/logout" component={LogOut} exact />
                                 <Route path="/logrecurrenceexpense/:seriesId" component={LogRecurrenceExpense} exact />
                                 <Route path="/newaccount" component={NewAccount} exact />
@@ -202,6 +205,7 @@ const App: React.FC = () => {
                                 <Route path="/travelmode" component={TravelMode} exact />
                                 <Route path="/viewtrip/:tripId" component={ViewTrip} exact />
                                 <Route path="/viewrecurrence/:seriesId" component={ViewRecurrence} exact />
+                                <Route exact path="/welcome" component={WelcomeScreen} />
                               </IonRouterOutlet>
                             </IonSplitPane>
                           </IonReactRouter>

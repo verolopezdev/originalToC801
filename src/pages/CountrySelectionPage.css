@@ -43,3 +43,86 @@ h4.app-type {
 .country-select {
   margin: 36px 0 18px 0;
 }
+
+
+/* Floating Action Button Footer */
+.fixed-footer-button {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  /* Top is 0% opacity (transparent), bottom is 100% solid ion background */
+  background: linear-gradient(
+    180deg, 
+    color-mix(in srgb, var(--ion-background-color, #ffffff) 0%, transparent) 0%, 
+    var(--ion-background-color, #ffffff) 40%
+  );
+  padding: 16px 20px 24px 20px;
+  z-index: 10;
+}
+
+.continue-btn {
+  --border-radius: 14px;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+
+.country-list-container {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 90px;
+}
+
+/* Card item styling */
+/* Ensure every country row has a consistent height */
+.country-item {
+  --min-height: 60px; /* Set your preferred uniform height */
+  height: 60px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.country-item-selected {
+  border-radius: 14px;
+  border: 1px solid var(--ion-color-primary);
+}
+
+/* Avatar container */
+.country-avatar {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ion-color-note);
+  border-radius: 50%;
+  border: 1px solid var(--ion-item-background);
+  margin-inline-end: 12px;
+}
+
+/* Ensure the label container takes up full vertical space and centers text */
+.country-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+}
+
+/* Prevent text overflow or layout shifting */
+.country-main-name {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.country-native-subtext {
+  font-size: 0.85rem;
+  color: var(--ion-color-note);
+  line-height: 1.2;
+  margin-top: 2px;
+}

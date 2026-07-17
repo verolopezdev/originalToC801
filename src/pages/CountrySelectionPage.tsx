@@ -1,42 +1,40 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import i18n from '../i18n';
 import { useTranslation } from 'react-i18next';
-
 import { Preferences } from '@capacitor/preferences';
 import { Device } from '@capacitor/device';
 
-
 // Context
 import { useCurrency } from '../context/CurrencyContext';
-import { useUser } from '../context/UserContext'; 
+import { useUser } from '../context/UserContext';
 
-// Ionic's components
+// Custom hooks
+import useScrollToTop from '../hooks/useScrollToTop';
+
+// Ionic components
 import { 
+  IonAvatar,
+  IonBackButton,
   IonButton,
   IonButtons, 
   IonContent, 
   IonHeader, 
-  IonIcon,
   IonItem,
-  IonModal,
+  IonLabel,
   IonPage, 
-  IonTitle,
+  IonRadio,
+  IonRadioGroup,
+  IonSearchbar,
   IonToolbar 
 } from '@ionic/react';
 
-
 // Ion icons
-import { 
-  caretDownOutline,
-  closeOutline,
-} from 'ionicons/icons';
-
+import { searchOutline } from 'ionicons/icons';
 
 // Styles
 import '../Main.css';
 import './CountrySelectionPage.css';
-
 
 interface CountryData {
   name: string;
@@ -44,199 +42,273 @@ interface CountryData {
   locale: string;
   symbol: string;
   country: string;
+  nativeName?: string;
   thousandSeparator: string;
   decimalSeparator: string;
+  flag?: string;
 }
 
-// Main function
+const getFlagEmoji = (countryCode: string) => {
+  if (!countryCode || countryCode.length !== 2) return '🌐';
+  const codePoints = countryCode
+    .toUpperCase()
+    .split('')
+    .map(char => 127397 + char.charCodeAt(0));
+  return String.fromCodePoint(...codePoints);
+};
+
 const CountrySelectionPage: React.FC = () => {
   const { t } = useTranslation();
-  
+  const contentRef = useScrollToTop();
+
   const { updateUser } = useUser(); 
   const { setDefaultCurrency, updateActualCurrency } = useCurrency(); 
   const history = useHistory();
 
-  const [isDefCountryModalOpen, setIsDefCountryModalOpen] = useState(false);  
-  const [country, setCountry] = useState<CountryData | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState<CountryData | null>(null);
   const [jsonCountries, setJsonCountries] = useState<CountryData[]>([]);
+  const [searchText, setSearchText] = useState<string>('');
   const supportedLngs = ['en', 'es', 'fr', 'pt'];
 
+  const selectedItemRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const content = contentRef.current;
+    const selectedEl = selectedItemRef.current;
   
-  // Load country list from json
+    if (!selectedCountry || !selectedEl || !content) return;
+  
+    const scroll = async () => {
+      const scrollEl = await content.getScrollElement();
+  
+      const itemRect = selectedEl.getBoundingClientRect();
+      const scrollRect = scrollEl.getBoundingClientRect();
+  
+      const y =
+        scrollEl.scrollTop +
+        itemRect.top -
+        scrollRect.top -
+        scrollRect.height / 2 +
+        itemRect.height / 2;
+  
+      content.scrollToPoint(0, y, 400);
+    };
+  
+    const timer = setTimeout(scroll, 100);
+  
+    return () => clearTimeout(timer);
+  }, [selectedCountry]);
+
+
+  // 1. Fetch countries safely
   useEffect(() => {
     fetch("/assets/countries.json")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(t('currency.failed_to_fetch_currency'));
-        }
-        return response.json();
-      })
+      .then((response) => response.json())
       .then((data: CountryData[]) => {
         setJsonCountries(data);
       })
-      .catch((err) => {
-        console.log(err.message);
-      });
+      .catch((err) => console.error("Error loading countries:", err));
   }, []);
 
-  // Detect device locale
+  // 2. Detect device locale
   useEffect(() => {
     if (jsonCountries.length === 0) return;
-  
+
     const detectDeviceLanguage = async () => {
-      // Prevent overriding existing user selection
-      const { value: savedCountry } = await Preferences.get({
-        key: 'selectedCountry',
-      });
-  
-      if (savedCountry) return;
-  
-      // Detect device locale
-      const { value: deviceLocale } = await Device.getLanguageTag();
-      // Examples:
-      // "es-AR"
-      // "en-US"
-      // "pt-BR"
-  
-      // Try exact locale match
-      let matchedCountry = jsonCountries.find(
-        c => c.locale.toLowerCase() === deviceLocale.toLowerCase()
+      // ------------------------------------------------------------------
+    // 🧪 FORCE TEST OVERRIDE: Always force "USD" for testing
+    // ------------------------------------------------------------------
+    const TEST_OVERRIDE_CODE = ""; // Set to null or "" when done testing
+
+    if (TEST_OVERRIDE_CODE) {
+      const forcedCountry = jsonCountries.find(
+        (c) => c.code.toUpperCase() === TEST_OVERRIDE_CODE
       );
-  
-      // Fallback to language only
-      if (!matchedCountry) {
-        const langOnly = deviceLocale.split('-')[0];
-  
-        matchedCountry = jsonCountries.find(
-          c => c.locale.startsWith(langOnly)
-        );
+      if (forcedCountry) {
+        setSelectedCountry(forcedCountry);
+        return; // Stop auto-detection
       }
-  
-      // Final fallback
-      if (!matchedCountry) {
-        matchedCountry = jsonCountries[0];
+    }
+    // ------------------------------------------------------------------
+      const { value: savedCountry } = await Preferences.get({ key: 'selectedCountry' });
+      if (savedCountry) return;
+
+      const { value: deviceLocale } = await Device.getLanguageTag();
+      
+      let matched = jsonCountries.find(
+        c => c.locale.toLowerCase() === (deviceLocale || '').toLowerCase()
+      );
+
+      if (!matched) {
+        const langOnly = (deviceLocale || '').split('-')[0];
+        matched = jsonCountries.find(c => c.locale.startsWith(langOnly));
       }
-  
-      if (matchedCountry) {
-        setCountry(matchedCountry);
-  
-        // Also set app language immediately
-        const userLang = matchedCountry.locale.split('-')[0];
-  
-        const langToUse = supportedLngs.includes(userLang)
-          ? userLang
-          : 'en';
-  
+
+      if (!matched) matched = jsonCountries[0];
+
+      if (matched) {
+        setSelectedCountry(matched);
+        const userLang = matched.locale.split('-')[0];
+        const langToUse = supportedLngs.includes(userLang) ? userLang : 'en';
         await i18n.changeLanguage(langToUse);
-        await Preferences.set({
-          key: 'i18nextLng',
-          value: langToUse,
-        });
       }
     };
-  
+
     detectDeviceLanguage();
   }, [jsonCountries]);
 
-  if (jsonCountries.length === 0) return <div>{t('common.loading')}</div>;
+  useEffect(() => {
+    console.log(selectedCountry?.code);
+    console.log(selectedItemRef.current);
+  }, [selectedCountry]);
 
+  // 3. Strict prefix search filter
+  const cleanSearchQuery = searchText.trim().toLowerCase();
 
-  // handleContinue applies changes and redirects to dashboard
+  const filteredCountries = jsonCountries.filter((item) => {
+    // Empty search query -> Return all items
+    if (!cleanSearchQuery) return true;
+
+    const countryName = item.country ? item.country.toLowerCase() : '';
+    const nativeName = item.nativeName ? item.nativeName.toLowerCase() : '';
+
+    // Checks if the country or native name starts with the typed query
+    const matchesCountry = countryName.startsWith(cleanSearchQuery);
+    const matchesNative = nativeName.startsWith(cleanSearchQuery);
+
+    return matchesCountry || matchesNative;
+  });
+
+  // 4. Immutable handleContinue (Prevents mutating state objects)
   const handleContinue = async () => {
-    if (!country) return; // Make sure a country is selected
-    
-    // Set default language
-    const userLang = country.locale.split('-')[0]; // Extract "es" from "es-AR"
-    
+    if (!selectedCountry) return;
+
+    // Create a fresh clone so we don't mutate state objects directly
+    const countryToSave = { ...selectedCountry };
+    console.log("Country to save: ", countryToSave);
+
+    const userLang = countryToSave.locale.split('-')[0];
     const langToUse = supportedLngs.includes(userLang) ? userLang : 'en';
+    console.log("userLang: ", userLang);
+    console.log("Lang to use: ", langToUse);
 
     await i18n.changeLanguage(langToUse);
     await Preferences.set({ key: 'i18nextLng', value: langToUse });
 
-    // thousands and decimals separators
-    const numberFormat = new Intl.NumberFormat(country.locale);
+    const numberFormat = new Intl.NumberFormat(countryToSave.locale);
     const exampleFormatted = numberFormat.format(1234567.89);
 
-    country.thousandSeparator = exampleFormatted.replace(/\d/g, '').charAt(0);
-    country.decimalSeparator = (1.1).toLocaleString(country.locale).substring(1, 2);
-    
-    // Set default currency
-    setDefaultCurrency(country);
-    updateActualCurrency(country); 
+    countryToSave.thousandSeparator = exampleFormatted.replace(/\d/g, '').charAt(0);
+    countryToSave.decimalSeparator = (1.1).toLocaleString(countryToSave.locale).substring(1, 2);
 
-    // Store the selected country so this screen doesn't show again
-    await Preferences.set({ key: 'selectedCountry', value: country.country });
+    setDefaultCurrency(countryToSave);
+    updateActualCurrency(countryToSave);
 
-    // Redirect to the Dashboard
+    await Preferences.set({ key: 'selectedCountry', value: countryToSave.country });
     history.replace('/dashboard');
   };
 
-
+  if (jsonCountries.length === 0) {
+    return <div className="loading-state">{t('common.loading')}</div>;
+  }
 
   return (
-    <IonPage>
-      <IonContent className="ion-padding-horizontal">
-        <div className="country-screen">
-          {/* Logo and app name */}
-          <div className="centered-container">
-            <img
-              src="/assets/images/logo.png"
-              alt="App logo"
-              className="big-logo"
-            />
-            <h1 className='app-name'>AppName</h1>
-            <h4 className='app-type'>Expense Tracker</h4>
-          </div>
+    <IonPage className="country-page">
+      <IonHeader className="page-header ion-no-border">
+        <IonToolbar>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref="/welcome" />
+          </IonButtons>
+        </IonToolbar>
+      </IonHeader>
 
-          {/* Screen headers */}
-          <h1 className='big-header'>{t('country_selection.big_heading')}</h1>
-          <h5 className='country-header-prompt'>{t('country_selection.subheading')}</h5>
-
-          {/* Select country */}
-          <IonItem className='country-select' button onClick={() => setIsDefCountryModalOpen(true)}>
-            <div className='list-item-select'>
-              <span>
-                {country ? country.country : t('country_selection.select_country')}
-              </span>
-              <IonIcon aria-hidden="true" icon={caretDownOutline}></IonIcon>
-            </div>
-          </IonItem> 
-
-          {/* Redirect button */}
-          <IonButton expand="block" onClick={handleContinue} disabled={!country}>
-            {t('common.continue')}
-          </IonButton>
+      <IonContent className="ion-padding-horizontal" ref={contentRef}>
+        <div className="header-text-container">
+          <h1>Select country</h1>
+          <p className="subtitle-text">
+            Please select your country of residence to customize your currency and defaults.
+          </p>
         </div>
 
-        {/* Modal for full screen country selection */}
-        <IonModal isOpen={isDefCountryModalOpen}>
-          <IonHeader className="ion-no-border">
-            <IonToolbar>
-              <IonTitle>{t('country_selection.select_country')}</IonTitle>
-              <IonButtons slot="end">
-                <IonButton onClick={() => setIsDefCountryModalOpen(false)}>
-                  <IonIcon aria-hidden="true" icon={closeOutline} className='close-modal'></IonIcon>
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent>
-            {jsonCountries.map((countryItem, index) => (
-              <IonItem
-                className='item-transparent'
-                  key={index}
-                  button
-                  onClick={() => {
-                    setCountry(countryItem);
-                    setIsDefCountryModalOpen(false);
-                  }}
+        {/* Controlled Searchbar */}
+        <div className="search-wrapper">
+          <IonSearchbar
+            value={searchText}
+            onIonInput={(e) => setSearchText(e.detail.value ?? '')}
+            showClearButton="never"
+            placeholder="Search country..."
+            searchIcon={searchOutline}
+            className='custom mb-20'
+            debounce={0}
+          />
+        </div>
+
+        {/* List of Countries */}
+        <IonRadioGroup
+          value={selectedCountry?.country}
+          onIonChange={(e) => {
+            const chosen = jsonCountries.find(
+              c => c.country === e.detail.value
+            );
+            if (chosen) {
+              setSelectedCountry(chosen);
+            }
+          }}
+        >
+          {filteredCountries.map((countryItem) => {
+            const isSelected = selectedCountry?.country === countryItem.country;
+            console.log(`/assets/flags/${countryItem.locale.split('-')[1].toLowerCase()}.svg`);
+            return (
+              <div
+                key={countryItem.country}
+                ref={(el) => {
+                  if (isSelected) {
+                    selectedItemRef.current = el;
+                  }
+                }}
+              >
+                <IonItem
+                  lines="none"
+                  className={`country-item ${isSelected ? 'country-item-selected' : ''}`}
+                  onClick={() => setSelectedCountry(countryItem)}
                 >
-                  {countryItem.country}
-              </IonItem>
-            ))}
-          </IonContent>
-        </IonModal>
+                  <IonAvatar slot="start" className="country-avatar">
+                    <img
+                      src={`/assets/flags/${countryItem.locale.split('-')[1].toLowerCase()}.svg`}
+                      alt={countryItem.country}
+                      className="country-flag"
+                    />
+                  </IonAvatar>
+
+                  <IonLabel className="country-label">
+                    <div className="country-main-name">{countryItem.country}</div>
+                    {countryItem.nativeName && countryItem.nativeName !== countryItem.country && (
+                      <div className="country-native-subtext">{countryItem.nativeName}</div>
+                    )}
+                  </IonLabel>
+
+                  <IonRadio
+                    slot="end"
+                    value={countryItem.country}
+                    aria-label={countryItem.country}
+                  />
+                </IonItem>
+              </div>
+            );
+          })}
+        </IonRadioGroup>
       </IonContent>
+
+      <div className="fixed-footer-button">
+        <IonButton
+          expand="block"
+          onClick={handleContinue}
+          disabled={!selectedCountry}
+          className="continue-btn"
+        >
+          {t('common.continue')}
+        </IonButton>
+      </div>
     </IonPage>
   );
 };

@@ -5,38 +5,36 @@ import { Preferences } from '@capacitor/preferences';
 
 const StartupRedirect: React.FC = () => {
   const history = useHistory();
-  //const { isReady } = useDatabase(); // Grab the global state
 
   useEffect(() => {
-    //if (!isReady) return;
-  
     const checkRoute = async () => {
+      // 1. Check if the user has made an initial choice or logged in
+      const { value: userMode } = await Preferences.get({ key: 'userMode' }); // e.g., 'free' or 'account'
       const { value: country } = await Preferences.get({ key: 'selectedCountry' });
-      
-      // Debug: See exactly what the app thinks the country is after reset
-      console.log("Startup Check - Country:", country);
-  
-      // Ensure country exists AND is not the string "null" or "undefined"
-      if (country && country !== "null" && country !== "undefined") {
+
+      console.log("Startup Check - Mode:", userMode, "Country:", country);
+
+      const hasValidCountry = country && country !== "null" && country !== "undefined";
+
+      // 2. Route based on status
+      if (userMode === 'free') {
+        if (hasValidCountry) {
+          history.replace('/dashboard');
+        } else {
+          history.replace('/select-country');
+        }
+      } else if (userMode === 'account') {
+        // Direct logged-in user to dashboard or login check
         history.replace('/dashboard');
       } else {
-        // This is where you want to land after a Reset
-        history.replace('/select-country');
+        // First time opening the app -> Welcome screen
+        history.replace('/welcome');
       }
     };
-  
+
     checkRoute();
   }, [history]);
 
-  // Show a clean loading state while restoring
-/*   if (!isReady) {
-    return (
-      <div className="ion-page ion-justify-content-center ion-align-items-center">
-        <p>Initializing Database...</p>
-      </div>
-    );
-  }
- */
   return null;
 };
 

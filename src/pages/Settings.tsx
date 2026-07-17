@@ -145,98 +145,124 @@ const Settings: React.FC = () => {
 
 
   const factoryReset = async (): Promise<void> => {
-  try {
-    console.log('🧨 FACTORY RESET STARTED');
-
-    //
-    // Prevent backup hooks from counting deletes
-    //
-    setIsSeeding(true);
-
-    //
-    // STEP 1
-    // Delete all backup files
-    //
     try {
-      const folder = await Filesystem.readdir({
-        path: 'backups',
-        directory: Directory.Data,
-      });
-
-      for (const file of folder.files) {
+      console.log('🧨 FACTORY RESET STARTED');
+  
+      //
+      // Prevent backup hooks from counting deletes
+      //
+      setIsSeeding(true);
+  
+      //
+      // STEP 1
+      // Delete backups folder
+      //
+      try {
+        await Filesystem.rmdir({
+          path: 'backups',
+          directory: Directory.Data,
+          recursive: true,
+        });
+  
+        console.log('✅ Backups folder removed');
+      } catch {
+        console.log('ℹ️ No backups folder found');
+      }
+  
+      //
+      // STEP 2
+      // Delete exchange rates cache
+      //
+      try {
         await Filesystem.deleteFile({
-          path: `backups/${file.name}`,
+          path: 'exchange-rates.json',
           directory: Directory.Data,
         });
+  
+        console.log('✅ Exchange rates cache removed');
+      } catch {
+        console.log('ℹ️ No exchange-rates.json found');
       }
-
-      //console.log('✅ Backup files removed');
-    } catch {
-      //console.log('ℹ️ No backup folder found');
+  
+      //
+      // STEP 3
+      // Clear Capacitor Preferences
+      //
+      await Preferences.clear();
+  
+      //
+      // STEP 4
+      // Clear browser storage (safe on native)
+      //
+      localStorage.clear();
+      sessionStorage.clear();
+  
+      //
+      // STEP 5
+      // Clear Cache API (PWA/browser only)
+      //
+      if ('caches' in window) {
+        try {
+          const cacheNames = await caches.keys();
+          await Promise.all(
+            cacheNames.map((name) => caches.delete(name))
+          );
+  
+          console.log('✅ Browser caches cleared');
+        } catch (err) {
+          console.warn('⚠️ Failed clearing Cache API', err);
+        }
+      }
+  
+      //
+      // STEP 6
+      // Verify Preferences are empty
+      //
+      const remaining = await Preferences.keys();
+  
+      if (remaining.keys.length > 0) {
+        console.warn(
+          '⚠️ Remaining Preferences:',
+          remaining.keys
+        );
+      } else {
+        console.log('✅ Preferences cleared');
+      }
+  
+      //
+      // STEP 7
+      // Close Dexie
+      //
+      db.close();
+  
+      //
+      // STEP 8
+      // Give IndexedDB time to close
+      //
+      await new Promise(resolve =>
+        setTimeout(resolve, 500)
+      );
+  
+      //
+      // STEP 9
+      // Delete IndexedDB
+      //
+      await Dexie.delete('DB');
+  
+      console.log('✅ IndexedDB deleted');
+  
+      //
+      // STEP 10
+      // Reload app
+      //
+      window.location.replace('/startup');
+    } catch (error) {
+      console.error('❌ Factory reset failed:', error);
+      throw error;
+    } finally {
+      setIsSeeding(false);
     }
-
-    //
-    // STEP 2
-    // Delete exchange rates cache
-    //
-    try {
-      await Filesystem.deleteFile({
-        path: 'exchange-rates.json',
-        directory: Directory.Data,
-      });
-
-      //console.log('✅ Exchange rates cache removed');
-    } catch {
-      //console.log('ℹ️ No exchange-rates.json found');
-    }
-
-    //
-    // STEP 3
-    // Clear all Capacitor Preferences
-    //
-    await Preferences.clear();
-
-    //console.log('✅ Preferences cleared');
-
-    //
-    // STEP 4
-    // Close Dexie connections
-    //
-    db.close();
-
-    //
-    // STEP 5
-    // Give IndexedDB a moment
-    //
-    await new Promise(resolve =>
-      setTimeout(resolve, 250)
-    );
-
-    //
-    // STEP 6
-    // Delete entire database
-    //
-    await Dexie.delete('DB');
-
-    //console.log('✅ IndexedDB deleted');
-
-    //
-    // STEP 7
-    // Reload app
-    //
-    window.location.href = '/startup';
-  } catch (error) {
-    console.error(
-      '❌ Factory reset failed:',
-      error
-    );
-
-    throw error;
-  } finally {
-    setIsSeeding(false);
-  }
-};
-
+  };
 const handleSubscriptionPlan = async (plan: SubscriptionPlan) => {
   if (plan === user.subscriptionPlan) return;
 

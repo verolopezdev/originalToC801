@@ -30,8 +30,8 @@ const DefaultPage: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding-horizontal"  ref={contentRef}>
-        <h1>LOGIN SCREEN</h1>
-        <h2>Some Content</h2>
+        <h1>Welcome back!</h1>
+        <p>Let's get you signed in. Enter your registered email below.</p>
       </IonContent>
     </IonPage>
   );

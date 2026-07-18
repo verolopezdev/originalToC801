@@ -43,7 +43,7 @@ const DeleteScopeModal: React.FC<DeleteScopeModalProps> = ({
         <div
           className='small-modal-btn'
           
-          onClick={() => { onSelect('all'); onClose(); }}
+          onClick={() => { onSelect('all'); onClose(); }} 
         >
           {t('modal.option_all_series_exp')}
         </div>

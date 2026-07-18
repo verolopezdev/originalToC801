@@ -629,6 +629,7 @@ const EditExpense: React.FC = () => {
       await db.transaction(
         'rw', 
         db.expenses,
+        db.recurringSeries,
         async (tx) => {
           await tx.expenses.where('seriesId').equals(seriesId).delete();
           await tx.recurringSeries.where('seriesId').equals(seriesId).delete();
@@ -636,10 +637,11 @@ const EditExpense: React.FC = () => {
       );
 
       checkExpense(); // Notify totalizers like SliderTotalCard to re-fetch the total
+      checkRecurrence();
       openSuccessModal(t('expenses.expense_deleted')); // Success feedback
     } catch (error) {
       openFailureModal(t('expenses.error_deleting_exp'));
-      console.error('Error deleting expense:', error);
+      console.log(error);
     }
   }
 
@@ -1222,7 +1224,7 @@ const EditExpense: React.FC = () => {
 
 
         {/* Delete modal */}
-        <DeleteScopeModal
+        <DeleteScopeModal 
           isOpen={showDeleteScopeAlert}
           onClose={() => setShowDeleteScopeAlert(false)}
           onSelect={(scope: 'this' | 'future' | 'all' | undefined) => 

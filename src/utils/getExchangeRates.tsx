@@ -302,3 +302,12 @@ export const updateSavedExchangeRates = async (
 
   return newRates;
 };
+
+
+export const getFlagImage = (currencyItem: any) => {
+  if (currencyItem.code === 'EUR') {
+    return '/assets/flags/eu.svg';
+  }
+
+  return `/assets/flags/${currencyItem.locale.split('-')[1].toLowerCase()}.svg`;
+};

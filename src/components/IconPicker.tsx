@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from "react-i18next";
 
 import '../Main.css';
 import './IconPicker.css';
@@ -18,7 +19,7 @@ const categories = {
   nature: [ "fa-star", "fa-bolt", "fa-droplet", "fa-fire", "fa-tree", "fa-snowflake", "fa-sun", "fa-cloud-sun","fa-cloud", "fa-mountain-sun", "fa-water", "fa-moon", "fa-feather", "fa-seedling", "fa-snowman", "fa-mountain-city", "fa-clover", "fa-caravan", "fa-campground", "fa-binoculars"],
   miscellaneous: ["fa-globe", "fa-heart", "fa-face-smile", "fa-hand-holding-heart", "fa-smoking"],
   people: ["fa-baby", "fa-baby-carriage", "fa-wheelchair", "fa-user-graduate", "fa-bed"],
-  personalCare: ["fa-scissors", "fa-spa", "fa-ribbon", "fa-leaf", "fa-mask"],
+  personal_care: ["fa-scissors", "fa-spa", "fa-ribbon", "fa-leaf", "fa-mask"],
   shopping: ["fa-cart-shopping", "fa-bag-shopping", "fa-gift", "fa-shirt", "fa-cart-plus", "fa-tags", "fa-crown", "fa-gifts", "fa-gem", "fa-basket-shopping"],
   sports: ["fa-dumbbell", "fa-bicycle", "fa-trophy", "fa-water-ladder", "fa-volleyball", "fa-person-swimming", "fa-person-skiing", "fa-person-hiking", "fa-person-biking", "fa-golf-ball-tee", "fa-futbol", "fa-football", "fa-basketball", "fa-baseball-bat-ball", "fa-baseball"],
   travel: ["fa-compass", "fa-earth-americas", "fa-anchor", "fa-cable-car", "fa-ship", "fa-umbrella-beach", "fa-plane-departure", "fa-suitcase-rolling", "fa-sailboat", "fa-ferry"],
@@ -40,7 +41,8 @@ interface IconPickerProps {
 }
 
 const IconPicker: React.FC<IconPickerProps> = ({ onIconSelect, selectedIcon, isDisabled, defaultView = 'categories' }) => {
-  
+  const { t } = useTranslation();
+
   // 💡 STATE INITIALIZATION: Use the 'defaultView' prop if passed, otherwise use its default value (which is 'categories' in the destructured props).
   const [view, setView] = useState<IconPickerView>(defaultView);
 
@@ -72,7 +74,7 @@ const IconPicker: React.FC<IconPickerProps> = ({ onIconSelect, selectedIcon, isD
     if (view === 'categories') {
       return Object.entries(categories).map(([category, icons]) => (
         <div key={category}>
-          <h6>{category.charAt(0).toUpperCase() + category.slice(1)}</h6>
+          <h6>{t(`categories.icon_categories.${category}`)}</h6>
           <hr />
           {renderIconGrid(icons)}
         </div>

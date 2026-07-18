@@ -8,7 +8,7 @@ import useBackButtonModalReset from "../hooks/useBackButtonModalReset";
 import useScrollToTop from '../hooks/useScrollToTop';
 import { useCurrency } from '../context/CurrencyContext';
 import { useExchangeRates } from '../context/ExchangeRateContext';
-
+import { getFlagImage } from '../utils/getExchangeRates';
 
 // App component
 import ExchangeRateDisplay from '../components/ExchangeRateDisplay';
@@ -16,6 +16,7 @@ import ExchangeRateDisplay from '../components/ExchangeRateDisplay';
 
 // Ionic's components
 import { 
+  IonAvatar,
   IonBackButton,
   IonButton,
   IonButtons, 
@@ -28,6 +29,8 @@ import {
   IonModal,
   IonNote,
   IonPage, 
+  IonSearchbar,
+  IonText,
   IonTitle,
   IonToolbar 
 } from '@ionic/react';
@@ -37,11 +40,14 @@ import {
   airplaneOutline,
   caretDownOutline,
   closeOutline,
+  lockClosedOutline,
+  searchOutline,
   trashOutline
 } from 'ionicons/icons';
 
 // Styles
 import '../Main.css';
+import '../pages/CountrySelectionPage.css';
 
 interface CurrencyData {
   name: string;
@@ -75,7 +81,7 @@ const Currency: React.FC = () => {
   const [isAltCurrencyModalOpen, setIsAltCurrencyModalOpen] = useState(false); // control modal for alternative currencies
   const [alternativeCurrencies, setAlternativeCurrencies] = useState<CurrencyData[]>([]); // State for alternative currencies
   const [hasDefaultCurrencyExpense, setHasDefaultCurrencyExpense] = useState<boolean | null>(null); // Holds true if there is one expense in default curr
-
+  const [currencySearch, setCurrencySearch] = useState('');
   
   const [selectedCurrency, setSelectedCurrency] = useState<{
     code: string;
@@ -94,6 +100,7 @@ const Currency: React.FC = () => {
   // Use the custom hook to handle back button and reset modal state
   useBackButtonModalReset(isDefCurrencyModalOpen, setIsDefCurrencyModalOpen);
   useBackButtonModalReset(isAltCurrencyModalOpen, setIsAltCurrencyModalOpen);
+
 
   // Initialize state from currency context
   useEffect(() => {
@@ -201,6 +208,18 @@ const Currency: React.FC = () => {
   }, []);
 
 
+  const filteredCurrencies = jsonCurrencies.filter(currency => {
+    const search = currencySearch.trim().toLowerCase();
+  
+    if (!search) return true;
+  
+    return (
+      currency.name.toLowerCase().includes(search) ||
+      currency.code.toLowerCase().includes(search) ||
+      currency.symbol.toLowerCase().includes(search)
+    );
+  });
+
 
   // Add a new alternative currency
   const newAlternativeCurrency = (currency: CurrencyData) => {
@@ -243,6 +262,7 @@ const Currency: React.FC = () => {
   if (jsonCurrencies.length === 0) return <div>Loading...</div>;
 
 
+  
   return (
     <IonPage>
       <IonHeader className='page-header ion-no-border'>
@@ -268,18 +288,31 @@ const Currency: React.FC = () => {
           <h6 className="section-title">{t('currency.primary_currency')}</h6>
           <p>{t('currency.primary_currency_prompt')}</p>
           <IonItem
-            button
             detail={false}
-            disabled={hasDefaultCurrencyExpense || alternativeCurrencies.length > 0}
-            onClick={() => setIsDefCurrencyModalOpen(true)}
+            onClick={() => {
+              if (!hasDefaultCurrencyExpense && alternativeCurrencies.length === 0) {
+                setIsDefCurrencyModalOpen(true);
+              }
+            }}
           >
+            <IonAvatar slot="start" className="country-avatar">
+              <img
+                src={getFlagImage(selectedCurrency)}
+                alt={selectedCurrency && selectedCurrency.name}
+                className="country-flag"
+              />
+            </IonAvatar>
             <div className='list-item-select'>
               <span>
                 {selectedCurrency && selectedCurrency.name && selectedCurrency.symbol
                   ? `${selectedCurrency.name} (${selectedCurrency.symbol})`
                   : 'Make a Selection'}
               </span>
-              <IonIcon aria-hidden="true" icon={caretDownOutline}></IonIcon>
+              {!hasDefaultCurrencyExpense && alternativeCurrencies.length === 0 ? (
+                <IonIcon aria-hidden="true" icon={caretDownOutline}></IonIcon>
+              ) : (
+                <IonIcon aria-hidden="true" className='currency-lock-icon' icon={lockClosedOutline}></IonIcon>
+              )}
             </div>
           </IonItem>  
         </section>
@@ -296,11 +329,19 @@ const Currency: React.FC = () => {
                 const isUsed = usedCodes.includes(currencyItem.code);
 
                 return ( 
-                <div 
-                  key={currencyItem.code}
-                  className='list-item'
+                <IonItem 
+                  key={currencyItem.name}
+                  className='country-item'
                 >
-                  <div>
+                  <IonAvatar slot="start" className="country-avatar">
+                    <img
+                      src={getFlagImage(currencyItem)}
+                      alt={currencyItem.name}
+                      className="country-flag"
+                    />
+                  </IonAvatar>
+
+                  <IonLabel className="country-label">
                     <div className='flex'>
                       <IonLabel>
                         {`${currencyItem.name} (${currencyItem.symbol})`}
@@ -316,19 +357,21 @@ const Currency: React.FC = () => {
                     <IonNote>
                       <ExchangeRateDisplay targetCurrency={currencyItem.code} showLastUpdated={false} />
                     </IonNote>
-                  </div>
+                  </IonLabel>
 
                   <IonIcon 
+                    slot="end"
                     aria-hidden="true" 
                     icon={trashOutline} 
                     style={{ color: isUsed ? 'var(--ion-color-note)' : 'var(--ion-color-danger)' }}
+                    className='delete-currency-icon'
                     onClick={() => {
                       if (!isUsed) {
                         deleteAlternativeCurrency(currencyItem.code);
                       }
                     }}
                   />
-                </div>
+                </IonItem>
               )})}
             {/* Call ExchangeRateDisplay with USD because it will only show last updated date */}
             <ExchangeRateDisplay targetCurrency="USD" showExchangeRate={false} showLastUpdated />            
@@ -349,9 +392,8 @@ const Currency: React.FC = () => {
 
         {/* modal for new default currency selection */}
         <IonModal isOpen={isDefCurrencyModalOpen}>
-          <IonHeader className="ion-no-border">
+          <IonHeader className="page-header ion-no-border">
             <IonToolbar>
-              <IonTitle>{t('currency.select_currency')}</IonTitle>
               <IonButtons slot="end">
                 <IonButton onClick={() => setIsDefCurrencyModalOpen(false)}>
                   <IonIcon aria-hidden="true" icon={closeOutline} className='close-modal'></IonIcon>
@@ -359,8 +401,25 @@ const Currency: React.FC = () => {
               </IonButtons>
             </IonToolbar>
           </IonHeader>
-          <IonContent>
-            {jsonCurrencies.map((currencyItem, index) => (
+          <IonContent className="ion-padding-horizontal">
+            <div className="header-text-container">
+              <h1>{t('currency.select_currency')}</h1>
+              <p className="subtitle-text">
+                {t('currency.search_currency_text')}
+              </p>
+            </div>
+
+            <IonSearchbar
+              value={currencySearch}
+              debounce={200}
+              placeholder={t('currency.search_currency')}
+              onIonInput={(e) => setCurrencySearch(e.detail.value ?? '')}
+              searchIcon={searchOutline}
+              showClearButton="never"
+              className='custom'
+            />
+
+            {filteredCurrencies.map((currencyItem, index) => (
               <IonItem
                 className='item-transparent'
                   key={index}
@@ -368,10 +427,24 @@ const Currency: React.FC = () => {
                   disabled={currency.defaultCurrency.code === currencyItem.code}
                   onClick={() => {
                     handleCurrencyChange(currencyItem);
+                    setCurrencySearch('');
                     setIsDefCurrencyModalOpen(false);
                   }}
                 >
-                  {`${currencyItem.name} (${currencyItem.symbol})`}
+                  <IonAvatar slot="start" className="country-avatar">
+                  <img
+                    src={getFlagImage(currencyItem)}
+                    alt={currencyItem.name}
+                    className="country-flag"
+                  />
+                </IonAvatar>
+              
+                <IonLabel>
+                  <h2>{currencyItem.name}</h2>
+                  <p>
+                    {currencyItem.code} ({currencyItem.symbol})
+                  </p>
+                </IonLabel>
               </IonItem>
             ))}
           </IonContent>
@@ -380,9 +453,8 @@ const Currency: React.FC = () => {
 
         {/* modal for alternative currency selection */}
         <IonModal isOpen={isAltCurrencyModalOpen}>
-          <IonHeader className="ion-no-border">
+          <IonHeader className="page-header ion-no-border">
             <IonToolbar>
-              <IonTitle>{t('currency.select_alternative_currency')}</IonTitle>
               <IonButtons slot="end">
                 <IonButton onClick={() => setIsAltCurrencyModalOpen(false)}>
                   <IonIcon aria-hidden="true" icon={closeOutline} className='close-modal'></IonIcon>
@@ -390,24 +462,52 @@ const Currency: React.FC = () => {
               </IonButtons>
             </IonToolbar>
           </IonHeader>
-          <IonContent>
-          {jsonCurrencies.map((currencyItem) => (
-            <IonItem
-              className='item-transparent'
-              key={currencyItem.code}
-              button
-              disabled={allSelectedCurrencies.some(c => c.code === currencyItem.code)}              
-              onClick={() => {
-                newAlternativeCurrency(currencyItem);
-                setIsAltCurrencyModalOpen(false); // Close the modal after selecting a currency
-              }}
-            >
-              <div>
-                <p>{`${currencyItem.name} (${currencyItem.symbol})`}</p>
-              </div>
-            </IonItem>
-          ))}
-          </IonContent>
+          <IonContent className="ion-padding-horizontal">
+            <div className="header-text-container">
+              <h1>{t('currency.select_alternative_currency')}</h1>
+              <p className="subtitle-text">
+                {t('currency.search_currency_text')}
+              </p>
+            </div>
+
+            <IonSearchbar
+              value={currencySearch}
+              debounce={200}
+              placeholder={t('currency.search_currency')}
+              onIonInput={(e) => setCurrencySearch(e.detail.value ?? '')}
+              searchIcon={searchOutline}
+              showClearButton="never"
+              className='custom'
+            />
+
+            {filteredCurrencies.map((currencyItem) => (
+              <IonItem
+                className="item-transparent"
+                key={currencyItem.code}
+                disabled={allSelectedCurrencies.some(c => c.code === currencyItem.code)}
+                onClick={() => {
+                  newAlternativeCurrency(currencyItem);
+                  setCurrencySearch('');
+                  setIsAltCurrencyModalOpen(false);
+                }}
+              >
+                <IonAvatar slot="start" className="country-avatar">
+                  <img
+                    src={getFlagImage(currencyItem)}
+                    alt={currencyItem.name}
+                    className="country-flag"
+                  />
+                </IonAvatar>
+              
+                <IonLabel>
+                  <h2>{currencyItem.name}</h2>
+                  <p>
+                    {currencyItem.code} ({currencyItem.symbol})
+                  </p>
+                </IonLabel>
+              </IonItem>
+            ))}
+          </IonContent>        
         </IonModal>
 
       </IonContent>

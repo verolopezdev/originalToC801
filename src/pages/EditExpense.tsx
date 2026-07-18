@@ -17,9 +17,10 @@ import { RecurrenceSettings, useRecurringExpense, ExpenseBase } from '../hooks/u
 import { useDatePicker } from '../context/DatePickerContext';
 
 
-
 // Utils
 import { validateName } from '../utils/validateName';
+import { getFlagImage } from '../utils/getExchangeRates';
+
 
 // App components
 import AccountSlider from '../components/AccountSlider';
@@ -36,6 +37,7 @@ import DeleteScopeModal from '../components/Modals/DeleteScopeModal';
 // Ionic components 
 import { 
   IonAlert,
+  IonAvatar,
   IonBackButton, 
   IonButton,
   IonButtons,
@@ -990,9 +992,13 @@ const EditExpense: React.FC = () => {
           <div 
             className='aditional-btn disabled'
           >
-            <div>
-              <IonIcon icon={cashOutline} className='small-icon-btn primary' />
-            </div>
+            <IonAvatar className="country-avatar country-avatar-small disabled">
+              <img
+                src={getFlagImage(selectedCurrency)}
+                alt={selectedCurrency && selectedCurrency.name}
+                className="country-flag"
+              />
+            </IonAvatar>
             <div className='selected-info'>
               <span className="title">{t('expenses.config_currency')}</span>
               <span className='data'>{selectedCurrency?.name}</span>

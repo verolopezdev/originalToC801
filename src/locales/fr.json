@@ -157,6 +157,24 @@
     "already_exists": "Ce nom de catégorie ou sous-catégorie existe déjà",
     "cannot_delete_categoryless": "Impossible de supprimer la catégorie système 'Sans catégorie'.",
     "category": "Catégorie",
+    "icon_categories": {
+      "animals": "Animaux",
+      "buildings": "Bâtiments",
+      "business": "Affaires",
+      "education": "Éducation",
+      "food": "Alimentation",
+      "health": "Santé",
+      "hobbies": "Loisirs",
+      "household": "Maison",
+      "nature": "Nature",
+      "miscellaneous": "Divers",
+      "people": "Personnes",
+      "personal_care": "Soins personnels",
+      "shopping": "Achats",
+      "sports": "Sports",
+      "travel": "Voyages",
+      "vehicles": "Véhicules"
+    },
     "categories": "Catégories",
     "Categoryless": "Sans catégorie",
     "category_deleted": "La catégorie '{{source}}' a été définitivement supprimée et les dépenses ont été déplacées vers 'Sans catégorie'.",
@@ -237,7 +255,9 @@
   },
   "country_selection": {
     "big_heading": "Économisez plus en dépensant mieux",
+    "search_country": "Rechercher un pays...",
     "select_country": "Sélectionner le pays",
+    "select_country_text": "Veuillez sélectionner votre pays de résidence afin de personnaliser votre devise et les paramètres par défaut.",
     "subheading": "Votre compagnon idéal pour une gestion des dépenses sans tracas"
   },
   "currency": {
@@ -255,6 +275,8 @@
     "no_rate_for": "Aucun taux disponible pour {{targetCurrency}}.",
     "primary_currency": "Devise principale",
     "primary_currency_prompt": "Choisissez la devise principale pour le suivi de vos dépenses. Elle sera appliquée par défaut dans toute l'application.",
+    "search_currency": "Rechercher une devise...",
+    "search_currency_text": "Recherchez par nom, code ou symbole (ex. : Dollar, USD, $).",
     "select_alternative_currency": "Sélectionner une devise alternative",
     "select_currency": "Sélectionner la devise",
     "select_travel_currency": "Sélectionner la devise de voyage",

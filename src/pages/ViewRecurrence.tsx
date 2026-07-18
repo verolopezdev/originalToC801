@@ -457,7 +457,7 @@ const ViewRecurrence: React.FC = () => {
               onDidDismiss={closePopover} 
               side="bottom" 
               alignment="end" 
-              className='secondary-menu'
+              className='secondary-menu'  
             >
               <IonContent class="ion-no-padding">
                 <ul className='list'>

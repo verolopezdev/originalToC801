@@ -67,7 +67,7 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ groupedExpenses, pa
     <div style={{ position: 'relative', zIndex: 100, overflow: 'visible', width: '100%' }}>
       {/* 💡 RETAIN: Use relative positioning on outer div for Z-index context */}
       <div style={{ width: "100%", height: 240, position: 'relative' }} className="mt-10"> 
-        <ResponsiveContainer>
+        <ResponsiveContainer width="100%" height={240}>
           <PieChart>
             <Pie
               data={data}

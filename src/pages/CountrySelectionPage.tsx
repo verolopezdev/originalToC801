@@ -157,10 +157,6 @@ const CountrySelectionPage: React.FC = () => {
     detectDeviceLanguage();
   }, [jsonCountries]);
 
-  useEffect(() => {
-    console.log(selectedCountry?.code);
-    console.log(selectedItemRef.current);
-  }, [selectedCountry]);
 
   // 3. Strict prefix search filter
   const cleanSearchQuery = searchText.trim().toLowerCase();
@@ -185,12 +181,9 @@ const CountrySelectionPage: React.FC = () => {
 
     // Create a fresh clone so we don't mutate state objects directly
     const countryToSave = { ...selectedCountry };
-    console.log("Country to save: ", countryToSave);
 
     const userLang = countryToSave.locale.split('-')[0];
     const langToUse = supportedLngs.includes(userLang) ? userLang : 'en';
-    console.log("userLang: ", userLang);
-    console.log("Lang to use: ", langToUse);
 
     await i18n.changeLanguage(langToUse);
     await Preferences.set({ key: 'i18nextLng', value: langToUse });
@@ -224,9 +217,9 @@ const CountrySelectionPage: React.FC = () => {
 
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
         <div className="header-text-container">
-          <h1>Select country</h1>
+          <h1>{t('country_selection.select_country')}</h1>
           <p className="subtitle-text">
-            Please select your country of residence to customize your currency and defaults.
+            {t('country_selection.select_country_text')}
           </p>
         </div>
 
@@ -236,7 +229,7 @@ const CountrySelectionPage: React.FC = () => {
             value={searchText}
             onIonInput={(e) => setSearchText(e.detail.value ?? '')}
             showClearButton="never"
-            placeholder="Search country..."
+            placeholder={t('country_selection.search_country')}
             searchIcon={searchOutline}
             className='custom mb-20'
             debounce={0}
@@ -257,7 +250,6 @@ const CountrySelectionPage: React.FC = () => {
         >
           {filteredCountries.map((countryItem) => {
             const isSelected = selectedCountry?.country === countryItem.country;
-            console.log(`/assets/flags/${countryItem.locale.split('-')[1].toLowerCase()}.svg`);
             return (
               <div
                 key={countryItem.country}

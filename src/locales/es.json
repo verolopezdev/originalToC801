@@ -157,6 +157,24 @@
     "already_exists": "El nombre de la categoría o subcategoría ya existe",
     "cannot_delete_categoryless": "No se puede eliminar la categoría del sistema 'Sin categoría'.",
     "category": "Categoría",
+    "icon_categories": {
+      "animals": "Animales",
+      "buildings": "Edificios",
+      "business": "Negocios",
+      "education": "Educación",
+      "food": "Alimentos",
+      "health": "Salud",
+      "hobbies": "Pasatiempos",
+      "household": "Hogar",
+      "nature": "Naturaleza",
+      "miscellaneous": "Misceláneos",
+      "people": "Personas",
+      "personal_care": "Cuidado personal",
+      "shopping": "Compras",
+      "sports": "Deportes",
+      "travel": "Viajes",
+      "vehicles": "Vehículos"
+    },
     "categories": "Categorías",
     "Categoryless": "Sin categoría",
     "category_deleted": "La categoría '{{source}}' ha sido eliminada permanentemente y los gastos se han movido a 'Sin categoría'.",
@@ -237,7 +255,9 @@
   },
   "country_selection": {
     "big_heading": "Ahorra más gastando de forma inteligente",
+    "search_country": "Buscar país...",
     "select_country": "Seleccionar país",
+    "select_country_text": "Selecciona tu país de residencia para personalizar tu moneda y la configuración predeterminada.",
     "subheading": "Tu compañero definitivo para una gestión de gastos sin complicaciones"
   },
   "currency": {
@@ -255,6 +275,8 @@
     "no_rate_for": "No hay un tipo de cambio disponible para {{targetCurrency}}.",
     "primary_currency": "Moneda principal",
     "primary_currency_prompt": "Elige la moneda principal que usarás para el seguimiento de tus gastos. Esta moneda se aplicará por defecto en toda la aplicación.",
+    "search_currency": "Buscar moneda...",
+    "search_currency_text": "Busca por nombre, código o símbolo (p. ej., Dólar, USD, $).",
     "select_alternative_currency": "Seleccionar moneda alternativa",
     "select_currency": "Seleccionar moneda",
     "select_travel_currency": "Seleccionar moneda de viaje",

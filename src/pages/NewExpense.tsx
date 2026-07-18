@@ -19,6 +19,7 @@ import { useDatePicker } from '../context/DatePickerContext';
 // Utils
 import { validateName } from '../utils/validateName';
 import { logAutoExpenses } from '../utils/autoLogger';
+import { getFlagImage } from '../utils/getExchangeRates';
 
 
 // App components
@@ -34,6 +35,7 @@ import NotificationForm, { NotificationData } from '../components/NotificationFo
 
 // Ionic components 
 import { 
+  IonAvatar,
   IonBackButton, 
   IonButton,
   IonButtons,
@@ -185,7 +187,6 @@ const NewExpense: React.FC = () => {
 
     // Filter out inactive accounts
     const activeAccounts = accounts.filter(account => account.activeAccount);
-    console.log("Active accounts: ", activeAccounts);
     // 2. Sort the active accounts
     return activeAccounts;
   }, [accounts]);
@@ -193,7 +194,6 @@ const NewExpense: React.FC = () => {
   
   // New code block to find the ID of the first sorted account
   const firstSortedAccountId = useMemo(() => {
-    console.log("Sorted accounts: ", sortedAccounts);
 
     if (!sortedAccounts) return '0';
     // sortedAccounts is already sorted by user.defaultAccount (if present) 
@@ -201,7 +201,6 @@ const NewExpense: React.FC = () => {
     return sortedAccounts.length > 0 ? sortedAccounts[0].accountId : '0';
   }, [sortedAccounts]);
   
-  console.log("First sorted account id: ", firstSortedAccountId);
 
   useEffect(() => {
     if (firstSortedAccountId && firstSortedAccountId !== '0' && (passedAccountId === '0' || !passedAccountId)) {
@@ -524,7 +523,6 @@ const NewExpense: React.FC = () => {
     }
   }
 
-console.log("Selected account id: ", selectedAccountId);
 
   return (
     <IonPage>
@@ -639,9 +637,13 @@ console.log("Selected account id: ", selectedAccountId);
 
           {/* Currency */}
           <div className='aditional-btn' onClick={() => setIsAlternativeModalOpen(true)}>
-            <div>
-              <IonIcon icon={cashOutline} className='small-icon-btn primary' />
-            </div>
+            <IonAvatar className="country-avatar country-avatar-small">
+              <img
+                src={getFlagImage(selectedCurrency)}
+                alt={selectedCurrency && selectedCurrency.name}
+                className="country-flag"
+              />
+            </IonAvatar>
             <div className='selected-info'>
               <span className="title">{t('expenses.config_currency')}</span>
               <span className='data'>{selectedCurrency?.name}</span>  
@@ -788,7 +790,6 @@ console.log("Selected account id: ", selectedAccountId);
         <IonModal isOpen={isAlternativeModalOpen} onDidDismiss={() => setIsAlternativeModalOpen(false)}>
           <IonHeader className="ion-no-border">
             <IonToolbar>
-              <IonTitle>{t('currency.select_currency')}</IonTitle>
               <IonButtons slot="end">
                 <IonButton onClick={() => setIsAlternativeModalOpen(false)}>
                   <IonIcon aria-hidden="true" icon={closeOutline} className='close-modal'></IonIcon>
@@ -797,6 +798,9 @@ console.log("Selected account id: ", selectedAccountId);
             </IonToolbar>
           </IonHeader>
           <IonContent className="ion-padding">
+            <div className="header-text-container">
+              <h1>{t('currency.select_currency')}</h1>
+            </div>
             {allSelectedCurrencies.length > 0 ? (
               allSelectedCurrencies.map((currencyItem) => (
                 <IonItem
@@ -805,6 +809,13 @@ console.log("Selected account id: ", selectedAccountId);
                   onClick={() => selectExpenseCurrency(currencyItem)}
                   disabled={currencyItem.code === selectedCurrency.code}
                 >
+                  <IonAvatar className="country-avatar country-avatar-small mr-10">
+                    <img
+                      src={getFlagImage(currencyItem)}
+                      alt={selectedCurrency && selectedCurrency.name}
+                      className="country-flag"
+                    />
+                  </IonAvatar>
                   <IonLabel>{`${currencyItem.name} (${currencyItem.symbol})`}</IonLabel>
                 </IonItem>
               ))

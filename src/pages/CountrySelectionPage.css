@@ -101,7 +101,12 @@ h4.app-type {
   background: var(--ion-color-note);
   border-radius: 50%;
   border: 1px solid var(--ion-item-background);
-  margin-inline-end: 12px;
+}
+
+.country-avatar-small {
+  min-width: 30px;
+  width: 30px;
+  height: 30px;
 }
 
 /* Ensure the label container takes up full vertical space and centers text */
@@ -126,3 +131,12 @@ h4.app-type {
   line-height: 1.2;
   margin-top: 2px;
 }
+
+.delete-currency-icon {
+  margin-right: 0;
+}
+
+.currency-lock-icon {
+  font-size: 22px;
+}
+

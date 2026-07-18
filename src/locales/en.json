@@ -158,6 +158,24 @@
     "cannot_delete_categoryless": "Cannot delete the system Categoryless category.",
     "categories": "Categories",
     "category": "Category",
+    "icon_categories": {
+      "animals": "Animals",
+      "buildings": "Buildings",
+      "business": "Business",
+      "education": "Education",
+      "food": "Food",
+      "health": "Health",
+      "hobbies": "Hobbies",
+      "household": "Household",
+      "nature": "Nature",
+      "miscellaneous": "Miscellaneous",
+      "people": "People",
+      "personal_care": "Personal Care",
+      "shopping": "Shopping",
+      "sports": "Sports",
+      "travel": "Travel",
+      "vehicles": "Vehicles"
+    },
     "Categoryless": "Categoryless",
     "category_deleted": "Category '{{source}}' has been permanently deleted and expenses moved to Categoryless.",
     "category_fallback": "Category {{id}}",
@@ -237,7 +255,9 @@
   },
   "country_selection": {
     "big_heading": "Save more by spending smarter",
+    "search_country": "Search country...",
     "select_country": "Select Country",
+    "select_country_text": "Please select your country of residence to customize your currency and defaults.",
     "subheading": "Your ultimate companion for hassle-free expense management"
   },
   "currency": {
@@ -255,6 +275,8 @@
     "no_rate_for": "No rate available for {{targetCurrency}}.",
     "primary_currency": "Primary currency",
     "primary_currency_prompt": "Choose the main currency you will use for tracking your expenses. This currency will be applied by default across the app.",
+    "search_currency": "Search currency...",
+    "search_currency_text": "Search by name, code, or symbol (e.g. Dollar, USD, $).",
     "select_alternative_currency": "Select Alternative Currency",
     "select_currency": "Select Currency",
     "select_travel_currency": "Select Travel Currency",

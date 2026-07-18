@@ -66,12 +66,6 @@
     "symbol": "$b"
   },
   {
-    "name": "Bosnia and Herzegovina Convertible Mark",
-    "code": "BAM",
-    "locale": "bs-Cyrl-BA",
-    "symbol": "KM"
-  },
-  {
     "name": "Botswana Pula",
     "code": "BWP",
     "locale": "en-BW",
@@ -88,12 +82,6 @@
     "code": "BRL",
     "locale": "pt-BR",
     "symbol": "R$"
-  },
-  {
-    "name": "Brunei Darussalam Dollar",
-    "code": "BND",
-    "locale": "ms-Latn-BN",
-    "symbol": "$"
   },
   {
     "name": "Cambodia Riel",
@@ -216,12 +204,6 @@
     "symbol": "L"
   },
   {
-    "name": "Hong Kong Dollar",
-    "code": "HKD",
-    "locale": "zh-Hans-HK",
-    "symbol": "$"
-  },
-  {
     "name": "Hungary Forint",
     "code": "HUF",
     "locale": "en-HU",
@@ -294,22 +276,10 @@
     "symbol": "£"
   },
   {
-    "name": "Liberia Dollar",
-    "code": "LRD",
-    "locale": "vai-Latn-LR",
-    "symbol": "$"
-  },
-  {
     "name": "Macedonia Denar",
     "code": "MKD",
     "locale": "sq-MK",
     "symbol": "ден"
-  },
-  {
-    "name": "Malaysia Ringgit",
-    "code": "MYR",
-    "locale": "ms-Latn-MY",
-    "symbol": "RM"
   },
   {
     "name": "Mauritius Rupee",
@@ -322,12 +292,6 @@
     "code": "MXN",
     "locale": "es-MX",
     "symbol": "$"
-  },
-  {
-    "name": "Mongolia Tughrik",
-    "code": "MNT",
-    "locale": "mn-Cyrl-MN",
-    "symbol": "₮"
   },
   {
     "name": "Moroccan-dirham",
@@ -370,12 +334,6 @@
     "code": "NIO",
     "locale": "es-NI",
     "symbol": "C$"
-  },
-  {
-    "name": "Nigeria Naira",
-    "code": "NGN",
-    "locale": "ha-Latn-NG",
-    "symbol": "₦"
   },
   {
     "name": "Norway Krone",
@@ -456,22 +414,10 @@
     "symbol": "﷼"
   },
   {
-    "name": "Serbia Dinar",
-    "code": "RSD",
-    "locale": "sr-Latn-RS",
-    "symbol": "Дин."
-  },
-  {
     "name": "Seychelles Rupee",
     "code": "SCR",
     "locale": "en-SC",
     "symbol": "₨"
-  },
-  {
-    "name": "Singapore Dollar",
-    "code": "SGD",
-    "locale": "ms-Latn-SG",
-    "symbol": "$"
   },
   {
     "name": "Solomon Islands Dollar",
@@ -522,12 +468,6 @@
     "symbol": "£"
   },
   {
-    "name": "Taiwan New Dollar",
-    "code": "TWD",
-    "locale": "zh-Hant-TW",
-    "symbol": "NT$"
-  },
-  {
     "name": "Thailand Baht",
     "code": "THB",
     "locale": "th-TH",
@@ -574,12 +514,6 @@
     "code": "UYU",
     "locale": "es-UY",
     "symbol": "$U"
-  },
-  {
-    "name": "Uzbekistan Som",
-    "code": "UZS",
-    "locale": "uz-Cyrl-UZ",
-    "symbol": "лв"
   },
   {
     "name": "Viet Nam Dong",

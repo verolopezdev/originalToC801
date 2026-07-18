@@ -104,7 +104,7 @@ export const ExchangeRateProvider: React.FC<{ children: React.ReactNode }> = ({ 
   
     // Refresh rates immediately
     if (currency.defaultCurrency.code) {
-      refreshRates();
+      refreshRates(true);
     }
   
     // store the listener returned by Capacitor

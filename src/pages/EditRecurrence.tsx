@@ -19,6 +19,7 @@ import { useDatePicker } from '../context/DatePickerContext';
 import { getRecurringSeriesById, getDateRange } from '../utils/recurrenceUtils';
 import { validateName } from '../utils/validateName';
 import { getOldestOverdueExpenseForSeries, isBeforeToday, isBeforeOrToday, getNextDueDate } from '../utils/recurrenceFunctions';
+import { getFlagImage } from '../utils/getExchangeRates';
 
 
 // App component
@@ -33,6 +34,7 @@ import Modal from '../components/Modal';
 
 // Ionic components 
 import { 
+  IonAvatar,
   IonAlert,
   IonBackButton, 
   IonButton,
@@ -608,7 +610,8 @@ const EditRecurrence: React.FC = () => {
 
           {/* Frecuency */}
           <div
-            className={`aditional-btn ${recurrence.totalOccurrences !== null && 'disabled'}`}
+            /* className={`aditional-btn ${recurrence.totalOccurrences !== null && 'disabled'}`} */
+            className='aditional-btn disabled'
             onClick={recurrence.totalOccurrences === null ? () => setShowFrequencyModal(true) : undefined}
           >
             <div>
@@ -638,9 +641,13 @@ const EditRecurrence: React.FC = () => {
             className={`aditional-btn ${recurrence.isRecurring && 'disabled'}`}
             onClick={recurrence.isRecurring ? undefined : () => setIsAlternativeModalOpen(true)}          
           >
-            <div>
-              <IonIcon icon={cashOutline} className='small-icon-btn primary' />
-            </div>
+            <IonAvatar className="country-avatar country-avatar-small disabled">
+              <img
+                src={getFlagImage(selectedCurrency)}
+                alt={selectedCurrency && selectedCurrency.name}
+                className="country-flag"
+              />
+            </IonAvatar>
 
             <div className='selected-info'>
               <span className="title">{t('expenses.config_currency')}</span>

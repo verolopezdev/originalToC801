@@ -809,7 +809,7 @@ const key =
 
         {/* Category icon picker modal */}
         <IonModal isOpen={isOpenCategoryModal}>
-          <IonHeader>
+          <IonHeader className="page-header ion-no-border">
             <IonToolbar>
               <IonTitle>{t('categories.select_an_icon')}</IonTitle>
               <IonButtons slot="end">
@@ -820,7 +820,7 @@ const key =
             </IonToolbar>
           </IonHeader>
           <IonContent className="ion-padding">
-          <IconPicker 
+          <IconPicker   
             selectedIcon={categoryIcon}
             onIconSelect={(icon) => {
               setCategoryIcon(icon); // Update the selected category

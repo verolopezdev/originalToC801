@@ -496,6 +496,15 @@ body {
   background-color: var(--ion-item-background);
 }
 
+.centered-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /* horizontally */
+  height: 100%;             /* full screen height */
+  padding: 30px;
+}
+
+
 .close-btn-storage-item {
   position: absolute;
   top: 4px;

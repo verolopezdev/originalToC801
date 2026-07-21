@@ -271,13 +271,18 @@ db.version(1).stores({
   recurringSeries: '@seriesId, userId, startDate, interval, unit, totalOccurrences, isActive, lastLoggedDate, moved, categoryId, subcategoryId, accountId, realmId',
 });
 
-// 2. Helper to activate Cloud Sync dynamically when user upgrades
-export const enableDexieCloud = (databaseUrl = 'https://zxzf58e25.dexie.cloud') => {  
+db.cloud.configure({
+  databaseUrl: 'https://zxzf58e25.dexie.cloud',
+  requireAuth: false,
+  customLoginGui: false,
+});
+
+export const enableDexieCloud = (databaseUrl = 'https://zxzf58e25.dexie.cloud') => {
   db.cloud.configure({
     databaseUrl,
     requireAuth: true,
+    customLoginGui: false,
   });
-  console.log("☁️ Dexie Cloud enabled.");
 };
 
 // HOOK SETUP
@@ -310,124 +315,123 @@ const setupHooks = () => {
   });
 };
 
-// INITIALIZATION / SEEDING
-db.on('ready', async () => {
-  console.log(`✅ [DB Status] Database ready.`);
+db.on("ready", async () => {
+  console.log("✅ [DB Status] Database ready.");
+
   setupHooks();
 
-  // Check if Premium status is already active from previous sessions
   const user = await db.users.toCollection().first();
+
   if (user?.isPremium) {
     enableDexieCloud();
   }
-
-  // Seed initial local data if database is empty
-  const count = await db.users.count();
-  if (count === 0) {
-    isPopulating = true;
-    console.log('⚠️ Seeding initial default data...');
-
-    try {
-      const installationId = crypto.randomUUID();
-
-      await db.metadata.put({
-        key: "installationId",
-        value: installationId,
-      });
-
-      await db.metadata.put({
-        key: "createdAt",
-        value: Date.now().toString(),
-      });
-
-      await db.users.add({
-        name: "",
-        lastName: "",
-        email: "",
-        avatar: "",
-        interval: "monthly",
-        showDisabledAccounts: true,
-        showDisabledCategories: true,
-        weekStartDay: "sunday",
-        isPremium: false,
-        subscriptionPlan: "free",
-      } as User);
-
-      await db.accounts.add({
-        accountName: "Cash",
-        accountIdentifier: "",
-        accountColor: "cyan",
-        accountLogo: "fa-money-bill-1-wave",
-        activeAccount: true,
-        userId: "local-user",
-        sortOrder: 0,
-      } as Account);
-
-      const defaultCategories = [
-        { name: "Categoryless", color: "categoryless", icon: "fa-bolt-lightning" },
-        { name: "Housing", color: "red", icon: "fa-house" },
-        { name: "Utilities", color: "redOrange", icon: "fa-bolt" },
-        { name: "Groceries", color: "orange", icon: "fa-cart-shopping" },
-        { name: "Transportation", color: "yellowOrange", icon: "fa-car" },
-        { name: "Healthcare", color: "yellow", icon: "fa-suitcase-medical" },
-        { name: "Communications", color: "yellowGreen", icon: "fa-phone" },
-        { name: "Dining & Takeout", color: "cyan", icon: "fa-utensils" },
-        { name: "Entertainment", color: "skyBlue", icon: "fa-film" },
-        { name: "Shopping", color: "blue", icon: "fa-bag-shopping" },
-        { name: "Fitness", color: "indigo", icon: "fa-dumbbell" },
-        { name: "Personal Care", color: "violet", icon: "fa-scissors" },
-        { name: "Pets", color: "magenta", icon: "fa-shield-dog" },
-        { name: "Education", color: "pink", icon: "fa-book" },
-        { name: "Travel", color: "crimson", icon: "fa-plane" },
-      ];
-
-      for (const cat of defaultCategories) {
-        await db.categories.add({
-          categoryName: cat.name,
-          categoryColor: cat.color,
-          categoryIcon: cat.icon,
-          activeCategory: true,
-          favouriteCategory: false,
-          systemCategory: true,
-          subcategories: false,
-        } as Category);
-      }
-
-      console.log('🎉 Initial population completed via db.on("ready").');
-    } catch (err) {
-      console.error("❌ Failed to seed default data:", err);
-    } finally {
-      isPopulating = false;
-    }
-  }
 });
+
+
+// Seed initial data
+export const seedInitialData = async (): Promise<void> => {
+  // Don't seed twice
+  const userCount = await db.users.count();
+  if (userCount > 0) {
+    console.log("⏭️ Seed skipped (database already initialized).");
+    return;
+  }
+
+  isPopulating = true;
+
+  console.log("🌱 Seeding initial database...");
+
+  try {
+    const installationId = crypto.randomUUID();
+
+    await db.transaction(
+      "rw",
+      db.metadata,
+      db.users,
+      db.accounts,
+      db.categories,
+      async () => {
+
+        await db.metadata.put({
+          key: "installationId",
+          value: installationId,
+        });
+
+        await db.metadata.put({
+          key: "createdAt",
+          value: Date.now().toString(),
+        });
+
+        await db.users.add({
+          name: "",
+          lastName: "",
+          email: "",
+          avatar: "",
+          interval: "monthly",
+          showDisabledAccounts: true,
+          showDisabledCategories: true,
+          weekStartDay: "sunday",
+          birthdate: "",
+          localInterval: "monthly",
+          language: "en",
+          favourites: 0,
+          isPremium: false,
+          subscriptionPlan: "free",
+          subscriptionExpirationDate: null,
+        } as User);
+
+        await db.accounts.add({
+          accountName: "Cash",
+          accountIdentifier: "",
+          accountColor: "cyan",
+          accountLogo: "fa-money-bill-1-wave",
+          activeAccount: true,
+          sortOrder: 0,
+        } as Account);
+
+        const defaultCategories = [
+          { name: "Categoryless", color: "categoryless", icon: "fa-bolt-lightning" },
+          { name: "Housing", color: "red", icon: "fa-house" },
+          { name: "Utilities", color: "redOrange", icon: "fa-bolt" },
+          { name: "Groceries", color: "orange", icon: "fa-cart-shopping" },
+          { name: "Transportation", color: "yellowOrange", icon: "fa-car" },
+          { name: "Healthcare", color: "yellow", icon: "fa-suitcase-medical" },
+          { name: "Communications", color: "yellowGreen", icon: "fa-phone" },
+          { name: "Dining & Takeout", color: "cyan", icon: "fa-utensils" },
+          { name: "Entertainment", color: "skyBlue", icon: "fa-film" },
+          { name: "Shopping", color: "blue", icon: "fa-bag-shopping" },
+          { name: "Fitness", color: "indigo", icon: "fa-dumbbell" },
+          { name: "Personal Care", color: "violet", icon: "fa-scissors" },
+          { name: "Pets", color: "magenta", icon: "fa-shield-dog" },
+          { name: "Education", color: "pink", icon: "fa-book" },
+          { name: "Travel", color: "crimson", icon: "fa-plane" },
+        ];
+
+        await db.categories.bulkAdd(
+          defaultCategories.map(cat => ({
+            categoryName: cat.name,
+            categoryColor: cat.color,
+            categoryIcon: cat.icon,
+            activeCategory: true,
+            favouriteCategory: false,
+            systemCategory: true,
+            subcategories: false,
+          }))
+        );
+      }
+    );
+
+    console.log("✅ Initial database seeded.");
+  } catch (err) {
+    console.error("❌ Failed to seed initial data:", err);
+    throw err;
+  } finally {
+    isPopulating = false;
+  }
+};
 
 export type { Account, Category, Subcategory, Trip };
 export { db };
 
 
 
-/*
-How to trigger the upgrade when purchasing Premium
-In your subscription/checkout success component, call enableDexieCloud() and update the user record:
-
-TypeScript
-import { db, enableDexieCloud } from './db';
-
-const handleUpgradeToPremium = async () => {
-  // 1. Enable cloud sync configuration
-  enableDexieCloud();
-
-  // 2. Update local DB user record
-  const user = await db.users.toCollection().first();
-  if (user?.userId) {
-    await db.users.update(user.userId, {
-      isPremium: true,
-      subscriptionPlan: 'monthly',
-    });
-  }
-
-  // 3. Prompt user authentication for Dexie Cloud login
-  await db.cloud.login();
-};
-*/

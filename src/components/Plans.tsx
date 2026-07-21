@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useUser } from '../context/UserContext';
 import { SubscriptionPlan } from '../db';
 import { refreshSubscription } from "../services/SubscriptionService";
+import { db, enableDexieCloud } from "../db";
 
 // Ionic components
 import { 
@@ -32,6 +33,8 @@ const Plans: React.FC = () => {
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan>(user.subscriptionPlan);
   const [showAlert, setShowAlert] = useState(false);
 
+  const DEV_PREMIUM_EMAIL = "verolopez.dev@gmail.com";
+
   const handleSubscribe = async () => {
     await updateUser({
       subscriptionPlan: selectedPlan,
@@ -40,6 +43,30 @@ const Plans: React.FC = () => {
     // 2. Refresh subscription (mock now, RevenueCat later)
     await refreshSubscription();
     setShowAlert(true);
+  };
+
+  const handleSimulatePremium = async () => {
+    try {
+      const email = "verolopez.dev@gmail.com"; // hard-coded while developing
+  
+      const user = await db.users.toCollection().first();
+  
+      if (!user?.userId) return;
+  
+      await db.users.update(user.userId, {
+        isPremium: true,
+        subscriptionPlan: "monthly",
+        email
+      });
+  
+      enableDexieCloud();
+  
+      await db.cloud.login({ email });
+  
+      console.log("✅ Premium simulation complete");
+    } catch (err) {
+      console.error(err);
+    }
   };
   
   return(
@@ -101,10 +128,14 @@ const Plans: React.FC = () => {
       />
 
       {/* Save changes button */}
-      <IonButton expand="block" onClick={handleSubscribe}>
+      <IonButton expand="block" onClick={handleSimulatePremium}>
+        Simulate Premium Purchase
+      </IonButton>
+      
+{/*       <IonButton expand="block" onClick={handleSubscribe}>
         {user.subscriptionPlan !== 'free' && user.isPremium === false ? ('Renew Subscription') : ('Subscribe Now')}
       </IonButton>
-    </>
+ */}    </>
   )
 }
 

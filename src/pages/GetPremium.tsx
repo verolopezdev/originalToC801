@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '../context/UserContext';
+import { db, enableDexieCloud } from "../db";
 
 // Custom hooks
 import useScrollToTop from '../hooks/useScrollToTop';
@@ -38,6 +39,7 @@ const GetPremium: React.FC = () => {
   const { user } = useUser();
 
   const isPremium = user.isPremium;
+
 
   console.log("GetPremium render", user);
   

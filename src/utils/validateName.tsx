@@ -4,3 +4,10 @@
     const nameRegex = /^[\p{L}0-9\s@\-–—_/\.,]+$/u;
     return nameRegex.test(name);
   };
+
+  // Validate email
+  export const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+  

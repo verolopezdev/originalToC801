@@ -10,6 +10,7 @@ interface UserContextType {
   resetUser: () => Promise<void>;
 }
 
+
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 const defaultUser: Omit<User, "userId"> = {

@@ -1,5 +1,6 @@
 // src/pages/WelcomeScreen.tsx
 import React from 'react';
+import { db, enableDexieCloud, seedInitialData } from '../db';
 import { useHistory } from 'react-router';
 import { Preferences } from '@capacitor/preferences';
 import i18n from '../i18n';
@@ -9,15 +10,8 @@ import { useTranslation } from 'react-i18next';
 // Ionic's components
 import { 
   IonButton,
-  IonButtons, 
   IonContent, 
-  IonHeader, 
-  IonIcon,
-  IonItem,
-  IonModal,
   IonPage, 
-  IonTitle,
-  IonToolbar 
 } from '@ionic/react';
 
 
@@ -29,12 +23,15 @@ const WelcomeScreen: React.FC = () => {
   const handleContinueFree = async () => {
     // Save that the user selected free mode
     await Preferences.set({ key: 'userMode', value: 'free' });
+    await seedInitialData();
     // Navigate to country selection
     history.push('/select-country');
   };
 
   const handleHaveAccount = async () => {
     await Preferences.set({ key: 'userMode', value: 'account' });
+    enableDexieCloud();
+
     // Navigate to your login route
     history.push('/login');
   };
@@ -49,7 +46,7 @@ const WelcomeScreen: React.FC = () => {
 
       <IonPage>
         <IonContent className="ion-padding-horizontal">
-          <div className="country-screen">
+          <div className="centered-screen">  
             {/* Logo and app name */}
             <div className="centered-container">
               <img

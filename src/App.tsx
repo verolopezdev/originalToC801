@@ -103,7 +103,7 @@ setupIonicReact();
 
 const App: React.FC = () => {
 
-  useEffect(() => {
+/*   useEffect(() => {
     const initializeApp = async () => {
       try {
         console.log(
@@ -133,7 +133,7 @@ const App: React.FC = () => {
   
     initializeApp();
   }, []);
-
+ */
 
   
 

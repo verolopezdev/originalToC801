@@ -17,7 +17,7 @@ import './AccountSlider.css';
 
 interface AccountTotalSliderProps {
   accounts: any[]; // Array of accounts
-  onAccountSelect: (accountId: number) => void; // Callback to pass the selected account id to the parent
+  onAccountSelect: (accountId: string) => void; // Callback to pass the selected account id to the parent
   currentDate: Dayjs; // Pass currentDate from parent
   selectedInterval: "weekly" | "monthly" | "yearly";
   setSelectedInterval: (interval: "weekly" | "monthly" | "yearly") => void;

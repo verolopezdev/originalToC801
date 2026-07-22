@@ -231,7 +231,7 @@ const EditSubcategory: React.FC = () => {
       title: t('modal.success_modal_title'),
       content: config.content,
       actions: [{ label: t('common.continue'), action: () => setIsModalOpen(false) }],
-      destination: `/editcategory/${parentCategoryId}`
+      destination: `/app/editcategory/${parentCategoryId}`
     });
     setIsModalOpen(true);
   };
@@ -250,7 +250,7 @@ const EditSubcategory: React.FC = () => {
           style: 'fail-btn', // Optional CSS class
         },
       ],
-      destination: `/editcategory/${parentCategoryId}`
+      destination: `/app/editcategory/${parentCategoryId}`
     });
     setIsModalOpen(true);
   };
@@ -289,7 +289,7 @@ const EditSubcategory: React.FC = () => {
           target: targetName  
         }),
   
-        destination: '/categories' // Assuming this navigates to the main list
+        destination: '/app/categories' // Assuming this navigates to the main list
       });
 
     } catch (error) {
@@ -354,14 +354,12 @@ const EditSubcategory: React.FC = () => {
   const handleTargetCategorySelect = (selection: { categoryId: string; categoryName: string; subcategoryId: string; subcategoryName: string; }) => {
     // We only care about the categoryId for the merge operation
     setTargetCategoryId(selection.categoryId); 
-    console.log("target category: ", selection.categoryId);
     
     if (selection.subcategoryId !== '') {
       // Case: User selected a SUBcategory
       setTargetSubcategoryId(selection.subcategoryId);
       // Display name includes the parent category for context
       setTargetName(`${selection.categoryName} / ${selection.subcategoryName}`); 
-      console.log("target subcategory: ", selection.subcategoryId);
     } else {
       // Case: User selected a main CATEGORY
       setTargetSubcategoryId(''); 
@@ -453,7 +451,7 @@ const EditSubcategory: React.FC = () => {
           target: targetName
         }),
   
-        destination: '/categories' // Assuming this navigates to the main list
+        destination: '/app/categories' // Assuming this navigates to the main list
       });
       
     } catch (error) {
@@ -526,7 +524,7 @@ const EditSubcategory: React.FC = () => {
         content: t('categories.subcategory_deleted', {
           source: subcategoryName,
         }),
-        destination: '/categories' 
+        destination: '/app/categories' 
       });
   
     } catch (error) {
@@ -550,7 +548,7 @@ const EditSubcategory: React.FC = () => {
         <IonToolbar>
           {/* Back button */}
           <IonButtons slot="start">
-            <IonBackButton defaultHref={`/editcategory/${parentCategoryId}`} />
+            <IonBackButton defaultHref={`/app/editcategory/${parentCategoryId}`} />
           </IonButtons>
 
           {/* Secondary menu for this category */}

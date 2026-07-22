@@ -107,12 +107,6 @@ const NewCategory: React.FC = () => {
   });
 
 
-  // Validation function for category name
-/*   const validateName = (name: string): boolean => {
-    const nameRegex = /^[a-zA-ZÀ-ÿ0-9\s@\-_\/.]+$/u; // Allows only alphanumeric characters, spaces @ - _ /
-    return nameRegex.test(name);
-  };
- */  
   
   // Handle input name validation  
   const handleInputChange = async ( value: string ) => {
@@ -173,7 +167,7 @@ const NewCategory: React.FC = () => {
           action: () => setIsConfirmationModalOpen(false),
         },
       ],
-      destination: '/categories'
+      destination: '/app/categories'
     });
     setIsConfirmationModalOpen(true);
   };
@@ -192,7 +186,7 @@ const NewCategory: React.FC = () => {
           style: 'fail-btn', // Optional CSS class
         },
       ],
-      destination: '/categories'
+      destination: '/app/categories'
     });
     setIsConfirmationModalOpen(true);
   };
@@ -204,7 +198,6 @@ const NewCategory: React.FC = () => {
       // 🚨 CRITICAL FIX: Wrap the operation in an explicit transaction 🚨
       // We list both 'categories' and 'changes' tables.
       await db.transaction('rw', db.categories, async (tx) => {
-        console.log("Starting category creation transaction...");
 
         const categoryId = await tx.categories.add({
             categoryName,
@@ -215,12 +208,7 @@ const NewCategory: React.FC = () => {
             systemCategory,
             subcategories
         });
-
-        // The Dexie hook for 'categories' will now successfully write 
-        // to the 'changes' table because 'changes' is part of the transaction (tx).
-        console.log(`Category added with ID: ${categoryId}. Change logged successfully.`);
       });
-      // 🚨 END CRITICAL FIX 🚨
       
       openInfoModal();
 

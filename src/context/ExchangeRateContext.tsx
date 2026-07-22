@@ -93,15 +93,6 @@ export const ExchangeRateProvider: React.FC<{ children: React.ReactNode }> = ({ 
   // The listener is removed during cleanup to prevent duplicate listeners from
   // accumulating if the effect runs again or the provider unmounts.
   useEffect(() => {
-    // Debugg log
-    /*console.log(
-      "[ExchangeRateContext UseEffect]",
-      {
-        defaultCurrency: currency.defaultCurrency.code,
-        altCodes
-      }
-    );*/
-  
     // Refresh rates immediately
     if (currency.defaultCurrency.code) {
       refreshRates(true);
@@ -215,13 +206,10 @@ export const ExchangeRateProvider: React.FC<{ children: React.ReactNode }> = ({ 
   
       // Download a fresh rates file when forced or when the cache is expired.
       if (forceUpdate || expired) {
-        console.log(`[${id}] [ExchangeRateContext] ---> Downloading new rates json...`);
         await downloadAndSaveExchangeRates(
           currency.defaultCurrency.code
         );
         
-        // Update stored data
-        console.log(`[${id}] [ExchangeRateContext] ---> Updating Preferences...`);
         // Rebuild and save the subset of currencies used by the app.
         await updateSavedExchangeRates(
           currency.defaultCurrency,
@@ -262,7 +250,6 @@ export const ExchangeRateProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
 
   const getExchangeRate = (currencyCode: string): number | null => {
-    //console.log("[ExchangeRateContext] - getExchangeRate executed...")
     if (!exchangeRates || !exchangeRates.currencies) return null;
     const rate = exchangeRates.currencies[currencyCode.toUpperCase()];
     return typeof rate === "number" ? rate : null;
@@ -293,8 +280,6 @@ export const ExchangeRateProvider: React.FC<{ children: React.ReactNode }> = ({ 
     fromCurrency: string,
     toCurrency: string
   ): number | null => {
-    //console.log("Convert currency...");
-
     // Cannot convert if rates have not been loaded.
     if (!exchangeRates || !exchangeRates.currencies) return null;
 

@@ -42,7 +42,6 @@ import {
 // Icons
 import { 
   add,
-  buildOutline,
   calendarOutline, 
   cashOutline, 
   home,
@@ -68,10 +67,10 @@ interface AppPage {
 }
 
 const appPages: AppPage[] = [
-  { title: 'dashboard', url: '/dashboard', icon: home },
-  { title: 'accounts', url: '/accounts', icon: layersOutline },
-  { title: 'Add', url: '/newexpense/0', icon: add },
-  { title: 'activity', url: '/activity', icon: cashOutline }
+  { title: 'dashboard', url: '/app/dashboard', icon: home },
+  { title: 'accounts', url: '/app/accounts', icon: layersOutline },
+  { title: 'Add', url: '/app/newexpense/0', icon: add },
+  { title: 'activity', url: '/app/activity', icon: cashOutline }
 ];
 
 
@@ -210,7 +209,7 @@ const Dashboard: React.FC = () => {
   
   // Navigate to the profile page
   const handleNavigation = () => {
-    router.push('/profile');  
+    router.push('/app/profile');  
   };
 
   
@@ -242,20 +241,20 @@ const Dashboard: React.FC = () => {
           </div>
           
           <IonButtons slot="end"> 
-            <IonButton routerLink="/reccurrences" routerDirection="forward" >
+            <IonButton routerLink="/app/reccurrences" routerDirection="forward" >
               <div className="status-button-wrapper">
                 <IonIcon icon={syncOutline} className="top-toolbar-icon-btn" />
                 <span className={`status-dot ${overallSeverity}-dot`} />
               </div>
             </IonButton>
 
-            <IonButton routerLink="/calendar" routerDirection="forward">  
+            <IonButton routerLink="/app/calendar" routerDirection="forward">  
               <IonIcon icon={calendarOutline} className='top-toolbar-icon-btn mr-15'/>
             </IonButton>
              
             {/* Secondary menu for testing page */}
             {/* 
-              <IonButton routerLink="/testpage">
+              <IonButton routerLink="/app/testpage">
               <IonIcon 
                 className='medium-icon-btn danger mr-10'
                 icon={buildOutline} 

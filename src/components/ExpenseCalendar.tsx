@@ -7,7 +7,6 @@ import 'dayjs/locale/en';
 import 'dayjs/locale/fr';
 import 'dayjs/locale/pt';
 import { db, Expense, Category, Subcategory } from '../db';
-import { getWeekdayNames } from '../utils/formatDate'; 
 import { useCurrency } from '../context/CurrencyContext';
 import { getAllExpenses } from '../utils/getAllExpenses';
 import { getDayjsLocale } from '../utils/getDayjsLocale';

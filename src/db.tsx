@@ -258,6 +258,16 @@ const db = new Dexie('DB', { addons: [dexieCloud] }) as Dexie & {
   recurringSeries: EntityTable<RecurringSeries, 'seriesId'>;
 };
 
+export const initializeDatabase = async () => {
+  await db.open();
+
+  const userCount = await db.users.count();
+
+  if (userCount === 0) {
+    await seedInitialData();
+  }
+};
+
 db.version(1).stores({
   metadata: 'key',
   users: '@userId, email, realmId',
@@ -315,17 +325,6 @@ const setupHooks = () => {
   });
 };
 
-db.on("ready", async () => {
-  console.log("✅ [DB Status] Database ready.");
-
-  setupHooks();
-
-  const user = await db.users.toCollection().first();
-
-  if (user?.isPremium) {
-    enableDexieCloud();
-  }
-});
 
 
 // Seed initial data
@@ -430,6 +429,28 @@ export const seedInitialData = async (): Promise<void> => {
   }
 };
 
+
+let dbReadyPromise: Promise<void> | null = null;
+
+export function dbReady() {
+  if (!dbReadyPromise) {
+    dbReadyPromise = (async () => {
+      await initializeDatabase();
+
+      setupHooks();
+
+      const user = await db.users.toCollection().first();
+
+      if (user?.isPremium) {
+        enableDexieCloud();
+      }
+
+      console.log("✅ Database ready");
+    })();
+  }
+
+  return dbReadyPromise;
+}
 export type { Account, Category, Subcategory, Trip };
 export { db };
 

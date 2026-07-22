@@ -93,7 +93,7 @@ const ReccurrenceItem: React.FC<ReccurrenceItemProps> = ({
   const dueInfo = getDueInfo(nextDueDate);  
 
   return (
-     <IonRouterLink routerLink={`/viewrecurrence/${seriesId}`} routerDirection="forward">
+     <IonRouterLink routerLink={`/app/viewrecurrence/${seriesId}`} routerDirection="forward">
       <div className='transaction reccurrence'> 
         <div className='left-col'>
           <CategoryIcon iconName={categoryIcon} categoryColor={color} autoLogged={autoLogged} isTransaction={true} />

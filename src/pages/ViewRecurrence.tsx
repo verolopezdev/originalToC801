@@ -467,7 +467,7 @@ const ViewRecurrence: React.FC = () => {
                         className="item" 
                         onClick={() => {
                           closePopover(); 
-                          router.push(`/editrecurrence/${seriesId}`, 'forward');
+                          router.push(`/app/editrecurrence/${seriesId}`, 'forward');
                         }}
                       >
                         <IonIcon 
@@ -585,7 +585,7 @@ const ViewRecurrence: React.FC = () => {
               <IonButton 
                 className='medium success'
                 onClick={() => {
-                  router.push(`/logrecurrenceexpense/${seriesId}`, 'forward');
+                  router.push(`/app/logrecurrenceexpense/${seriesId}`, 'forward');
                 }}
               >
                 {t('expenses.log_exp')}
@@ -712,7 +712,7 @@ const ViewRecurrence: React.FC = () => {
               text: t('expenses.pay_all_stop'),
               handler: () => {
                 setShowStopInstallmentRecAlert(false);
-                router.push(`/logrecurrenceexpense/${seriesId}?mode=remaining`, 'forward');
+                router.push(`/app/logrecurrenceexpense/${seriesId}?mode=remaining`, 'forward');
               },
             },
             {

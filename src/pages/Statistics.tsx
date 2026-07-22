@@ -342,7 +342,7 @@ const statistics: React.FC = () => {
                     className='item' 
                     onClick={() => {
                       closePopover(); // First, close the popover
-                      router.push('/otherperiods');
+                      router.push('/app/otherperiods');
                     }}
                   >
                     <IonIcon icon={calendarNumberOutline} />
@@ -354,7 +354,7 @@ const statistics: React.FC = () => {
                     className='item' 
                     onClick={() => {
                       closePopover(); // First, close the popover
-                      router.push('/exportdata');
+                      router.push('/app/exportdata');
                     }}
                   >
                     <IonIcon icon={receiptOutline} />

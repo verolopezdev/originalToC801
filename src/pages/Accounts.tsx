@@ -65,10 +65,10 @@ interface AppPage {
 }
 
 const appPages: AppPage[] = [
-  { title: 'dashboard', url: '/dashboard', icon: homeOutline },
-  { title: 'accounts', url: '/accounts', icon: layers },
-  { title: 'Add', url: '/newaccount', icon: add },
-  { title: 'activity', url: '/activity', icon: cashOutline }
+  { title: 'dashboard', url: '/app/dashboard', icon: homeOutline },
+  { title: 'accounts', url: '/app/accounts', icon: layers },
+  { title: 'Add', url: '/app/newaccount', icon: add },
+  { title: 'activity', url: '/app/activity', icon: cashOutline }
 ];
 
 
@@ -151,7 +151,6 @@ const Accounts: React.FC = () => {
         db.accounts,
         async (tx) => {
           await tx.accounts.bulkPut(updates);
-          console.log(`Successfully updated sortOrder for ${updates.length} accounts. Logging handled by existing hook.`);
         }
       );
 
@@ -337,7 +336,7 @@ const Accounts: React.FC = () => {
                   {/* This is the new content wrapper for the animation */}
                   <div className='reorder-item-content'> 
                     <IonRouterLink
-                      routerLink={`/editaccount/${item.accountId}`} 
+                      routerLink={`/app/editaccount/${item.accountId}`} 
                       routerDirection="forward"
                       className='default-card-router-link'
                     >

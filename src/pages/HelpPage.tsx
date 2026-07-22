@@ -22,10 +22,6 @@ const HelpPage: React.FC = () => {
 
   return (
     <IonPage>
-      <div className="background-bubbles">
-        <div className="bubble bubbleLeft"></div>
-        <div className="bubble bubbleTop"></div>
-      </div>
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">

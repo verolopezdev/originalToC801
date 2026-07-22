@@ -83,6 +83,8 @@ export const ExpenseProvider: React.FC<{ children: ReactNode }> = ({ children })
     };
   }, [lastCheckDate]);
 
+
+
   return (
     <ExpenseContext.Provider value={{ checkExpense, checkRecurrence, overallSeverity }}>
       {children}

@@ -1,11 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '../context/UserContext';
-import { db, enableDexieCloud } from "../db";
 
 // Custom hooks
 import useScrollToTop from '../hooks/useScrollToTop';
-
 
 // Ionic components
 import { 
@@ -15,7 +13,6 @@ import {
   IonHeader, 
   IonIcon, 
   IonLabel,
-  IonMenuButton,
   IonPage, 
   IonToolbar 
 } from '@ionic/react';
@@ -25,7 +22,6 @@ import {
   checkmarkCircle, 
   diamond, 
   diamondOutline, 
-  star 
 } from 'ionicons/icons';
 
 // Styles
@@ -40,8 +36,6 @@ const GetPremium: React.FC = () => {
 
   const isPremium = user.isPremium;
 
-
-  console.log("GetPremium render", user);
   
   return (
     <IonPage>

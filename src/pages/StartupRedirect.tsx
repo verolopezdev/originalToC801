@@ -19,13 +19,13 @@ const StartupRedirect: React.FC = () => {
       // 2. Route based on status
       if (userMode === 'free') {
         if (hasValidCountry) {
-          history.replace('/dashboard');
+          history.replace('/app/dashboard');
         } else {
           history.replace('/select-country');
         }
       } else if (userMode === 'account') {
         // Direct logged-in user to dashboard or login check
-        history.replace('/dashboard');
+        history.replace('/app/dashboard');
       } else {
         // First time opening the app -> Welcome screen
         history.replace('/welcome');

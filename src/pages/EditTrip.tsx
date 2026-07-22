@@ -272,7 +272,7 @@ const EditTrip: React.FC = () => {
           action: () => setIsConfirmationModalOpen(false),
         },
       ],
-      destination: '/travelmode'
+      destination: '/app/travelmode'
     });
     setIsConfirmationModalOpen(true);
   };
@@ -294,7 +294,7 @@ const EditTrip: React.FC = () => {
           style: 'fail-btn', // Optional CSS class
         },
       ],
-      destination: '/travelmode'
+      destination: '/app/travelmode'
     });
     setIsConfirmationModalOpen(true);
   };

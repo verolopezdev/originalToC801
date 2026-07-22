@@ -60,7 +60,7 @@ const TravelItem: React.FC<TravelItemProps> = ({
         <div className='left-col'>
           <CategoryIcon categoryColor={`${selectedTripId === tripId ? color : 'neutral'}`} iconName={tripIcon} />  
         </div>
-        <IonRouterLink routerLink={`edittrip/${tripId}`} routerDirection="forward">
+        <IonRouterLink routerLink={`/app/edittrip/${tripId}`} routerDirection="forward">
           <div className='center-col border-right'>
             <div className='text'>{tripName}</div>
               <div className='travel-date-range'>
@@ -68,7 +68,7 @@ const TravelItem: React.FC<TravelItemProps> = ({
               </div>
           </div>
         </IonRouterLink>
-        <IonRouterLink routerLink={`viewtrip/${tripId}`} routerDirection="forward">
+        <IonRouterLink routerLink={`/app/viewtrip/${tripId}`} routerDirection="forward">
           <div className='right-col'>
             <IonIcon icon={chevronForwardOutline} />
           </div>

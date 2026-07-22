@@ -66,10 +66,10 @@ interface AppPage {
 }
 
 const appPages: AppPage[] = [
-  { title: 'dashboard', url: '/dashboard', icon: homeOutline },
-  { title: 'accounts', url: '/accounts', icon: layersOutline },
-  { title: 'Add', url: '/newexpense/0', icon: add },
-  { title: 'activity', url: '/activity', icon: cashOutline }
+  { title: 'dashboard', url: '/app/dashboard', icon: homeOutline },
+  { title: 'accounts', url: '/app/accounts', icon: layersOutline },
+  { title: 'Add', url: '/app/newexpense/0', icon: add },
+  { title: 'activity', url: '/app/activity', icon: cashOutline }
 ];
 
 
@@ -297,7 +297,7 @@ const handleSubscriptionPlan = async (plan: SubscriptionPlan) => {
         
         {/* Profile Bar */}
         <IonList className='profile-settings'>
-          <IonItem detail={true} routerLink='/profile' lines="none" className='no-padding'>
+          <IonItem detail={true} routerLink='/app/profile' lines="none" className='no-padding'>
             <IonLabel>
               <div className='profile-avatar-bar'>
                 {avatar ? (
@@ -371,7 +371,7 @@ const handleSubscriptionPlan = async (plan: SubscriptionPlan) => {
             </IonItem>
 
             {/* Currency */}
-            <IonItem detail={true} lines="none" routerLink="/currency">
+            <IonItem detail={true} lines="none" routerLink="/app/currency">
               <IonIcon aria-hidden="true" icon={cashOutline} slot="start"></IonIcon>
               <IonLabel>{t('settings.currency')}</IonLabel>
             </IonItem>
@@ -392,7 +392,7 @@ const handleSubscriptionPlan = async (plan: SubscriptionPlan) => {
             </IonItem>
 
             {/* Themes */}
-            <IonItem lines="none" detail={true} routerLink="/themes">
+            <IonItem lines="none" detail={true} routerLink="/app/themes">
               <IonIcon aria-hidden="true" icon={colorPaletteOutline} slot="start"></IonIcon>
               <IonLabel>{t('settings.themes')}</IonLabel>
             </IonItem>
@@ -406,7 +406,7 @@ const handleSubscriptionPlan = async (plan: SubscriptionPlan) => {
           </div>
           <IonList>
             {/* Configure Back Up */}
-            <IonItem detail={true} routerLink="/backup">
+            <IonItem detail={true} routerLink="/app/backup">
               <IonIcon aria-hidden="true" icon={arrowDownCircleOutline} slot="start"></IonIcon>
               <IonLabel>{t('settings.back_up')}</IonLabel>
             </IonItem>
@@ -420,25 +420,25 @@ const handleSubscriptionPlan = async (plan: SubscriptionPlan) => {
           </div>
           <IonList>
             {/* Edit Profile */}
-            <IonItem detail={true} routerLink="/profile">
+            <IonItem detail={true} routerLink="/app/profile">
               <IonIcon aria-hidden="true" icon={personOutline} slot="start"></IonIcon>
               <IonLabel>{t('common.edit_profile')}</IonLabel>
             </IonItem>
 
             {/* Change Password */}
-            <IonItem detail={true} routerLink="/default">
+            <IonItem detail={true} routerLink="/app/default">
               <IonIcon aria-hidden="true" icon={lockClosedOutline} slot="start"></IonIcon>
               <IonLabel>{t('settings.change_pass')}</IonLabel>
             </IonItem>
 
             {/* Reset Account */}
-            <IonItem detail={true} routerLink="/default">
+            <IonItem detail={true} routerLink="/app/default">
               <IonIcon aria-hidden="true" icon={refreshOutline} slot="start"></IonIcon>
               <IonLabel>{t('settings.reset_account')}</IonLabel>
             </IonItem>
 
             {/* Billing ans Subscription */}
-            <IonItem lines='none' detail={true} routerLink="/billing">
+            <IonItem lines='none' detail={true} routerLink="/app/billing">
               <IonIcon aria-hidden="true" icon={cardOutline} slot="start"></IonIcon>
               <IonLabel>{t('settings.billing_subs')}</IonLabel>
             </IonItem>
@@ -452,7 +452,7 @@ const handleSubscriptionPlan = async (plan: SubscriptionPlan) => {
           </div>
           <IonList>
             {/* File Explorer */}
-            <IonItem detail={true} routerLink="/devFileExplorer">
+            <IonItem detail={true} routerLink="/app/devFileExplorer">
               <IonIcon aria-hidden="true" icon={folderOpenOutline} slot="start"></IonIcon>
               <IonLabel>DEV - File Explorer</IonLabel>
             </IonItem>
@@ -473,13 +473,13 @@ const handleSubscriptionPlan = async (plan: SubscriptionPlan) => {
             </IonItem>
 
             {/* Other actions */}
-            <IonItem detail={true} routerLink="/devOtherActions">
+            <IonItem detail={true} routerLink="/app/devOtherActions">
               <IonIcon aria-hidden="true" icon={folderOpenOutline} slot="start"></IonIcon>
               <IonLabel>Other actions</IonLabel>
             </IonItem>
 
             {/* Seeding */}
-            <IonItem detail={true} lines="none" routerLink="/devSeeding">
+            <IonItem detail={true} lines="none" routerLink="/app/devSeeding">
               <IonIcon aria-hidden="true" icon={folderOpenOutline} slot="start"></IonIcon>
               <IonLabel>Seed Expenses</IonLabel>
             </IonItem>

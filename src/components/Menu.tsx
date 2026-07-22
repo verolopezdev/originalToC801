@@ -41,13 +41,13 @@ interface AppPage {
 }
 
 const appPages: AppPage[] = [
-  { title: 'dashboard', url: '/dashboard', icon: gridOutline },
-  { title: 'categories', url: '/categories', icon: layersOutline },
-  { title: 'settings', url: '/settings', icon: cogOutline },
-  { title: 'travel_mode', url: '/travelmode', icon: airplaneOutline },
-  { title: 'statistics', url: '/statistics', icon: barChartOutline },
-  { title: 'help', url: '/help', icon: helpBuoyOutline },
-  { title: 'log_out', url: '/logout', icon: logOutOutline }
+  { title: 'dashboard', url: '/app/dashboard', icon: gridOutline },
+  { title: 'categories', url: '/app/categories', icon: layersOutline },
+  { title: 'settings', url: '/app/settings', icon: cogOutline },
+  { title: 'travel_mode', url: '/app/travelmode', icon: airplaneOutline },
+  { title: 'statistics', url: '/app/statistics', icon: barChartOutline },
+  { title: 'help', url: '/app/help', icon: helpBuoyOutline },
+  { title: 'log_out', url: '/app/logout', icon: logOutOutline }
 ];
 
 
@@ -74,7 +74,7 @@ const Menu: React.FC = () => {
 
 
   const handleNavigation = () => {
-    router.push('/profile'); // Navigate to the profile page
+    router.push('/app/profile'); // Navigate to the profile page
   };
 
   return (
@@ -88,7 +88,7 @@ const Menu: React.FC = () => {
                 
                 {/* App Bar */}
                 <IonList className='menu-list'> 
-                  <IonItem detail={false} routerLink='/profile' lines="none" className='no-padding top-bottom-item'>
+                  <IonItem detail={false} routerLink='/app/profile' lines="none" className='no-padding top-bottom-item'>
                     <IonLabel>
                       <div className='profile-bar mb-20'>
                         <img
@@ -132,7 +132,7 @@ const Menu: React.FC = () => {
                 })}
                 <IonMenuToggle key={10} autoHide={false}>
                   <IonItem
-                    routerLink="/getpremium"
+                    routerLink="/app/getpremium"
                     routerDirection="forward"
                     lines="none"
                     detail={false}
@@ -152,7 +152,7 @@ const Menu: React.FC = () => {
               {/* Profile Bar */}
               <IonList className='menu-list'>
                 <IonMenuToggle key={20} autoHide={false}>
-                  <IonItem routerLink='/profile' routerDirection="forward" lines="none" detail={true} className='no-padding ion-no-margin top-bottom-item'>
+                  <IonItem routerLink='/app/profile' routerDirection="forward" lines="none" detail={true} className='no-padding ion-no-margin top-bottom-item'>
                     <IonLabel>
                       <div className='profile-bar'>
                         {avatar ? (

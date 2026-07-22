@@ -133,7 +133,7 @@ const NewAccount: React.FC = () => {
           action: () => setIsModalOpen(false),
         },
       ],
-      destination: '/accounts',
+      destination: '/app/accounts',
     });
     setIsModalOpen(true);
   };
@@ -151,7 +151,7 @@ const NewAccount: React.FC = () => {
           style: 'fail-btn', // Optional CSS class
         },
       ],
-      destination: '/accounts',
+      destination: '/app/accounts',
     });
     setIsModalOpen(true);
   };
@@ -171,7 +171,6 @@ const NewAccount: React.FC = () => {
       // 🚨 CRITICAL FIX: Wrap the operation in an explicit transaction 🚨
       // We list both 'accounts' and 'changes' tables.
       await db.transaction('rw', db.accounts, async (tx) => {
-        console.log("Starting account creation transaction...");
         
         const accountId = await tx.accounts.add({
             accountName,
@@ -183,11 +182,7 @@ const NewAccount: React.FC = () => {
             sortOrder
         });
         
-        // The Dexie hook for 'accounts' will now successfully write 
-        // to the 'changes' table because 'changes' is part of the transaction (tx).
-        console.log(`Account added with ID: ${accountId}. Change logged successfully.`);
       });
-      // 🚨 END CRITICAL FIX 🚨
 
       setAccountName('');
       setAccountIdentifier('');

@@ -117,7 +117,6 @@ const YTDCategoryChart: React.FC<Props> = React.memo(({ expenses, year }) => {
               />
 
               {/* 🟢 Tooltip with Ionic theme-based style */}
-              {/* 🟢 Tooltip with Ionic theme-based style */}
               <Tooltip
                 active={activeIndex !== null}
                 contentStyle={{

@@ -1,18 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '../theme/ThemeContext';
-import { useUser } from '../context/UserContext'; // Import the useUser hook
 import './ColorPicker.css';
 
 // Ionic components
 import {
   IonButton, 
-  IonIcon
 } from '@ionic/react';
-
-// Icons
-import { 
-  diamond 
-} from 'ionicons/icons';
 
 
 interface ColorPickerProps {
@@ -41,7 +34,6 @@ const colors = [
 
 
 const ColorPicker: React.FC<ColorPickerProps> = ({ onColorSelect, initialColor, isDisabled }) => {
-  const { user } = useUser(); // Access user context
   const { themeColor } = useTheme(); // theme-yellow
 
   const [currentColor, setCurrentColor] = useState<string>(initialColor || themeColor.split('-')[1]);

@@ -217,7 +217,7 @@ const EditCategory: React.FC = () => {
           style: 'fail-btn', // Optional CSS class
         },
       ],
-      destination: '/categories'
+      destination: '/app/categories'
     });
     setIsModalOpen(true);
   };
@@ -276,7 +276,7 @@ const EditCategory: React.FC = () => {
       
       openInfoModal({ // A revised success modal function to accept custom content
         content: t('categories.category_updated'),
-        destination: '/categories' // Navigate away since the current category is deleted
+        destination: '/app/categories' // Navigate away since the current category is deleted
     }); // Success feedback
 
     } catch (error) {
@@ -341,7 +341,7 @@ const EditCategory: React.FC = () => {
   };
 
   const handleBack = () => {
-    history.replace('/categories');
+    history.replace('/app/categories');
   };
 
 
@@ -440,7 +440,7 @@ const mergeCategory = async () => {
         source: category?.categoryName,
         target: targetName
       }),
-      destination: '/categories'
+      destination: '/app/categories'
     });
     
   } catch (error) {
@@ -524,7 +524,7 @@ const deleteCategory = async () => {
       content: t('categories.category_deleted', {
         source: category?.categoryName,
       }),
-      destination: '/categories' 
+      destination: '/app/categories' 
     });
 
   } catch (error) {
@@ -586,7 +586,7 @@ const key =
                       {categoryId !== categorylessId && (
                         <IonRouterLink 
                           key={1}
-                          routerLink={`/newsubcategory/${categoryId}`}
+                          routerLink={`/app/newsubcategory/${categoryId}`}
                           routerDirection="forward"
                           style={{ textDecoration: 'none' }} /* Optional: remove underline styling */
                         >

@@ -78,22 +78,6 @@ const defaultCurrency: CurrencyData = {
   decimalSeparator: '.',
 };
 
-// Footer items
-interface AppPage {
-  url: string;
-  icon: string;
-  title: string;
-}
-
-const appPages: AppPage[] = [
-  { title: 'dashboard', url: '/dashboard', icon: homeOutline },
-  { title: 'accounts', url: '/accounts', icon: layersOutline },
-  { title: 'Add', url: '/newexpense/0', icon: add },
-  { title: 'activity', url: '/activity', icon: cashOutline }
-];
-
-
-
 
 const NewTrip: React.FC = () => {
   const contentRef = useScrollToTop(); // use the custom hook 
@@ -261,7 +245,7 @@ const NewTrip: React.FC = () => {
           },
         },
       ],
-      destination: '/travelmode'
+      destination: '/app/travelmode'
     });
     setIsConfirmationModalOpen(true);
   };
@@ -280,7 +264,7 @@ const NewTrip: React.FC = () => {
           style: 'fail-btn', // Optional CSS class
         },
       ],
-      destination: '/travelmode'
+      destination: '/app/travelmode'
     });
     setIsConfirmationModalOpen(true);
   };
@@ -312,13 +296,6 @@ const NewTrip: React.FC = () => {
       openFailureModal();
     }
   }
-
-
-  // Translate footer menu item titles
-  const translatedMenuItems = appPages.map((item) => ({
-    ...item,
-    title: t(`common.${item.title}`, { defaultValue: item.title }),
-  }));
   
   
   
@@ -538,7 +515,6 @@ const NewTrip: React.FC = () => {
 
         
       </IonContent>
-      <Footer appPages={translatedMenuItems} />
     </IonPage>
   );
 };

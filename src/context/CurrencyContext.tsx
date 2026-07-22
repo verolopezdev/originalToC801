@@ -240,6 +240,8 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
       .sort((a, b) => a.code.localeCompare(b.name)),
   ];
 
+
+
   return (
     <CurrencyContext.Provider
       value={{

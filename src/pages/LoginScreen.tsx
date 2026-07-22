@@ -72,7 +72,7 @@ const DefaultPage: React.FC = () => {
       console.log("✅ Successfully logged in via Dexie Cloud!");
       
       // 3. Navigate the user to their main dashboard or profile
-      history.push('/dashboard');
+      history.replace('/app/dashboard');
     } catch (error) {
       console.error("❌ Login cancelled or failed:", error);
     } finally {

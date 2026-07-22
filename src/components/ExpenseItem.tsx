@@ -161,7 +161,7 @@ const ExpenseItem: React.FC<TransactionItemProps> = ({
         ]}
       />
       
-      <IonRouterLink routerLink={paymentStatus === 1 ? `/editexpense/${expenseId}` : undefined} routerDirection="forward">
+      <IonRouterLink routerLink={paymentStatus === 1 ? `/app/editexpense/${expenseId}` : undefined} routerDirection="forward">
         <div className='expense-item'>
           <div className='center-col'>
             {/* Original due date */}

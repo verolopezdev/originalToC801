@@ -82,8 +82,8 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
     <IonRouterLink
       routerLink={
         expenseId === '-1' // is a projected expense, navigate to edit recurrence
-            ? `/viewrecurrence/${seriesId}`
-            : `/editexpense/${expenseId}` // is an actual expense
+            ? `/app/viewrecurrence/${seriesId}`
+            : `/app/editexpense/${expenseId}` // is an actual expense
       }
       routerDirection="forward"
     >      

@@ -14,7 +14,6 @@ import CategoryIcon from './CategoryIcon';
 // Ionic's components
 import { 
   IonIcon,
-  IonRouterLink, 
   IonToast,
 } from '@ionic/react';
 
@@ -56,16 +55,15 @@ const Category: React.FC<CategoryProps> = ({
   const [toastOpen, setToastOpen] = useState(false); // controls visibility of the toast
   const [toastMessage, setToastMessage] = useState("");
   const wasLongPressRef = useRef(false); // a flag to know if the last interaction was a long press
-  const timerRef = useRef<NodeJS.Timeout | null>(null); // stores the timeout ID so we can cancel it if the press ends early
   
   const getLink = (destination?: string) => {
     switch (destination) {
       case "addsubcategory":
-        return "/newsubcategory/";
+        return "/app/newsubcategory/";
       case "editsubcategory":
-        return "/editsubcategory/";
+        return "/app/editsubcategory/";
       default:
-        return "/editcategory/";
+        return "/app/editcategory/";
     }
   };
   const link = getLink(destination);

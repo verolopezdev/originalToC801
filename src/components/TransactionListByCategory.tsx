@@ -241,7 +241,7 @@ const TransactionListByCategory: React.FC<Props> = ({
                   key={exp.expenseId}
                   onClick={(e) => {
                     e.stopPropagation(); 
-                    router.push(`/editexpense/${exp.expenseId}`, "forward");
+                    router.push(`/app/editexpense/${exp.expenseId}`, "forward");
                   }}
                 >
                   <div className="transaction-category__date">

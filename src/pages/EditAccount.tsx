@@ -319,7 +319,6 @@ const EditAccount: React.FC = () => {
           // 1. Delete the account record
           // NOTE: Dexie's delete() returns the number of deleted records.
           await db.accounts.where('accountId').equals(accountId).delete();
-          console.log(`Account ${accountId} deleted and deletion logged.`);
           
           // 2. RE-INDEX sortOrder for ALL remaining accounts (READ)
           // When called inside a transaction, Dexie ensures this read is consistent 
@@ -333,7 +332,6 @@ const EditAccount: React.FC = () => {
 
             if (account.sortOrder !== newSortOrder) {
               await db.accounts.update(account.accountId, { sortOrder: newSortOrder });
-              console.log(`Updated sortOrder for account ${account.accountId} to ${newSortOrder}.`);
             }
           }
           

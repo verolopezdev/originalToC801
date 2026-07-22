@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '../context/UserContext';
 import { SubscriptionPlan } from '../db';
-import { refreshSubscription } from "../services/SubscriptionService";
-import { db, enableDexieCloud } from "../db";
+import { Preferences } from '@capacitor/preferences';
+import { activatePremium } from "../services/PremiumService";
+
 
 // Ionic components
 import { 
@@ -28,46 +29,23 @@ import './Plans.css';
 
 const Plans: React.FC = () => {
   const { t } = useTranslation();
-  const { user, updateUser } = useUser();
+  const { user } = useUser();
 
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan>(user.subscriptionPlan);
   const [showAlert, setShowAlert] = useState(false);
 
-  const DEV_PREMIUM_EMAIL = "verolopez.dev@gmail.com";
 
-  const handleSubscribe = async () => {
-    await updateUser({
-      subscriptionPlan: selectedPlan,
-      isPremium: true
-    });
-    // 2. Refresh subscription (mock now, RevenueCat later)
-    await refreshSubscription();
-    setShowAlert(true);
-  };
+    const simulatePremiumPurchase = async () => {
+      await activatePremium(
+        user.userId,
+        "monthly",
+        new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      );
 
-  const handleSimulatePremium = async () => {
-    try {
-      const email = "verolopez.dev@gmail.com"; // hard-coded while developing
+      await Preferences.set({ key: 'userMode', value: 'account' });
+    };
   
-      const user = await db.users.toCollection().first();
   
-      if (!user?.userId) return;
-  
-      await db.users.update(user.userId, {
-        isPremium: true,
-        subscriptionPlan: "monthly",
-        email
-      });
-  
-      enableDexieCloud();
-  
-      await db.cloud.login({ email });
-  
-      console.log("✅ Premium simulation complete");
-    } catch (err) {
-      console.error(err);
-    }
-  };
   
   return(
     <>
@@ -127,10 +105,15 @@ const Plans: React.FC = () => {
         buttons={['OK']}
       />
 
-      {/* Save changes button */}
-      <IonButton expand="block" onClick={handleSimulatePremium}>
-        Simulate Premium Purchase
-      </IonButton>
+      {import.meta.env.DEV && (
+        <IonButton
+          expand="block"
+          color="danger"
+          onClick={simulatePremiumPurchase}
+        >
+          Simulate Premium
+        </IonButton>
+      )}
       
 {/*       <IonButton expand="block" onClick={handleSubscribe}>
         {user.subscriptionPlan !== 'free' && user.isPremium === false ? ('Renew Subscription') : ('Subscribe Now')}

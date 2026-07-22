@@ -59,10 +59,10 @@ interface AppPage {
 }
 
 const appPages: AppPage[] = [
-  { title: 'dashboard', url: '/dashboard', icon: homeOutline },
-  { title: 'accounts', url: '/accounts', icon: layersOutline },
-  { title: 'Add', url: '/newexpense/0', icon: add },
-  { title: 'activity', url: '/activity', icon: cash }
+  { title: 'dashboard', url: '/app/dashboard', icon: homeOutline },
+  { title: 'accounts', url: '/app/accounts', icon: layersOutline },
+  { title: 'Add', url: '/app/newexpense/0', icon: add },
+  { title: 'activity', url: '/app/activity', icon: cash }
 ];
 
 
@@ -81,7 +81,7 @@ const Activity: React.FC = () => {
   const accounts = useLiveQuery(() => db.accounts.toArray());
 
   const allAccounts = useLiveQuery(() => db.accounts.toArray());
-  const [selectedCardId, setSelectedCardId] = useState<number>(0);
+  const [selectedCardId, setSelectedCardId] = useState<string>('');
   const [viewMode, setViewMode] = useState<"date" | "category">("date");
 
 
@@ -199,7 +199,7 @@ const Activity: React.FC = () => {
   }, [accounts]);   
 
   // Handle selected card id change from SliderComponent
-  const handleAccountSelect = (accountId: number) => {
+  const handleAccountSelect = (accountId: string) => {
     setSelectedCardId(accountId); // Update the state with the selected account id
   };
 
@@ -208,7 +208,7 @@ const Activity: React.FC = () => {
   const translatedMenuItems = appPages.map((item) => ({
     ...item,
     title: t(`common.${item.title}`, { defaultValue: item.title }),
-    url: item.title === 'Add' ? `/newexpense/${selectedCardId}` : item.url,
+    url: item.title === 'Add' ? `/app/newexpense/${selectedCardId}` : item.url,
   }));
 
 

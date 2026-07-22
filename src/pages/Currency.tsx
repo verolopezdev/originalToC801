@@ -30,8 +30,6 @@ import {
   IonNote,
   IonPage, 
   IonSearchbar,
-  IonText,
-  IonTitle,
   IonToolbar 
 } from '@ionic/react';
 
@@ -61,7 +59,6 @@ interface CurrencyData {
 
 const Currency: React.FC = () => {
   const contentRef = useScrollToTop(); // use the custom hook 
-  const { refreshRates, lastUpdated, outdated } = useExchangeRates();
   const { t } = useTranslation();
   const { themeColor } = useTheme(); 
   const color = themeColor.split("-")[1]; // Extracts color name from theme name

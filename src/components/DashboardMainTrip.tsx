@@ -37,7 +37,7 @@ const TripData: React.FC<TripDataProps> = ({
 }) => {
 
   return(
-    <IonRouterLink routerLink={`/viewtrip/${tripId}`} routerDirection="forward">  
+    <IonRouterLink routerLink={`/app/viewtrip/${tripId}`} routerDirection="forward">  
       <div className='dashboard-trip-card'>      
         <div className="card-container">
           <div className="bgk-icon-card">

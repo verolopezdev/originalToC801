@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 
 import { Share } from '@capacitor/share';
 import { db } from '../db';
@@ -21,14 +21,12 @@ import Footer from '../components/Footer';
 
 // Ionic's components
 import { 
-  IonAlert,
   IonBackButton,
   IonButton,
   IonButtons, 
   IonContent, 
   IonHeader,
   IonIcon,
-  IonNote,
   IonPage,
   IonToolbar,
   useIonAlert,
@@ -75,15 +73,15 @@ interface AppPage {
 }
 
 const appPages: AppPage[] = [
-  { title: 'dashboard', url: '/dashboard', icon: homeOutline },
-  { title: 'accounts', url: '/accounts', icon: layersOutline },
-  { title: 'Add', url: '/newexpense/0', icon: add },
-  { title: 'activity', url: '/activity', icon: cashOutline }
+  { title: 'dashboard', url: '/app/dashboard', icon: homeOutline },
+  { title: 'accounts', url: '/app/accounts', icon: layersOutline },
+  { title: 'Add', url: '/app/newexpense/0', icon: add },
+  { title: 'activity', url: '/app/activity', icon: cashOutline }
 ];
 
 
 
-const TestPage: React.FC = () => {
+const BackUp: React.FC = () => {
   const contentRef = useScrollToTop(); // use the custom hook 
   const { t } = useTranslation();
   const [presentAlert] = useIonAlert();
@@ -174,7 +172,6 @@ const TestPage: React.FC = () => {
 
   
   useIonViewWillEnter(() => {
-    console.log('Backup page entered');
     loadBackups();
   });
 
@@ -205,7 +202,6 @@ const TestPage: React.FC = () => {
         directory: Directory.Cache,
       });
   
-      console.log('Sharing URI:', uriResult.uri);
   
       // 4. Share
       await Share.share({
@@ -258,11 +254,6 @@ const TestPage: React.FC = () => {
         return;
       }
   
-      console.log(
-        'Selected backup:',
-        selectedFile.name
-      );
-  
       // Attempt restore
       await restoreLatestBackup(parsedBackup);
   
@@ -304,9 +295,7 @@ const TestPage: React.FC = () => {
   const createManualBackup = async () => {
     try {
       setIsCreatingBackup(true);
-      console.log('Creating manual backup...');
       const fileName = await backupDatabase(db);
-      console.log('Manual backup created:', fileName);
   
       // Refresh list after backup
       await loadBackups();
@@ -503,4 +492,4 @@ const TestPage: React.FC = () => {
   );
 };
 
-export default TestPage;
+export default BackUp;

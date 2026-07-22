@@ -155,7 +155,7 @@ const MonthlyChart: React.FC<MonthlyChartProps> = React.memo(({ expenses, catego
 
   const handleBarClick = (entry: any) => {
     if (!entry) return;
-    router.push(`/statisticscategory/${entry.categoryId}/${year}/${month + 1}`);
+    router.push(`/app/statisticscategory/${entry.categoryId}/${year}/${month + 1}`);
   };
 
   const CustomBar = (props: any) => {

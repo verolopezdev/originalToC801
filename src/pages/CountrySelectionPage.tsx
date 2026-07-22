@@ -7,7 +7,6 @@ import { Device } from '@capacitor/device';
 
 // Context
 import { useCurrency } from '../context/CurrencyContext';
-import { useUser } from '../context/UserContext';
 
 // Custom hooks
 import useScrollToTop from '../hooks/useScrollToTop';
@@ -48,20 +47,11 @@ interface CountryData {
   flag?: string;
 }
 
-const getFlagEmoji = (countryCode: string) => {
-  if (!countryCode || countryCode.length !== 2) return '🌐';
-  const codePoints = countryCode
-    .toUpperCase()
-    .split('')
-    .map(char => 127397 + char.charCodeAt(0));
-  return String.fromCodePoint(...codePoints);
-};
 
 const CountrySelectionPage: React.FC = () => {
   const { t } = useTranslation();
   const contentRef = useScrollToTop();
 
-  const { updateUser } = useUser(); 
   const { setDefaultCurrency, updateActualCurrency } = useCurrency(); 
   const history = useHistory();
 
@@ -115,21 +105,6 @@ const CountrySelectionPage: React.FC = () => {
     if (jsonCountries.length === 0) return;
 
     const detectDeviceLanguage = async () => {
-      // ------------------------------------------------------------------
-    // 🧪 FORCE TEST OVERRIDE: Always force "USD" for testing
-    // ------------------------------------------------------------------
-    const TEST_OVERRIDE_CODE = ""; // Set to null or "" when done testing
-
-    if (TEST_OVERRIDE_CODE) {
-      const forcedCountry = jsonCountries.find(
-        (c) => c.code.toUpperCase() === TEST_OVERRIDE_CODE
-      );
-      if (forcedCountry) {
-        setSelectedCountry(forcedCountry);
-        return; // Stop auto-detection
-      }
-    }
-    // ------------------------------------------------------------------
       const { value: savedCountry } = await Preferences.get({ key: 'selectedCountry' });
       if (savedCountry) return;
 
@@ -198,7 +173,7 @@ const CountrySelectionPage: React.FC = () => {
     updateActualCurrency(countryToSave);
 
     await Preferences.set({ key: 'selectedCountry', value: countryToSave.country });
-    history.replace('/dashboard');
+    history.replace('/app/dashboard');
   };
 
   if (jsonCountries.length === 0) {

@@ -173,7 +173,7 @@ const NewSubCategory: React.FC = () => {
           action: () => setIsConfirmationModalOpen(false),
         },
       ],
-      destination: `/editcategory/${categoryId}`
+      destination: `/app/editcategory/${categoryId}`
     });
     setIsConfirmationModalOpen(true);
   };
@@ -192,7 +192,7 @@ const NewSubCategory: React.FC = () => {
           style: 'fail-btn', // Optional CSS class
         },
       ],
-      destination: `/editcategory/${categoryId}`
+      destination: `/app/editcategory/${categoryId}`
     });
     setIsConfirmationModalOpen(true);
   };

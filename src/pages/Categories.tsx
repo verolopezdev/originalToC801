@@ -24,7 +24,6 @@ import {
   IonIcon,
   IonPage, 
   IonPopover,
-  IonTitle,
   IonToolbar,
 } from '@ionic/react';
 
@@ -32,12 +31,10 @@ import {
 // Icons
 import { 
   add,
-  barChartOutline, 
   cashOutline, 
   ellipsisVertical,
   eyeOffOutline,
   eyeOutline,
-  home,
   homeOutline,
   informationCircleOutline,
   layersOutline
@@ -58,10 +55,10 @@ interface AppPage {
 }
 
 const appPages: AppPage[] = [
-  { title: 'dashboard', url: '/dashboard', icon: homeOutline },
-  { title: 'accounts', url: '/accounts', icon: layersOutline },
-  { title: 'Add', url: '/newcategory', icon: add },
-  { title: 'activity', url: '/activity', icon: cashOutline }
+  { title: 'dashboard', url: '/app/dashboard', icon: homeOutline },
+  { title: 'accounts', url: '/app/accounts', icon: layersOutline },
+  { title: 'Add', url: '/app/newcategory', icon: add },
+  { title: 'activity', url: '/app/activity', icon: cashOutline }
 ];
 
 

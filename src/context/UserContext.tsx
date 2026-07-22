@@ -1,6 +1,6 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db, User } from '../db';
+import { db, User, dbReady } from '../db';
 
 interface UserContextType {
   user: User;
@@ -32,17 +32,60 @@ const defaultUser: Omit<User, "userId"> = {
 };
 
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // 1. Fetch the user record dynamically instead of looking for numerical ID 1
+  const [databaseReady, setDatabaseReady] = React.useState(false);
+
+  React.useEffect(() => {
+    dbReady()
+      .then(() => {
+        setDatabaseReady(true);
+      })
+      .catch(err => {
+        console.error("Database initialization failed:", err);
+      });
+  }, []);
+
+
   const user = useLiveQuery(
-    () => db.users.toCollection().first(),
-    []
+    async () => {
+      if (!databaseReady) return undefined;
+  
+      return await db.users.toCollection().first();
+  
+    },
+    [databaseReady]
   );
 
+
+
   // 2. Fetch the "Categoryless" system category (first record or by name)
-  const categorylessId = useLiveQuery(async () => {
-    const category = await db.categories.toCollection().first();
-    // Alternatively: await db.categories.where('name').equals('Categoryless').first();
-    return category?.categoryId ?? '';
+  const categorylessId = useLiveQuery(
+    async () => {
+      if (!databaseReady) return undefined;
+
+      const category = await db.categories
+        .where("categoryName")
+        .equals("Categoryless")
+        .first();
+
+
+      return category?.categoryId ?? "";
+
+    },
+    [databaseReady]
+  );
+
+  React.useEffect(() => {
+    console.log("Calling dbReady...");
+  
+    dbReady()
+      .then(() => {
+        console.log("dbReady resolved");
+        setDatabaseReady(true);
+      })
+      .catch(err => {
+        console.error("dbReady failed", err);
+      });
+  
   }, []);
 
   const updateUser = async (updates: Partial<User>) => {
@@ -59,10 +102,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   // 2. While loading, show a visible indicator instead of returning null (blank page)
-  if (!user || categorylessId === undefined) {
+  if (!user || !categorylessId) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <p>Loading user context...</p>
+      <div style={{
+        padding: 50,
+        color: "white",
+        background: "black"
+      }}>
+        Loading user context...
       </div>
     );
   }

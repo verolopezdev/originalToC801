@@ -14,7 +14,6 @@ import {
   IonHeader, 
   IonImg,
   IonPage,
-  IonTitle, 
   IonToolbar,
 } from '@ionic/react';
 
@@ -25,7 +24,7 @@ import ExportForm from '../components/ExportForm';
 const DefaultPage: React.FC = () => {
   const contentRef = useScrollToTop(); // use the custom hook 
   const { t } = useTranslation();
-  const { themeColor, setThemeColor } = useTheme(); 
+  const { themeColor } = useTheme(); 
   const color = themeColor.split("-")[1]; // Extracts "red"
   
 

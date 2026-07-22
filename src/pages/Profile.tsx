@@ -177,7 +177,7 @@ const Profile: React.FC = () => {
           action: () => setIsModalOpen(false),
         },
       ],
-      destination: '/dashboard'
+      destination: '/app/dashboard'
     });
     setIsModalOpen(true);
   };

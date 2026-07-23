@@ -4,6 +4,7 @@ import { incrementChangeCount } from './services/BackupService';
 
 // GLOBAL FLAGS
 let isPopulating = false;
+let isSyncing = false;
 export const TABLE_NAMES = [
   'users',
   'accounts',
@@ -164,6 +165,7 @@ interface Subcategory {
 export interface Expense {
   expenseId: string;
   realmId?: string;
+  owner?: string;
   userId: string;
   dueDate?: string;
   deletionDate?: string;
@@ -261,19 +263,14 @@ const db = new Dexie('DB', { addons: [dexieCloud] }) as Dexie & {
 export const initializeDatabase = async () => {
   await db.open();
 
-  const userCount = await db.users.count();
-
-  if (userCount === 0) {
-    await seedInitialData();
-  }
 };
 
 db.version(1).stores({
   metadata: 'key',
   users: '@userId, email, realmId',
   accounts: '@accountId, userId, sortOrder, realmId',
-  categories: '@categoryId, &categoryName, realmId',
-  subcategories: '@subcategoryId, &subcategoryName, parentCategoryId, realmId',
+  categories: '@categoryId, categoryName, realmId',
+  subcategories: '@subcategoryId, subcategoryName, parentCategoryId, realmId',
   expenses: '@expenseId, isActive, userId, expenseDate, accountId, categoryId, subcategoryId, expenseCurrencyCode, tripId, seriesId, realmId, [seriesId+expenseDate], [seriesId+installmentIndex], [seriesId+isActive+dueDate], [seriesId+dueDate]',
   trips: '@tripId, tripName, tripIcon, fromDate, toDate, currencyCode, realmId',
   historicCurrencyList: 'id',
@@ -285,6 +282,12 @@ db.cloud.configure({
   databaseUrl: 'https://zxzf58e25.dexie.cloud',
   requireAuth: false,
   customLoginGui: false,
+});
+
+db.cloud.syncState.subscribe(state => {
+  isSyncing =
+    state.phase === "pulling" ||
+    state.phase === "pushing";
 });
 
 export const enableDexieCloud = (databaseUrl = 'https://zxzf58e25.dexie.cloud') => {
@@ -305,7 +308,10 @@ const setupHooks = () => {
     const table = db.table(tableName);
 
     const handleChange = () => {
-      const isBypassed = isPopulating || isSeeding;
+      const isBypassed =
+        isPopulating ||
+        isSeeding ||
+        isSyncing;
 
       if (isBypassed) {
         if (!hasLoggedBypass) {
@@ -451,6 +457,8 @@ export function dbReady() {
 
   return dbReadyPromise;
 }
+
+
 export type { Account, Category, Subcategory, Trip };
 export { db };
 

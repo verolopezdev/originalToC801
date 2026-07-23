@@ -44,6 +44,7 @@ const Plans: React.FC = () => {
 
       await Preferences.set({ key: 'userMode', value: 'account' });
     };
+
   
   
   

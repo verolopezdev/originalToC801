@@ -22,7 +22,7 @@ import {
 // Styles
 import '../Main.css';
 
-const DefaultPage: React.FC = () => {
+const LoginScreen: React.FC = () => {
   const contentRef = useScrollToTop();
   const { t } = useTranslation();
   const history = useHistory();
@@ -65,6 +65,10 @@ const DefaultPage: React.FC = () => {
     try {
       // 1. Ensure Dexie Cloud config is enabled
       //enableDexieCloud();
+
+      db.cloud.syncState.subscribe(state => {
+        console.log("syncState", state);
+      });
 
       // 2. Trigger Dexie Cloud's built-in OTP dialog modal pre-filled with the email
       await db.cloud.login({ email: userEmail });
@@ -142,4 +146,4 @@ const DefaultPage: React.FC = () => {
   );
 };
 
-export default DefaultPage;
+export default LoginScreen;

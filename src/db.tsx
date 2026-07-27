@@ -3,6 +3,7 @@ import dexieCloud from 'dexie-cloud-addon';
 import { incrementChangeCount } from './services/BackupService';
 
 // GLOBAL FLAGS
+let initializing = false;
 let isPopulating = false;
 let isSyncing = false;
 export const TABLE_NAMES = [
@@ -100,7 +101,8 @@ export const getLiveRecordCount = async (): Promise<DbCounts> => {
   };
 };
 
-interface Metadata {
+interface AppMetadata {
+  id: string;
   key: string;
   value: string;
 }
@@ -109,7 +111,6 @@ export type SubscriptionPlan = "free" | "monthly" | "quarterly" | "yearly";
 
 export interface User {
   userId: string;
-  realmId?: string;
   name: string;
   lastName: string;
   email: string;
@@ -129,7 +130,6 @@ export interface User {
 
 interface Account {
   accountId: string;
-  realmId?: string;
   accountName: string;
   accountIdentifier: string;
   accountColor: string;
@@ -141,7 +141,6 @@ interface Account {
 
 interface Category {
   categoryId: string;
-  realmId?: string;
   categoryName: string;
   categoryColor: string;
   categoryIcon: string;
@@ -153,7 +152,6 @@ interface Category {
 
 interface Subcategory {
   subcategoryId: string;
-  realmId?: string;
   subcategoryName: string;
   subcategoryColor: string;
   subcategoryIcon: string;
@@ -164,8 +162,6 @@ interface Subcategory {
 
 export interface Expense {
   expenseId: string;
-  realmId?: string;
-  owner?: string;
   userId: string;
   dueDate?: string;
   deletionDate?: string;
@@ -191,7 +187,6 @@ export type FrequencyUnit = 'week' | 'month' | 'year';
 
 export interface RecurringSeries {
   seriesId: string;
-  realmId?: string;
   userId: string;
   startDate: string;
   interval: number;
@@ -223,7 +218,6 @@ export interface ParsedExpense extends Omit<Expense, 'expenseDate'> {
 interface Trip {
   tripId: string;
   userId: string;
-  realmId?: string;
   tripName: string;
   tripIcon: string;
   fromDate: Date;
@@ -238,6 +232,7 @@ interface HistoricCurrencyList {
 }
 
 export interface AlternativeCurrency {
+  id: string;
   code: string;
   name: string;
   symbol: string;
@@ -248,7 +243,7 @@ export interface AlternativeCurrency {
 
 // 1. Initialize Dexie with the addon attached so schema annotations (@) remain valid
 const db = new Dexie('DB', { addons: [dexieCloud] }) as Dexie & {
-  metadata: EntityTable<Metadata, 'key'>;
+  appmetadata: EntityTable<AppMetadata, 'id'>;
   users: EntityTable<User, 'userId'>;
   accounts: EntityTable<Account, 'accountId'>;
   categories: EntityTable<Category, 'categoryId'>;
@@ -256,32 +251,49 @@ const db = new Dexie('DB', { addons: [dexieCloud] }) as Dexie & {
   expenses: EntityTable<Expense, 'expenseId'>;
   trips: EntityTable<Trip, 'tripId'>;
   historicCurrencyList: EntityTable<HistoricCurrencyList, 'id'>;
-  alternativeCurrencies: EntityTable<AlternativeCurrency, 'code'>;
+  alternativeCurrencies: EntityTable<AlternativeCurrency, 'id'>;
   recurringSeries: EntityTable<RecurringSeries, 'seriesId'>;
 };
 
-export const initializeDatabase = async () => {
-  await db.open();
 
-};
+export async function initializeDatabase() {
+  if (initializing) {
+    console.log("//// Database initialization already running");
+    return;
+  }
+
+  initializing = true;
+
+  try {
+    if (!db.isOpen()) {
+      console.log("//// opening db");
+      await db.open();
+      console.log("//// db opened");
+    }
+
+    console.log("//// Database ready");
+  } finally {
+    initializing = false;
+  }
+}
+
 
 db.version(1).stores({
-  metadata: 'key',
-  users: '@userId, email, realmId',
-  accounts: '@accountId, userId, sortOrder, realmId',
-  categories: '@categoryId, categoryName, realmId',
-  subcategories: '@subcategoryId, subcategoryName, parentCategoryId, realmId',
-  expenses: '@expenseId, isActive, userId, expenseDate, accountId, categoryId, subcategoryId, expenseCurrencyCode, tripId, seriesId, realmId, [seriesId+expenseDate], [seriesId+installmentIndex], [seriesId+isActive+dueDate], [seriesId+dueDate]',
-  trips: '@tripId, tripName, tripIcon, fromDate, toDate, currencyCode, realmId',
+  appmetadata: 'id, key',
+  users: 'userId, email',
+  accounts: 'accountId, userId, sortOrder',
+  categories: 'categoryId, categoryName',
+  subcategories: 'subcategoryId, subcategoryName, parentCategoryId',
+  expenses: 'expenseId, isActive, userId, expenseDate, accountId, categoryId, subcategoryId, expenseCurrencyCode, tripId, seriesId, [seriesId+expenseDate], [seriesId+installmentIndex], [seriesId+isActive+dueDate], [seriesId+dueDate]',
+  trips: 'tripId, tripName, tripIcon, fromDate, toDate, currencyCode',
   historicCurrencyList: 'id',
-  alternativeCurrencies: 'code',
-  recurringSeries: '@seriesId, userId, startDate, interval, unit, totalOccurrences, isActive, lastLoggedDate, moved, categoryId, subcategoryId, accountId, realmId',
+  alternativeCurrencies: 'id, code',
+  recurringSeries: 'seriesId, userId, startDate, interval, unit, totalOccurrences, isActive, lastLoggedDate, moved, categoryId, subcategoryId, accountId',
 });
 
 db.cloud.configure({
-  databaseUrl: 'https://zxzf58e25.dexie.cloud',
+  databaseUrl: 'https://zz8cobd57.dexie.cloud',
   requireAuth: false,
-  customLoginGui: false,
 });
 
 db.cloud.syncState.subscribe(state => {
@@ -290,13 +302,6 @@ db.cloud.syncState.subscribe(state => {
     state.phase === "pushing";
 });
 
-export const enableDexieCloud = (databaseUrl = 'https://zxzf58e25.dexie.cloud') => {
-  db.cloud.configure({
-    databaseUrl,
-    requireAuth: true,
-    customLoginGui: false,
-  });
-};
 
 // HOOK SETUP
 const setupHooks = () => {
@@ -351,23 +356,26 @@ export const seedInitialData = async (): Promise<void> => {
 
     await db.transaction(
       "rw",
-      db.metadata,
+      db.appmetadata,
       db.users,
       db.accounts,
       db.categories,
       async () => {
 
-        await db.metadata.put({
+        await db.appmetadata.put({
+          id: crypto.randomUUID(),
           key: "installationId",
           value: installationId,
         });
 
-        await db.metadata.put({
+        await db.appmetadata.put({
+          id: crypto.randomUUID(),
           key: "createdAt",
           value: Date.now().toString(),
         });
 
         await db.users.add({
+          userId: crypto.randomUUID(),
           name: "",
           lastName: "",
           email: "",
@@ -386,6 +394,7 @@ export const seedInitialData = async (): Promise<void> => {
         } as User);
 
         await db.accounts.add({
+          accountId:crypto.randomUUID(),
           accountName: "Cash",
           accountIdentifier: "",
           accountColor: "cyan",
@@ -414,6 +423,7 @@ export const seedInitialData = async (): Promise<void> => {
 
         await db.categories.bulkAdd(
           defaultCategories.map(cat => ({
+            categoryId:crypto.randomUUID(),
             categoryName: cat.name,
             categoryColor: cat.color,
             categoryIcon: cat.icon,
@@ -440,24 +450,15 @@ let dbReadyPromise: Promise<void> | null = null;
 
 export function dbReady() {
   if (!dbReadyPromise) {
-    dbReadyPromise = (async () => {
-      await initializeDatabase();
-
-      setupHooks();
-
-      const user = await db.users.toCollection().first();
-
-      if (user?.isPremium) {
-        enableDexieCloud();
-      }
-
-      console.log("✅ Database ready");
-    })();
+    console.log("//// Starting database initialization");
+    dbReadyPromise = initializeDatabase();
+    setupHooks();
+  } else {
+    console.log("//// Database initialization already in progress");
   }
 
   return dbReadyPromise;
 }
-
 
 export type { Account, Category, Subcategory, Trip };
 export { db };

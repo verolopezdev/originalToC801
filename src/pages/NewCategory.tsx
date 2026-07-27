@@ -200,13 +200,14 @@ const NewCategory: React.FC = () => {
       await db.transaction('rw', db.categories, async (tx) => {
 
         const categoryId = await tx.categories.add({
-            categoryName,
-            categoryColor,
-            categoryIcon,
-            activeCategory,
-            favouriteCategory,
-            systemCategory,
-            subcategories
+          categoryId: crypto.randomUUID(),
+          categoryName,
+          categoryColor,
+          categoryIcon,
+          activeCategory,
+          favouriteCategory,
+          systemCategory,
+          subcategories
         });
       });
       

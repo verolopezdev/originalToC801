@@ -2,6 +2,8 @@ import { Preferences } from '@capacitor/preferences';
 import { CurrencyType } from "../context/CurrencyContext"; // adjust import
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 
+import { saveAppMetadata } from './appMetadata';
+
 
 export type ExchangeRates = {
   baseCurrency: string;
@@ -297,6 +299,8 @@ export const updateSavedExchangeRates = async (
     key: EXCHANGE_KEY,
     value: JSON.stringify(newRates),
   });
+  await saveAppMetadata(EXCHANGE_KEY, JSON.stringify(newRates));
+  
 
   console.log("[getExchangeRates] - Rates in preferences updated.");
 

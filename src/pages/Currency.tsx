@@ -229,7 +229,9 @@ const Currency: React.FC = () => {
     // It creates a new object called enrichedCurrency by:
     // Spreading all properties from the existing currency object
     // Adding two new properties: thousandSeparator and decimalSeparator
+
     const enrichedCurrency = {
+      id: crypto.randomUUID(),
       ...currency,
       thousandSeparator: exampleFormatted.replace(/\d/g, '').charAt(0),
       decimalSeparator: (1.1).toLocaleString(currency.locale).substring(1, 2),

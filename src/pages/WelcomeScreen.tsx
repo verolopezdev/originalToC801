@@ -1,8 +1,6 @@
 // src/pages/WelcomeScreen.tsx
 import React from 'react';
-import { db, enableDexieCloud, seedInitialData } from '../db';
 import { useHistory } from 'react-router';
-import { Preferences } from '@capacitor/preferences';
 import i18n from '../i18n';
 import { useTranslation } from 'react-i18next';
 
@@ -18,21 +16,12 @@ import {
 const WelcomeScreen: React.FC = () => {
   const history = useHistory();
   const { t } = useTranslation();
-  
 
   const handleContinueFree = async () => {
-    // Save that the user selected free mode
-    await Preferences.set({ key: 'userMode', value: 'free' });
-    await seedInitialData();
-    // Navigate to country selection
     history.push('/select-country');
   };
 
   const handleHaveAccount = async () => {
-    await Preferences.set({ key: 'userMode', value: 'account' });
-    enableDexieCloud();
-
-    // Navigate to your login route
     history.push('/login');
   };
 

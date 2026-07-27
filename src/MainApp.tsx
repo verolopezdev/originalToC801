@@ -1,7 +1,6 @@
 import React from "react";
 import { IonRouterOutlet, IonSplitPane } from "@ionic/react";
 import { Route } from "react-router-dom";
-import { useLocation } from "react-router-dom";
 import { UserProvider } from "./context/UserContext";
 import { ExchangeRateProvider } from "./context/ExchangeRateContext";
 import { DatePickerProvider } from "./context/DatePickerContext";
@@ -9,6 +8,7 @@ import { NumericKeypadProvider } from "./context/NumericKeypadContext";
 import { ExpenseProvider } from "./context/ExpenseContext";
 import { IntervalProvider } from "./context/IntervalContext";
 import { TripProvider } from "./context/TripContext";
+import { AppMetadataProvider } from "./context/AppMetadataContext";
 
 import Menu from "./components/Menu";
 
@@ -87,7 +87,8 @@ const MainApp: React.FC = () => {
  */
 
   return (
-    <UserProvider>
+    <AppMetadataProvider>
+      <UserProvider>
           <ExchangeRateProvider>
             <DatePickerProvider>
               <NumericKeypadProvider>
@@ -159,7 +160,8 @@ const MainApp: React.FC = () => {
               </NumericKeypadProvider>
             </DatePickerProvider>
           </ExchangeRateProvider>
-    </UserProvider>
+      </UserProvider>
+    </AppMetadataProvider>
   );
 };
 

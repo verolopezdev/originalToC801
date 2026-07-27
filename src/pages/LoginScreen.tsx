@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
+import { Preferences } from '@capacitor/preferences';
+
+
 
 // Custom hooks
 import useScrollToTop from '../hooks/useScrollToTop';
 
 import { validateEmail } from '../utils/validateName';
-import { db, enableDexieCloud } from '../db'; // Import db and cloud initializer
+import { restoreAllSyncedPreferences } from '../utils/appMetadata';
+import { db } from '../db'; // Import db and cloud initializer
 
 // Ionic's components
 import { 
@@ -63,20 +67,24 @@ const LoginScreen: React.FC = () => {
 
     setIsLoading(true);
     try {
-      // 1. Ensure Dexie Cloud config is enabled
-      //enableDexieCloud();
 
-      db.cloud.syncState.subscribe(state => {
-        console.log("syncState", state);
-      });
-
-      // 2. Trigger Dexie Cloud's built-in OTP dialog modal pre-filled with the email
       await db.cloud.login({ email: userEmail });
+      
+      await new Promise<void>((resolve) => {
+        const subscription = db.cloud.events.syncComplete.subscribe(() => {
+          subscription.unsubscribe();
+          resolve();
+        });
+      });
+      
+      await restoreAllSyncedPreferences();
 
       console.log("✅ Successfully logged in via Dexie Cloud!");
-      
-      // 3. Navigate the user to their main dashboard or profile
-      history.replace('/app/dashboard');
+      await Preferences.set({ key: 'userMode', value: 'account' });
+
+      window.location.reload(); 
+
+
     } catch (error) {
       console.error("❌ Login cancelled or failed:", error);
     } finally {

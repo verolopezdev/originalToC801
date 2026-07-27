@@ -208,6 +208,7 @@ const NewSubCategory: React.FC = () => {
         async (tx) => {
       
           await tx.subcategories.add({
+            subcategoryId: crypto.randomUUID(),
             subcategoryName,
             subcategoryColor,
             subcategoryIcon,

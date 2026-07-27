@@ -2,6 +2,7 @@ import React, { createContext, useContext, ReactNode } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, User, dbReady } from '../db';
 
+
 interface UserContextType {
   user: User;
   userId: string;
@@ -32,6 +33,7 @@ const defaultUser: Omit<User, "userId"> = {
 };
 
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  
   const [databaseReady, setDatabaseReady] = React.useState(false);
 
   React.useEffect(() => {
@@ -50,7 +52,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (!databaseReady) return undefined;
   
       return await db.users.toCollection().first();
-  
     },
     [databaseReady]
   );
@@ -67,26 +68,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         .equals("Categoryless")
         .first();
 
-
       return category?.categoryId ?? "";
-
     },
     [databaseReady]
   );
-
-  React.useEffect(() => {
-    console.log("Calling dbReady...");
-  
-    dbReady()
-      .then(() => {
-        console.log("dbReady resolved");
-        setDatabaseReady(true);
-      })
-      .catch(err => {
-        console.error("dbReady failed", err);
-      });
-  
-  }, []);
 
   const updateUser = async (updates: Partial<User>) => {
     if (!user?.userId) return;

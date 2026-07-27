@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useEffect, useRef, useState, ReactNode } from 'react';
 import { db } from '../db';
 import { Preferences } from '@capacitor/preferences';
-//import { fetchAndSaveExchangeRates } from "../utils/getExchangeRates";
+
+import { saveAppMetadata } from '../utils/appMetadata';
 
 // Define currency data type
 export interface CurrencyType {
@@ -25,6 +26,7 @@ interface CurrencyContextType {
   currency: Currency;
   allSelectedCurrencies: CurrencyType[];  
   defaultLocaleRef: React.RefObject<string>;
+  reloadCurrencyPreferences: () => Promise<void>; 
   updateCurrency: (updates: Partial<Currency>) => void;
   setDefaultCurrency: (currency: CurrencyType) => void;
   addAlternativeCurrency: (currency: CurrencyType) => void;
@@ -47,23 +49,27 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
   });
 
   const defaultLocaleRef = useRef<string>('en-US');
-
+  let currencyData;
 
   // Load from Preferences or fallback to mock data
   useEffect(() => {
     const loadCurrencyData = async () => {
+
       const { value } = await Preferences.get({ key: 'currency' });
-      let currencyData;
   
       if (value) {
         currencyData = JSON.parse(value);
+        console.log("**** Loaded from Preferences", currencyData);
       } else {
         const response = await fetch('/mockCurrencyData.json');
         currencyData = await response.json();
-        await Preferences.set({
+        
+        /* await Preferences.set({
           key: 'currency',
           value: JSON.stringify(currencyData),
         });
+        await saveAppMetadata('currency', JSON.stringify(currencyData)); */
+        
       }
   
       // Set ref before state to make sure it's ready
@@ -78,6 +84,16 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
   }, []);
 
 
+  const reloadCurrencyPreferences = async () => {
+    const { value } = await Preferences.get({ key: 'currency' });
+    if (value) {
+      currencyData = JSON.parse(value);
+      setCurrency(currencyData);
+    }
+  };
+
+
+
   // update the ref if locale changes dynamically
   useEffect(() => {
     if (currency.defaultCurrency.locale) {
@@ -88,10 +104,14 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   // Persist currency to Preferences
   const persistCurrency = async (updatedCurrency: Currency) => {
+    console.log("**** persistCurrency", updatedCurrency);
+
     await Preferences.set({
       key: 'currency',
       value: JSON.stringify(updatedCurrency),
     });
+    
+    await saveAppMetadata('currency', JSON.stringify(updatedCurrency));
   };
 
 
@@ -248,6 +268,7 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
         currency,
         allSelectedCurrencies,
         defaultLocaleRef,
+        reloadCurrencyPreferences,
         updateCurrency,
         setDefaultCurrency,
         addAlternativeCurrency,

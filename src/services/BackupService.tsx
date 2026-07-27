@@ -681,7 +681,7 @@ export const handleStartupRecovery = async () => {
    * If it changes unexpectedly, it usually means the database
    * was deleted and recreated.
    */
-  const installationIdRecord = await db.metadata.get(
+  const installationIdRecord = await db.appmetadata.get(
     "installationId"
   );
 
@@ -890,7 +890,7 @@ export const handleStartupRecovery = async () => {
    * - Upgrade diagnostics
    * - Support investigations
    */
-  const versionRecord = await db.metadata.get(
+  const versionRecord = await db.appmetadata.get(
     "createdWithVersion"
   );
 
@@ -905,12 +905,14 @@ export const handleStartupRecovery = async () => {
       build = appInfo.build;
     }
   
-    await db.metadata.bulkPut([
+    await db.appmetadata.bulkPut([
       {
+        id: crypto.randomUUID(),
         key: "createdWithVersion",
         value: version,
       },
       {
+        id: crypto.randomUUID(),
         key: "createdWithBuild",
         value: build,
       },

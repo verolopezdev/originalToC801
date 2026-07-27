@@ -279,6 +279,7 @@ const NewTrip: React.FC = () => {
         async (tx) => {
           await tx.trips.add({
             userId,
+            tripId: crypto.randomUUID(),
             tripName,
             tripIcon,
             fromDate,

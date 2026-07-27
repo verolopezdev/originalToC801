@@ -4,12 +4,17 @@ import i18n from '../i18n';
 import { useTranslation } from 'react-i18next';
 import { Preferences } from '@capacitor/preferences';
 import { Device } from '@capacitor/device';
+import { seedInitialData } from '../db';
+
 
 // Context
 import { useCurrency } from '../context/CurrencyContext';
 
 // Custom hooks
 import useScrollToTop from '../hooks/useScrollToTop';
+
+// Utility functions
+import { saveAppMetadata } from '../utils/appMetadata';
 
 // Ionic components
 import { 
@@ -150,6 +155,7 @@ const CountrySelectionPage: React.FC = () => {
     return matchesCountry || matchesNative;
   });
 
+
   // 4. Immutable handleContinue (Prevents mutating state objects)
   const handleContinue = async () => {
     if (!selectedCountry) return;
@@ -162,6 +168,8 @@ const CountrySelectionPage: React.FC = () => {
 
     await i18n.changeLanguage(langToUse);
     await Preferences.set({ key: 'i18nextLng', value: langToUse });
+    await saveAppMetadata('i18nextLng', langToUse);
+
 
     const numberFormat = new Intl.NumberFormat(countryToSave.locale);
     const exampleFormatted = numberFormat.format(1234567.89);
@@ -171,8 +179,12 @@ const CountrySelectionPage: React.FC = () => {
 
     setDefaultCurrency(countryToSave);
     updateActualCurrency(countryToSave);
-
+    
+    await seedInitialData();  
     await Preferences.set({ key: 'selectedCountry', value: countryToSave.country });
+    await saveAppMetadata('selectedCountry', countryToSave.country);
+    await Preferences.set({ key: 'userMode', value: 'free' });
+
     history.replace('/app/dashboard');
   };
 

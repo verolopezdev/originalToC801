@@ -3,6 +3,8 @@ import { IonSelect, IonSelectOption } from '@ionic/react';
 import { useTranslation } from 'react-i18next';
 import { Preferences } from '@capacitor/preferences';
 
+import { saveAppMetadata } from '../utils/appMetadata';
+
 const LanguageSelector: React.FC = () => {
   const { i18n, t } = useTranslation();
 
@@ -26,6 +28,8 @@ const LanguageSelector: React.FC = () => {
 
     // Save to Capacitor Preferences
     await Preferences.set({ key: 'i18nextLng', value });
+    await saveAppMetadata('i18nextLng', value);
+    
 
     // Change i18n language
     i18n.changeLanguage(value);

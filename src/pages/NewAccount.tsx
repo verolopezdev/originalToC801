@@ -173,13 +173,14 @@ const NewAccount: React.FC = () => {
       await db.transaction('rw', db.accounts, async (tx) => {
         
         const accountId = await tx.accounts.add({
-            accountName,
-            accountIdentifier,
-            accountColor,
-            accountLogo,
-            activeAccount: true,
-            userId,
-            sortOrder
+          accountId: crypto.randomUUID(),
+          accountName,
+          accountIdentifier,
+          accountColor,
+          accountLogo,
+          activeAccount: true,
+          userId,
+          sortOrder
         });
         
       });

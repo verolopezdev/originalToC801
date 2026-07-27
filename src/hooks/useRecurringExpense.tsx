@@ -87,6 +87,7 @@ export const useRecurringExpense = () => {
         if (!isRecurring) {
           await expensesTable.add({
             ...base,
+            expenseId: crypto.randomUUID(),
             expenseDate: selectedDate.toISOString(),
             isActive: 1,
           });
@@ -95,7 +96,8 @@ export const useRecurringExpense = () => {
           return;
         }
 
-        const seriesId = `rcr_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+        //const seriesId = `rcr_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+        const seriesId = crypto.randomUUID();
         const isFutureExpense = dayjs(selectedDate).isAfter(dayjs());
 
         // Save recurring series metadata regardless of endCondition

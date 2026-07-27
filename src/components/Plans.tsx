@@ -106,7 +106,6 @@ const Plans: React.FC = () => {
         buttons={['OK']}
       />
 
-      {import.meta.env.DEV && (
         <IonButton
           expand="block"
           color="danger"
@@ -114,7 +113,6 @@ const Plans: React.FC = () => {
         >
           Simulate Premium
         </IonButton>
-      )}
       
 {/*       <IonButton expand="block" onClick={handleSubscribe}>
         {user.subscriptionPlan !== 'free' && user.isPremium === false ? ('Renew Subscription') : ('Subscribe Now')}

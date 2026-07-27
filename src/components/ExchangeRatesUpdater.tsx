@@ -4,6 +4,7 @@ import { App as CapacitorApp } from '@capacitor/app';
 
 import { useCurrency } from '../context/CurrencyContext'; // Import the useUser hook
 
+import { saveAppMetadata } from "../utils/appMetadata";
 
 const primaryUrl =
   "https://exchangerate.datasur.net.ar/Exchange-rates/"
@@ -120,6 +121,9 @@ const ExchangeRatesUpdater: React.FC = () => {
         key: EXCHANGE_KEY,
         value: JSON.stringify(dataToStore)
       });
+
+      await saveAppMetadata(EXCHANGE_KEY, JSON.stringify(dataToStore));
+      
     } catch (error) {
       console.error("Error saving currencies to Preferences", error);
     }

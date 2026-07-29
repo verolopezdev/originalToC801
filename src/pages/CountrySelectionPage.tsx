@@ -177,10 +177,11 @@ const CountrySelectionPage: React.FC = () => {
     countryToSave.thousandSeparator = exampleFormatted.replace(/\d/g, '').charAt(0);
     countryToSave.decimalSeparator = (1.1).toLocaleString(countryToSave.locale).substring(1, 2);
 
-    setDefaultCurrency(countryToSave);
-    updateActualCurrency(countryToSave);
     
-    await seedInitialData();  
+    await seedInitialData(countryToSave);  
+    await setDefaultCurrency(countryToSave);
+    await updateActualCurrency(countryToSave);
+
     await Preferences.set({ key: 'selectedCountry', value: countryToSave.country });
     await saveAppMetadata('selectedCountry', countryToSave.country);
     await Preferences.set({ key: 'userMode', value: 'free' });

@@ -1,8 +1,6 @@
-import React, { createContext, useContext, useEffect, useRef, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useRef, ReactNode } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
-import { Preferences } from '@capacitor/preferences';
-
-import { saveAppMetadata } from '../utils/appMetadata';
 
 // Define currency data type
 export interface CurrencyType {
@@ -24,241 +22,286 @@ interface Currency {
 
 interface CurrencyContextType {
   currency: Currency;
-  allSelectedCurrencies: CurrencyType[];  
+  allSelectedCurrencies: CurrencyType[];
   defaultLocaleRef: React.RefObject<string>;
-  reloadCurrencyPreferences: () => Promise<void>; 
-  updateCurrency: (updates: Partial<Currency>) => void;
-  setDefaultCurrency: (currency: CurrencyType) => void;
-  addAlternativeCurrency: (currency: CurrencyType) => void;
-  removeAlternativeCurrency: (code: string) => void;
-  updateTravelCurrency: (currency: CurrencyType) => void;
-  clearTravelCurrency: () => void;
-  updateActualCurrency: (currency: CurrencyType) => void;
-  syncAlternativeCurrenciesFromDexie: () => Promise<void>;
+
+  updateCurrency: (updates: Partial<Currency>) => Promise<void>;
+  setDefaultCurrency: (currency: CurrencyType) => Promise<void>;
+  updateActualCurrency: (currency: CurrencyType) => Promise<void>;
+  addAlternativeCurrency: (currency: CurrencyType) => Promise<void>;
+  removeAlternativeCurrency: (code: string) => Promise<void>;
+  updateTravelCurrency: (currency: CurrencyType) => Promise<void>;
+  clearTravelCurrency: () => Promise<void>;
 }
+
+
+
+/**
+ * Temporary fallback used while the settings record is loading.
+ *
+ * The application should normally replace this immediately with the user's
+ * persisted default currency from the database.
+ */
+export const DEFAULT_CURRENCY: CurrencyType = {
+  name: "US Dollar",
+  code: "USD",
+  symbol: "$",
+  locale: "en-US",
+  thousandSeparator: ",",
+  decimalSeparator: ".",
+};
+
+
+
+/**
+ * Returns the single user settings record.
+ *
+ * IMPORTANT:
+ * Dexie Cloud uses UUIDs as primary keys, so we cannot use:
+ *
+ *   db.userSettings.get("settings")
+ *
+ * because "settings" is the value of the `key` field, not the primary key.
+ * Instead we query by the indexed `key` property.
+ */
+const getSettings = () =>
+  db.userSettings
+    .where("key")
+    .equals("settings")
+    .first();
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
 export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [currency, setCurrency] = useState<Currency>({
-    isTravelMode: false,
-    defaultCurrency: { name: '', code: '', locale: '', symbol: '', thousandSeparator: '', decimalSeparator: '' },
-    travelCurrency: null,
-    alternativeCurrencies: [],
-    actualCurrency: { name: '', code: '', locale: '', symbol: '', thousandSeparator: '', decimalSeparator: '' },
-  });
 
-  const defaultLocaleRef = useRef<string>('en-US');
-  let currencyData;
+  const defaultLocaleRef = useRef("en-US");
 
-  // Load from Preferences or fallback to mock data
-  useEffect(() => {
-    const loadCurrencyData = async () => {
+  /**
+   * Live subscription to the user settings.
+   *
+   * Whenever the settings record changes, Dexie automatically re-runs
+   * getSettings() and React re-renders this provider.
+   */
+  const settings = useLiveQuery(getSettings, []);
 
-      const { value } = await Preferences.get({ key: 'currency' });
+  const alternativeCurrencies = useLiveQuery(
+    () => db.alternativeCurrencies.toArray(),
+    []
+  );
+
+
+  /**
+   * Builds the currency object exposed by the context.
+   *
+   * This object is derived from the database settings plus the list of
+   * alternative currencies.
+   *
+   * A fallback currency is provided only while the settings record is still
+   * loading during app startup.
+   */
+  const currency = useMemo<Currency>(() => {
+    const defaultCurrency =
+      settings?.defaultCurrency ?? DEFAULT_CURRENCY;
   
-      if (value) {
-        currencyData = JSON.parse(value);
-        console.log("**** Loaded from Preferences", currencyData);
-      } else {
-        const response = await fetch('/mockCurrencyData.json');
-        currencyData = await response.json();
-        
-        /* await Preferences.set({
-          key: 'currency',
-          value: JSON.stringify(currencyData),
-        });
-        await saveAppMetadata('currency', JSON.stringify(currencyData)); */
-        
-      }
+    const travelCurrency =
+      settings?.travelCurrency ?? null;
   
-      // Set ref before state to make sure it's ready
-      if (currencyData.defaultCurrency?.locale) {
-        defaultLocaleRef.current = currencyData.defaultCurrency.locale;
-      }
+    const isTravelMode =
+      settings?.isTravelMode ?? false;
   
-      setCurrency(currencyData);
+    return {
+      defaultCurrency,
+      travelCurrency,
+      isTravelMode,
+      alternativeCurrencies: alternativeCurrencies ?? [],
+      actualCurrency:
+        isTravelMode && travelCurrency
+          ? travelCurrency
+          : defaultCurrency,
     };
-  
-    loadCurrencyData();
-  }, []);
+  }, [settings, alternativeCurrencies]);
 
 
-  const reloadCurrencyPreferences = async () => {
-    const { value } = await Preferences.get({ key: 'currency' });
-    if (value) {
-      currencyData = JSON.parse(value);
-      setCurrency(currencyData);
-    }
-  };
+  /**
+   * Convenience list used throughout the app.
+   *
+   * Combines:
+   *   - the default currency
+   *   - all alternative currencies
+   *
+   * and sorts them alphabetically by currency code.
+   */
+  const allSelectedCurrencies = useMemo(() => {
+
+    const list = [
+      ...(currency.defaultCurrency ? [currency.defaultCurrency] : []),
+      ...(currency.alternativeCurrencies ?? []),
+    ];
+
+    return list.sort((a, b) => a.code.localeCompare(b.code));
+
+  }, [currency]);
 
 
 
-  // update the ref if locale changes dynamically
+  /**
+   * Stores the current default locale in a mutable ref.
+   *
+   * Using a ref allows non-React code to read the latest locale without
+   * triggering React re-renders.
+   */
   useEffect(() => {
-    if (currency.defaultCurrency.locale) {
-      defaultLocaleRef.current = currency.defaultCurrency.locale;
+    defaultLocaleRef.current = currency.defaultCurrency.locale;
+  }, [currency.defaultCurrency]);
+
+
+  
+  /**
+   * Generic helper that updates one or more user settings.
+   *
+   * Only the properties present in `updates` are written.
+   * The existing record is preserved by spreading the current settings first.
+   */
+  const updateCurrency = async (updates: Partial<Currency>) => {
+    const settings = await getSettings();
+
+    if (!settings) {
+      console.error("User settings not found.");
+      return;
     }
-  }, [currency.defaultCurrency.locale]);
 
+    await db.userSettings.put({
+      ...settings,
+      ...(updates.defaultCurrency && {
+        defaultCurrency: updates.defaultCurrency,
+      }),
 
-  // Persist currency to Preferences
-  const persistCurrency = async (updatedCurrency: Currency) => {
-    console.log("**** persistCurrency", updatedCurrency);
+      ...(updates.travelCurrency !== undefined && {
+        travelCurrency: updates.travelCurrency,
+      }),
 
-    await Preferences.set({
-      key: 'currency',
-      value: JSON.stringify(updatedCurrency),
+      ...(updates.isTravelMode !== undefined && {
+        isTravelMode: updates.isTravelMode,
+      }),
     });
-    
-    await saveAppMetadata('currency', JSON.stringify(updatedCurrency));
+
   };
 
 
-  // Sync alternative currencies from Dexie to Preferences when restoring db
-  const syncAlternativeCurrenciesFromDexie = async () => {
-    try {
-      // 1. Fetch alternative currencies from Dexie:
-      const alternativeCurrencies = await db.alternativeCurrencies.toArray();
+
+  /**
+   * Changes the application's default currency.
+   *
+   * If Travel Mode is disabled, the actual currency also becomes the new
+   * default currency.
+   *
+   * If Travel Mode is enabled, the actual currency remains unchanged because
+   * it is controlled by the selected travel currency.
+   */
+  const setDefaultCurrency = async (newCurrency: CurrencyType) => {
+    const settings = await getSettings();
   
-      // 2. Merge into updated currency object
-      const updated = {
-        ...currency,  // Copy everything from the current currency object (...currency)
-        alternativeCurrencies, // Replace the alternativeCurrencies field with the version you just read from the database
-      };
-  
-      // 3. Set currency and persist it
-      setCurrency(updated);
-      await persistCurrency(updated);
-    } catch (error) {
-      console.error("Failed to sync currencies from Dexie:", error);
+    if (!settings) {
+      throw new Error("Settings record not found.");
     }
+  
+    await db.userSettings.put({
+      ...settings,
+      defaultCurrency: newCurrency,
+      actualCurrency: settings.isTravelMode
+        ? settings.actualCurrency
+        : newCurrency,
+    });
   };
+
   
 
-  const updateCurrency = (updates: Partial<Currency>) => {
-    setCurrency((prev) => {
-      const updated = { ...prev, ...updates };
-      persistCurrency(updated);
-      return updated;
-    });
-  };
-
-
-  const setDefaultCurrency = (newDefaultCurrency: CurrencyType) => {
-    setCurrency((prev) => {
-      const updated = {
-        ...prev,
-        defaultCurrency: { ...prev.defaultCurrency, ...newDefaultCurrency },
-      };
-      persistCurrency(updated);
-      return updated;
-    });
-  };
-
-  // This function adds a new currency to the list of alternativeCurrencies in your app's state, persists to Preferences and saves it to Dexie.
-  // You're defining an async function that takes a CurrencyType object called newCurrency
-  const addAlternativeCurrency = async (newCurrency: CurrencyType) => {
-    // You are updating the state using the React state updater function. The prev parameter gives you the previous currency state
-    setCurrency((prev) => {
-      const updated = {
-        ...prev,   // Copying everything from the previous state prev (...prev)
-        alternativeCurrencies: [
-          ...(prev.alternativeCurrencies ?? []),   // prev.alternativeCurrencies ?? [] ensures that if it's null or undefined, you start with an empty array.
-          newCurrency, // newCurrency is added at the end
-        ],
-      };
-      persistCurrency(updated); 
-      return updated;  // This returns the updated object to setCurrency
-    });
-
-  // Save to Dexie
-  try {
-    await db.transaction(
-      'rw', 
-      db.alternativeCurrencies,
-      async (tx) => {
-        await tx.alternativeCurrencies.put(newCurrency); // insert or update by `code` if the currency already exists, it will be updated.
-      }
-    );
-
-  } catch (error) {
-    console.error('Failed to save to Dexie:', error);
-  }
-};
+  /**
+   * Updates only the current working currency.
+   *
+   * This is the currency used when creating new expenses and may differ from
+   * the default currency while Travel Mode is active.
+   */
+  const updateActualCurrency = async (newCurrency: CurrencyType) => {
+    const settings = await getSettings();
   
+    if (!settings) {
+      console.error("User settings not found.");
+      return;
+    }
+  
+    await db.userSettings.put({
+      ...settings,
+      actualCurrency: newCurrency,
+    });
+  };
 
+
+
+  /**
+   * Enables Travel Mode.
+   *
+   * The selected travel currency becomes both:
+   *   - the stored travel currency
+   *   - the current working currency
+   */
+  const updateTravelCurrency = async (newCurrency: CurrencyType) => {
+    const settings = await getSettings();
+  
+    if (!settings) {
+      console.error("User settings not found.");
+      return;
+    }
+  
+    await db.userSettings.put({
+      ...settings,
+      travelCurrency: newCurrency,
+      actualCurrency: newCurrency,
+      isTravelMode: true,
+    });
+  };
+
+
+
+  /**
+   * Disables Travel Mode.
+   *
+   * The travel currency is cleared and the working currency returns to the
+   * default currency.
+   */
+  const clearTravelCurrency = async () => {
+    const settings = await getSettings();
+  
+    if (!settings) return;
+  
+    await db.userSettings.put({
+      ...settings,
+      travelCurrency: null,
+      actualCurrency: settings.defaultCurrency,
+      isTravelMode: false,
+    });
+  };
+
+
+
+  /**
+   * Adds a selectable alternative currency.
+   *
+   * The currency is stored in its own table because multiple records can
+   * exist for a user.
+   */
+  const addAlternativeCurrency = async (currency: CurrencyType) => {
+    await db.alternativeCurrencies.put(currency);
+  };
+
+
+
+  /**
+   * Removes an alternative currency by its primary key (currency code).
+   */
   const removeAlternativeCurrency = async (code: string) => {
-    setCurrency((prev) => {
-      const updated = {
-        ...prev,
-        alternativeCurrencies: prev.alternativeCurrencies.filter((alt) => alt.code !== code),
-      };
-      persistCurrency(updated);
-      return updated;
-    });
-
-    // Delete from Dexie
-    try {
-      await db.transaction(
-        'rw', 
-        db.alternativeCurrencies,
-        async (tx) => {
-          await tx.alternativeCurrencies.delete(code);
-        }
-      );
-
-    } catch (error) {
-      console.error('Failed to delete from Dexie:', error);
-    }
+    await db.alternativeCurrencies.delete(code);
   };
-
-
-  const updateTravelCurrency = (newCurrency: CurrencyType) => {
-    setCurrency((prev) => {
-      const updated = {
-        ...prev,
-        travelCurrency: newCurrency,
-        actualCurrency: newCurrency,
-      };
-      persistCurrency(updated);
-      return updated;
-    });
-  };
-
-
-  const clearTravelCurrency = () => {
-    setCurrency((prev) => {
-      const updated = {
-        ...prev,
-        travelCurrency: null,
-        actualCurrency: prev.defaultCurrency,
-      };
-      persistCurrency(updated);
-      return updated;
-    });
-  };
-
-
-  const updateActualCurrency = (newCurrency: CurrencyType) => {
-    setCurrency((prev) => {
-      const updated = {
-        ...prev,
-        actualCurrency: newCurrency,
-      };
-      persistCurrency(updated);
-      return updated;
-    });
-  };
-
-
-
-  const allSelectedCurrencies: CurrencyType[] = [
-    currency.defaultCurrency,
-    ...(currency.alternativeCurrencies || [])
-      .slice()
-      .sort((a, b) => a.code.localeCompare(b.name)),
-  ];
 
 
 
@@ -268,15 +311,13 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
         currency,
         allSelectedCurrencies,
         defaultLocaleRef,
-        reloadCurrencyPreferences,
         updateCurrency,
         setDefaultCurrency,
+        updateActualCurrency,
         addAlternativeCurrency,
         removeAlternativeCurrency,
         updateTravelCurrency,
         clearTravelCurrency,
-        updateActualCurrency,
-        syncAlternativeCurrenciesFromDexie,
       }}
     >
       {children}
@@ -286,8 +327,10 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
 
 export const useCurrency = () => {
   const context = useContext(CurrencyContext);
+
   if (!context) {
-    throw new Error('useCurrency must be used within a CurrencyProvider');
+    throw new Error("useCurrency must be used within a CurrencyProvider");
   }
+
   return context;
 };

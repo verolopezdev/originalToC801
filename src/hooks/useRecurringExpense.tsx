@@ -139,6 +139,7 @@ export const useRecurringExpense = () => {
           
           await expensesTable.add({
             ...base,
+            expenseId: crypto.randomUUID(),
             dueDate: selectedDate.toISOString(),
             expenseDate: selectedDate.toISOString(),
             seriesId,

@@ -27,7 +27,6 @@ interface FooterProps {
 const Footer: React.FC<FooterProps> = ({ appPages }) => {   
   const { t } = useTranslation();
   
-  
   return (
     <IonFooter className="footer">
       <IonToolbar>

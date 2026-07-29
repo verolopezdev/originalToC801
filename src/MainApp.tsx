@@ -8,7 +8,6 @@ import { NumericKeypadProvider } from "./context/NumericKeypadContext";
 import { ExpenseProvider } from "./context/ExpenseContext";
 import { IntervalProvider } from "./context/IntervalContext";
 import { TripProvider } from "./context/TripContext";
-import { AppMetadataProvider } from "./context/AppMetadataContext";
 
 import Menu from "./components/Menu";
 
@@ -38,7 +37,6 @@ import NewCategory from "./pages/NewCategory";
 import NewExpense from "./pages/NewExpense";
 import NewSubCategory from "./pages/NewSubCategory";
 import NewTrip from "./pages/NewTrip";
-import OtherActions from "./pages/OtherActions";
 import OtherPeriods from "./pages/OtherPeriods";
 import Profile from "./pages/Profile";
 import Reccurrences from "./pages/Recurrences";
@@ -87,7 +85,6 @@ const MainApp: React.FC = () => {
  */
 
   return (
-    <AppMetadataProvider>
       <UserProvider>
           <ExchangeRateProvider>
             <DatePickerProvider>
@@ -111,7 +108,6 @@ const MainApp: React.FC = () => {
                           <Route path="/app/default" component={DefaultPage} exact />
 
                           <Route path="/app/devFileExplorer" component={FileExplorer} exact />
-                          <Route path="/app/devOtherActions" component={OtherActions} exact />
                           <Route path="/app/devSeeding" component={SeedExpensesPage} exact />
 
                           <Route path="/app/editaccount/:accountId" component={EditAccount} exact />
@@ -161,7 +157,6 @@ const MainApp: React.FC = () => {
             </DatePickerProvider>
           </ExchangeRateProvider>
       </UserProvider>
-    </AppMetadataProvider>
   );
 };
 

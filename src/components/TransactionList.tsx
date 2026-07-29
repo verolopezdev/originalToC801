@@ -43,7 +43,6 @@ const TransactionList: React.FC<Props> = ({
   const limit = fixedLimit || null;
 
   const [expenses, setExpenses] = useState<ParsedExpense[]>([]); // list of currently loaded expenses
-  const [isLoading, setIsLoading] = useState(true); // New state to track loading
   const [hasLoaded, setHasLoaded] = useState(false);
 
   const isFetchingRef = useRef(false);
@@ -70,9 +69,10 @@ const TransactionList: React.FC<Props> = ({
   const loadTransactions = async () => {
     if (isFetchingRef.current) return;
     isFetchingRef.current = true; // Start fetching
+    
+    setHasLoaded(false); // <--- Add this! Hide content while fetching
 
     try {
-      // Pass the calculated 'limit' and 'reverse' to fetchExpenses
       const result = await fetchExpenses(limit, reverse);
       setExpenses(result);
     } catch (error) {

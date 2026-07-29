@@ -61,7 +61,7 @@ interface AppPage {
 const appPages: AppPage[] = [
   { title: 'dashboard', url: '/app/dashboard', icon: homeOutline },
   { title: 'accounts', url: '/app/accounts', icon: layersOutline },
-  { title: 'Add', url: '/app/newexpense/0', icon: add },
+  { title: 'Add', url: '/app/newexpense/0', icon: add },  
   { title: 'activity', url: '/app/activity', icon: cash }
 ];
 
@@ -162,6 +162,23 @@ const Activity: React.FC = () => {
     });
   }, [allAccounts, usedAccountIdsInPeriod, t]);
 
+
+  useEffect(() => {
+    if (accountsToShow.length === 0) {
+      setSelectedCardId('');
+      return;
+    }
+  
+    const selectedStillExists = accountsToShow.some(
+      account => account.accountId === selectedCardId
+    );
+  
+    if (!selectedStillExists) {
+      setSelectedCardId(accountsToShow[0].accountId!);
+    }
+  }, [accountsToShow, selectedCardId]);
+
+
   // Load general interval state (weekly, monthly, yearly)
   useEffect(() => {
     if (interval) {
@@ -170,7 +187,7 @@ const Activity: React.FC = () => {
   }, [interval]);
   
 
-  const sortedAccounts = useMemo(() => {
+/*   const sortedAccounts = useMemo(() => {
     if (!accounts) return [];
   
     // Sort all accounts based on three criteria:
@@ -197,6 +214,7 @@ const Activity: React.FC = () => {
       return a.sortOrder - b.sortOrder;
     });
   }, [accounts]);   
+ */
 
   // Handle selected card id change from SliderComponent
   const handleAccountSelect = (accountId: string) => {
@@ -208,7 +226,7 @@ const Activity: React.FC = () => {
   const translatedMenuItems = appPages.map((item) => ({
     ...item,
     title: t(`common.${item.title}`, { defaultValue: item.title }),
-    url: item.title === 'Add' ? `/app/newexpense/${selectedCardId}` : item.url,
+    url: item.title === 'Add' ? `/app/newexpense/${selectedCardId}` : item.url, 
   }));
 
 

@@ -92,7 +92,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       <div style={{
         padding: 50,
         color: "white",
-        background: "black"
       }}>
         Loading user context...
       </div>

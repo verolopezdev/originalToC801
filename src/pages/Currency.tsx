@@ -101,68 +101,76 @@ const Currency: React.FC = () => {
 
   // Initialize state from currency context
   useEffect(() => {
-    if (currency) {
-      setSelectedCurrency(currency.defaultCurrency || undefined);
-      setActualCurrency(currency.actualCurrency || undefined);
-      setAlternativeCurrencies(allSelectedCurrencies.slice(1));
-      
-      const checkForDefaultCurrency = async () => {
-        const result = await db.expenses
-          .where('expenseCurrencyCode')
-          .equals(currency.defaultCurrency.code)
-          .first();
+    if (!currency) return;
   
-        setHasDefaultCurrencyExpense(!!result); // true if found, false if not
-      };
+    setSelectedCurrency(currency.defaultCurrency ?? undefined);
+    setActualCurrency(currency.actualCurrency ?? undefined);
+    setAlternativeCurrencies(allSelectedCurrencies.slice(1));
   
-      checkForDefaultCurrency();
-
-      //refreshRates();
-    }
-  }, [currency]);
-
-  // Get every alternative currency in use
-  useEffect(() => {
-    if(!currency.defaultCurrency.code) return;
-
-    const fetchUsedCurrencyCodes = async () => {
-      // 1. Get expense currency codes (from this year)
-      const now = new Date();
-      const startOfYear = new Date(now.getFullYear(), 0, 1);
-      const endOfYear = new Date(now.getFullYear() + 1, 0, 1);
+    const checkForDefaultCurrency = async () => {
+      if (!currency.defaultCurrency) {
+        setHasDefaultCurrencyExpense(false);
+        return;
+      }
   
-      const expenseCodes = await db.expenses
-        .where('expenseDate')
-        .between(startOfYear.toISOString(), endOfYear.toISOString(), true, false)
-        .toArray();
+      const result = await db.expenses
+        .where("expenseCurrencyCode")
+        .equals(currency.defaultCurrency.code)
+        .first();
   
-      const filteredExpenseCodes = expenseCodes
-        .map(e => e.expenseCurrencyCode)
-        .filter(code => code !== currency.defaultCurrency.code);
-  
-      // 2. Get trip currency codes (no date filtering)
-      const tripCodes = await db.trips
-        .toArray(); 
-  
-      const filteredTripCodes = tripCodes
-        .map(t => t.currencyCode)
-        .filter(code => code !== currency.defaultCurrency.code);
-
-      // 3. Get historic currency codes
-      const historicList = await db.historicCurrencyList.get('all');
-      const historicCurrencyCodes = historicList?.currencies ?? [];
-
-      // 4. Merge and deduplicate
-      const allCodes = [...filteredExpenseCodes, ...filteredTripCodes, ...historicCurrencyCodes];
-      const distinctCodes = Array.from(new Set(allCodes));
-  
-      // 5. Update state
-      setUsedCodes(distinctCodes);
+      setHasDefaultCurrencyExpense(!!result);
     };
   
-    fetchUsedCurrencyCodes();
-  }, [currency.defaultCurrency.code]);
-  
+    checkForDefaultCurrency();
+  }, [currency]);
+
+
+  // Get every alternative currency in use
+useEffect(() => {
+  const defaultCurrency = currency.defaultCurrency;
+
+  if (!defaultCurrency) return;
+
+  const fetchUsedCurrencyCodes = async () => {
+    // 1. Get expense currency codes (from this year)
+    const now = new Date();
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+    const endOfYear = new Date(now.getFullYear() + 1, 0, 1);
+
+    const expenseCodes = await db.expenses
+      .where("expenseDate")
+      .between(startOfYear.toISOString(), endOfYear.toISOString(), true, false)
+      .toArray();
+
+    const filteredExpenseCodes = expenseCodes
+      .map(e => e.expenseCurrencyCode)
+      .filter(code => code !== defaultCurrency.code);
+
+    // 2. Get trip currency codes
+    const tripCodes = await db.trips.toArray();
+
+    const filteredTripCodes = tripCodes
+      .map(t => t.currencyCode)
+      .filter(code => code !== defaultCurrency.code);
+
+    // 3. Get historic currency codes
+    const historicList = await db.historicCurrencyList.get("all");
+    const historicCurrencyCodes = historicList?.currencies ?? [];
+
+    // 4. Merge and deduplicate
+    const allCodes = [
+      ...filteredExpenseCodes,
+      ...filteredTripCodes,
+      ...historicCurrencyCodes,
+    ];
+    const distinctCodes = Array.from(new Set(allCodes));
+
+    // 5. Update state
+    setUsedCodes(distinctCodes);
+  };
+
+  fetchUsedCurrencyCodes();
+}, [currency.defaultCurrency]);  
 
   const handleCurrencyChange = (currency: CurrencyData) => {
     // thousands and decimals separators
@@ -423,7 +431,7 @@ const Currency: React.FC = () => {
                 className='item-transparent'
                   key={index}
                   button
-                  disabled={currency.defaultCurrency.code === currencyItem.code}
+                  disabled={currency.defaultCurrency?.code === currencyItem.code}
                   onClick={() => {
                     handleCurrencyChange(currencyItem);
                     setCurrencySearch('');

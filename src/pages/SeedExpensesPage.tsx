@@ -270,10 +270,9 @@ const SeedExpensesPage: React.FC = () => {
 
         const addExpense = (date: Date, categoryId: any, amount: number, note: string) => {
           expenses.push({
-            userId,
+            expenseId: crypto.randomUUID(),
             accountId, // Dynamically set from DB
             categoryId, // Dynamically set from DB
-            // expenseId is omitted to allow Dexie Cloud auto-generation
             subcategoryId: 0,
             expenseNote: note,
             expenseAmountDefault: amount,

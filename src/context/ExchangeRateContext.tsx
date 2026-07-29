@@ -93,49 +93,24 @@ export const ExchangeRateProvider: React.FC<{ children: React.ReactNode }> = ({ 
   // The listener is removed during cleanup to prevent duplicate listeners from
   // accumulating if the effect runs again or the provider unmounts.
   useEffect(() => {
-    // Refresh rates immediately
-    if (currency.defaultCurrency.code) {
-      refreshRates(true);
-    }
+    if (!currency.defaultCurrency) return;
   
-    // store the listener returned by Capacitor
+    refreshRates(true);
+  
     let resumeListener: PluginListenerHandle | null = null;
   
-    // Create an async helper function that returns a Promise
     const setupListener = async () => {
-      // Register the resume listener
-      resumeListener = await CapacitorApp.addListener(
-        // This event fires when the app returns to the foreground. 
-        // Example: user opens your app, switches to WhatsApp, comes back
-        "resume",
-        // Callback executed on resume: runs every time the resume event occurs.
-        () => {
-          //console.log("[ExchangeRateContext Listener] Resume detected");
-          // The idea is:
-          // User may have left the app for hours.
-          // Exchange rates may have changed.
-          // When they come back, update them automatically.
-          // So every resume triggers:
-          refreshRates();
-        }
-      );
+      resumeListener = await CapacitorApp.addListener("resume", () => {
+        refreshRates();
+      });
     };
   
-    // Without this line, the function would merely exist.
-    // This actually registers the listener.
     setupListener();
   
-    // Cleanup function
-    // React calls this cleanup: When component unmounts
-    // or Before effect re-runs: if currency.defaultCurrency.code changes
-    // React executes cleanup first, then runs the effect again.
-    // Cleanup guarantees only one active listener exists.
     return () => {
-      // Remove listener safely: if it exists, it runs
       resumeListener?.remove();
     };
-  }, [currency.defaultCurrency.code]);
-
+  }, [currency.defaultCurrency]);
 
   // Keep the stored exchange rates file synchronized with the currently
   // selected alternative currencies.
@@ -145,11 +120,14 @@ export const ExchangeRateProvider: React.FC<{ children: React.ReactNode }> = ({ 
   // updated to include newly selected currencies and remove currencies
   // that are no longer needed.
   useEffect(() => {
+    if (!currency.defaultCurrency) return;
+  
     updateSavedExchangeRates(
       currency.defaultCurrency,
       currency.alternativeCurrencies ?? []
     );
-  }, [altCodes]);
+  }, [currency.defaultCurrency, altCodes]);
+
 
 
   const isOverOneDayOld = (ts: number): boolean => {
@@ -178,32 +156,20 @@ export const ExchangeRateProvider: React.FC<{ children: React.ReactNode }> = ({ 
  * @param forceUpdate When true, forces a download regardless of cache age.
  */
   const refreshRates = useCallback(async (forceUpdate = false) => {
+    if (!currency.defaultCurrency) return;
+
     try {
       // Generate a short random id to make concurrent refresh logs easier to track.
       const id = Math.random().toString(36).slice(2, 7);
-      //console.log(`[${id}] refreshRates start`);
 
       // Read the timestamp from the last downloaded exchange-rates.json file.
       const timestamp = await getExchangeRatesTimestamp();
 
-      // Debug log
-      /*console.log(
-        "[ExchangeRateContext]",
-        "timestamp:",
-        timestamp,
-        "expired:",
-        !timestamp || Date.now() - timestamp > ONE_DAY_MS
-      );*/
-  
       // Rates are considered expired if no timestamp exists or if older than 24 hours.
       const expired =
         !timestamp ||
         Date.now() - timestamp > ONE_DAY_MS;
 
-      /*console.log(
-        `[${id}] timestamp=${timestamp} expired=${expired} force=${forceUpdate}`
-      );*/
-  
       // Download a fresh rates file when forced or when the cache is expired.
       if (forceUpdate || expired) {
         await downloadAndSaveExchangeRates(
@@ -238,7 +204,7 @@ export const ExchangeRateProvider: React.FC<{ children: React.ReactNode }> = ({ 
     // altCodes is not used directly inside refreshRates, but it's intentionally included in the dependency array 
     // so a new callback is created whenever the alternative currency list changes. 
     // This allows any effects or listeners using refreshRates to pick up the updated currency configuration.
-    currency.defaultCurrency.code,
+    currency.defaultCurrency,
     altCodes
   ]);
   

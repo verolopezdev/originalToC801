@@ -121,163 +121,21 @@ const Settings: React.FC = () => {
   };
 
 
+  const handleSubscriptionPlan = async (plan: SubscriptionPlan) => {
+    if (plan === user.subscriptionPlan) return;
 
-  const handleFactoryReset = async () => {
-    const confirmed = window.confirm(
-      'Factory Reset?\n\n' +
-      'This will delete:\n' +
-      '- All database data\n' +
-      '- All preferences\n' +
-      '- All backup files\n\n' +
-      'The app will restart as a fresh installation.'
-    );
-  
-    if (!confirmed) {
-      return;
-    }
-  
+    let isPremium = false;
+    if(plan !== 'free') isPremium = true;
+
     try {
-      await factoryReset();
+      await updateUser({
+        subscriptionPlan: plan,
+        isPremium
+      });
     } catch (error) {
-      console.error(error);
+      console.error("Failed to update subscription plan:", error);
     }
   };
-
-
-  const factoryReset = async (): Promise<void> => {
-    try {
-      console.log('🧨 FACTORY RESET STARTED');
-  
-      //
-      // Prevent backup hooks from counting deletes
-      //
-      setIsSeeding(true);
-  
-      //
-      // STEP 1
-      // Delete backups folder
-      //
-      try {
-        await Filesystem.rmdir({
-          path: 'backups',
-          directory: Directory.Data,
-          recursive: true,
-        });
-  
-        console.log('✅ Backups folder removed');
-      } catch {
-        console.log('ℹ️ No backups folder found');
-      }
-  
-      //
-      // STEP 2
-      // Delete exchange rates cache
-      //
-      try {
-        await Filesystem.deleteFile({
-          path: 'exchange-rates.json',
-          directory: Directory.Data,
-        });
-  
-        console.log('✅ Exchange rates cache removed');
-      } catch {
-        console.log('ℹ️ No exchange-rates.json found');
-      }
-  
-      //
-      // STEP 3
-      // Clear Capacitor Preferences
-      //
-      await Preferences.clear();
-  
-      //
-      // STEP 4
-      // Clear browser storage (safe on native)
-      //
-      localStorage.clear();
-      sessionStorage.clear();
-  
-      //
-      // STEP 5
-      // Clear Cache API (PWA/browser only)
-      //
-      if ('caches' in window) {
-        try {
-          const cacheNames = await caches.keys();
-          await Promise.all(
-            cacheNames.map((name) => caches.delete(name))
-          );
-  
-          console.log('✅ Browser caches cleared');
-        } catch (err) {
-          console.warn('⚠️ Failed clearing Cache API', err);
-        }
-      }
-  
-      //
-      // STEP 6
-      // Verify Preferences are empty
-      //
-      const remaining = await Preferences.keys();
-  
-      if (remaining.keys.length > 0) {
-        console.warn(
-          '⚠️ Remaining Preferences:',
-          remaining.keys
-        );
-      } else {
-        console.log('✅ Preferences cleared');
-      }
-  
-      //
-      // STEP 7
-      // Close Dexie
-      //
-      db.close();
-  
-      //
-      // STEP 8
-      // Give IndexedDB time to close
-      //
-      await new Promise(resolve =>
-        setTimeout(resolve, 500)
-      );
-  
-      //
-      // STEP 9
-      // Delete IndexedDB
-      //
-      await Dexie.delete('DB');
-  
-      console.log('✅ IndexedDB deleted');
-  
-      //
-      // STEP 10
-      // Reload app
-      //
-      window.location.replace('/startup');
-    } catch (error) {
-      console.error('❌ Factory reset failed:', error);
-      throw error;
-    } finally {
-      setIsSeeding(false);
-    }
-  };
-const handleSubscriptionPlan = async (plan: SubscriptionPlan) => {
-  if (plan === user.subscriptionPlan) return;
-
-  let isPremium = false;
-  if(plan !== 'free') isPremium = true;
-
-  try {
-    await updateUser({
-      subscriptionPlan: plan,
-      isPremium
-    });
-  } catch (error) {
-    console.error("Failed to update subscription plan:", error);
-  }
-};
 
   
   
@@ -455,27 +313,6 @@ const handleSubscriptionPlan = async (plan: SubscriptionPlan) => {
             <IonItem detail={true} routerLink="/app/devFileExplorer">
               <IonIcon aria-hidden="true" icon={folderOpenOutline} slot="start"></IonIcon>
               <IonLabel>DEV - File Explorer</IonLabel>
-            </IonItem>
-
-            {/* Factory reset */}
-            <IonItem
-              button
-              color="danger"
-              lines="none"
-              onClick={handleFactoryReset}
-            >
-              <IonIcon
-                aria-hidden="true"
-                icon={serverOutline}
-                slot="start"
-              />
-              <IonLabel>Factory Reset</IonLabel>
-            </IonItem>
-
-            {/* Other actions */}
-            <IonItem detail={true} routerLink="/app/devOtherActions">
-              <IonIcon aria-hidden="true" icon={folderOpenOutline} slot="start"></IonIcon>
-              <IonLabel>Other actions</IonLabel>
             </IonItem>
 
             {/* Seeding */}

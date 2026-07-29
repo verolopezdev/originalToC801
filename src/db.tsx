@@ -1,6 +1,7 @@
 import Dexie, { type EntityTable } from 'dexie';
 import dexieCloud from 'dexie-cloud-addon';
 import { incrementChangeCount } from './services/BackupService';
+import { CurrencyType } from './context/CurrencyContext';
 
 // GLOBAL FLAGS
 let initializing = false;
@@ -25,52 +26,7 @@ export const setIsSeeding = (value: boolean) => {
   isSeeding = value;
 };
 
-export const clearAllData = async () => {
-  try {
-    setIsSeeding(true);
-    await db.transaction('rw', db.tables, async () => {
-      await Promise.all(db.tables.map((table) => table.clear()));
-    });
-    console.log("🗑️ Database cleared successfully.");
-  } catch (error) {
-    console.error("❌ Failed to clear database:", error);
-    throw error;
-  } finally {
-    setIsSeeding(false);
-  }
-};
 
-export const deleteDatabaseEntirely = async () => {
-  try {
-    console.log("Shutting down DB connections...");
-    db.close();
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    await Dexie.delete('DB');
-    console.log("🧨 Database 'DB' deleted from storage.");
-  } catch (error) {
-    console.error("❌ Failed to delete database:", error);
-    throw error;
-  }
-};
-
-export const deleteRecords = async () => {
-  try {
-    setIsSeeding(true);
-    const idsToDelete = await db.expenses.limit(10).primaryKeys();
-
-    if (idsToDelete.length === 0) {
-      console.log("No expenses found to delete.");
-      return;
-    }
-
-    await db.expenses.bulkDelete(idsToDelete);
-    console.log(`🗑️ Deleted ${idsToDelete.length} expenses.`);
-  } catch (error) {
-    console.error("❌ Failed to delete expenses:", error);
-  } finally {
-    setIsSeeding(false);
-  }
-};
 
 export interface DbCounts {
   totalRecords: number;
@@ -126,6 +82,23 @@ export interface User {
   isPremium: boolean;
   subscriptionPlan: SubscriptionPlan;
   subscriptionExpirationDate: string | null;
+}
+
+export interface UserSettings {
+  id: string;      // random UUID for Dexie Cloud
+  key: string;     // always "settings"
+
+  // Currency
+  defaultCurrency: CurrencyType;
+  actualCurrency: CurrencyType;
+  travelCurrency: CurrencyType | null;
+  isTravelMode: boolean;
+
+  // Future synced settings
+  language?: string;
+  firstDayOfWeek?: number;
+  dateFormat?: string;
+  timeFormat24h?: boolean;
 }
 
 interface Account {
@@ -245,6 +218,7 @@ export interface AlternativeCurrency {
 const db = new Dexie('DB', { addons: [dexieCloud] }) as Dexie & {
   appmetadata: EntityTable<AppMetadata, 'id'>;
   users: EntityTable<User, 'userId'>;
+  userSettings: EntityTable<UserSettings, 'id'>;
   accounts: EntityTable<Account, 'accountId'>;
   categories: EntityTable<Category, 'categoryId'>;
   subcategories: EntityTable<Subcategory, 'subcategoryId'>;
@@ -254,11 +228,11 @@ const db = new Dexie('DB', { addons: [dexieCloud] }) as Dexie & {
   alternativeCurrencies: EntityTable<AlternativeCurrency, 'id'>;
   recurringSeries: EntityTable<RecurringSeries, 'seriesId'>;
 };
+(window as any).db = db;
 
 
 export async function initializeDatabase() {
   if (initializing) {
-    console.log("//// Database initialization already running");
     return;
   }
 
@@ -266,12 +240,9 @@ export async function initializeDatabase() {
 
   try {
     if (!db.isOpen()) {
-      console.log("//// opening db");
       await db.open();
-      console.log("//// db opened");
     }
 
-    console.log("//// Database ready");
   } finally {
     initializing = false;
   }
@@ -281,6 +252,7 @@ export async function initializeDatabase() {
 db.version(1).stores({
   appmetadata: 'id, key',
   users: 'userId, email',
+  userSettings: "id, key",
   accounts: 'accountId, userId, sortOrder',
   categories: 'categoryId, categoryName',
   subcategories: 'subcategoryId, subcategoryName, parentCategoryId',
@@ -339,11 +311,12 @@ const setupHooks = () => {
 
 
 // Seed initial data
-export const seedInitialData = async (): Promise<void> => {
+export const seedInitialData = async (
+  initialCurrency: CurrencyType
+): Promise<void> => {
   // Don't seed twice
   const userCount = await db.users.count();
   if (userCount > 0) {
-    console.log("⏭️ Seed skipped (database already initialized).");
     return;
   }
 
@@ -358,6 +331,7 @@ export const seedInitialData = async (): Promise<void> => {
       "rw",
       db.appmetadata,
       db.users,
+      db.userSettings,
       db.accounts,
       db.categories,
       async () => {
@@ -392,6 +366,15 @@ export const seedInitialData = async (): Promise<void> => {
           subscriptionPlan: "free",
           subscriptionExpirationDate: null,
         } as User);
+
+        await db.userSettings.add({
+          id: crypto.randomUUID(),
+          key: "settings",
+          defaultCurrency: initialCurrency,
+          actualCurrency: initialCurrency,
+          travelCurrency: null,
+          isTravelMode: false,
+        });
 
         await db.accounts.add({
           accountId:crypto.randomUUID(),
@@ -450,11 +433,9 @@ let dbReadyPromise: Promise<void> | null = null;
 
 export function dbReady() {
   if (!dbReadyPromise) {
-    console.log("//// Starting database initialization");
     dbReadyPromise = initializeDatabase();
     setupHooks();
   } else {
-    console.log("//// Database initialization already in progress");
   }
 
   return dbReadyPromise;

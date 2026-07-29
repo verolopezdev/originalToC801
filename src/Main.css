@@ -1453,6 +1453,10 @@ ion-note {
   color: var(--ion-color-note);
 }
 
+ion-page {
+  max-width: 500px;
+}
+
 ion-radio-group.frecuency-radio-group {
   display: flex;
   flex-direction: column;

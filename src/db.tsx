@@ -3,10 +3,13 @@ import dexieCloud from 'dexie-cloud-addon';
 import { incrementChangeCount } from './services/BackupService';
 import { CurrencyType } from './context/CurrencyContext';
 
+
 // GLOBAL FLAGS
 let initializing = false;
 let isPopulating = false;
 let isSyncing = false;
+
+
 export const TABLE_NAMES = [
   'users',
   'accounts',
@@ -19,19 +22,20 @@ export const TABLE_NAMES = [
   'recurringSeries',
 ];
 
+
 export let isSeeding = false;
-export const CATEGORYLESS_ID = 'system_categoryless';
+
 
 export const setIsSeeding = (value: boolean) => {
   isSeeding = value;
 };
 
 
-
 export interface DbCounts {
   totalRecords: number;
   tableCounts: Record<string, number>;
 }
+
 
 export const getLiveRecordCount = async (): Promise<DbCounts> => {
   const tableCounts = {
@@ -56,6 +60,7 @@ export const getLiveRecordCount = async (): Promise<DbCounts> => {
     tableCounts,
   };
 };
+
 
 interface AppMetadata {
   id: string;
@@ -95,10 +100,10 @@ export interface UserSettings {
   isTravelMode: boolean;
 
   // Future synced settings
-  language?: string;
+  language?: string;  
+  selectedCountry?: string;
+  theme?: string;
   firstDayOfWeek?: number;
-  dateFormat?: string;
-  timeFormat24h?: boolean;
 }
 
 interface Account {
@@ -263,10 +268,12 @@ db.version(1).stores({
   recurringSeries: 'seriesId, userId, startDate, interval, unit, totalOccurrences, isActive, lastLoggedDate, moved, categoryId, subcategoryId, accountId',
 });
 
+
 db.cloud.configure({
   databaseUrl: 'https://zz8cobd57.dexie.cloud',
   requireAuth: false,
 });
+
 
 db.cloud.syncState.subscribe(state => {
   isSyncing =
@@ -312,7 +319,7 @@ const setupHooks = () => {
 
 // Seed initial data
 export const seedInitialData = async (
-  initialCurrency: CurrencyType
+  initialCurrency: any
 ): Promise<void> => {
   // Don't seed twice
   const userCount = await db.users.count();
@@ -321,8 +328,8 @@ export const seedInitialData = async (
   }
 
   isPopulating = true;
-
   console.log("🌱 Seeding initial database...");
+  console.log("Initial currency: ", initialCurrency);
 
   try {
     const installationId = crypto.randomUUID();
@@ -374,6 +381,8 @@ export const seedInitialData = async (
           actualCurrency: initialCurrency,
           travelCurrency: null,
           isTravelMode: false,
+          language: initialCurrency.locale.split("-")[0],
+          selectedCountry: initialCurrency.country,
         });
 
         await db.accounts.add({

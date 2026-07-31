@@ -1,7 +1,9 @@
 // i18n.ts
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import { Preferences } from '@capacitor/preferences';
+import { Device } from "@capacitor/device";
+
+import { db } from './db';
 
 import en from './locales/en.json';
 import es from './locales/es.json';
@@ -15,18 +17,42 @@ const resources = {
   pt: { translation: pt },
 };
 
-// Async init function to load stored language
+export const supportedLngs = ["en", "es", "fr", "pt"];
+
+const getDeviceLanguage = async () => {
+  const { value: deviceLocale } = await Device.getLanguageTag();
+
+  const language = deviceLocale?.split("-")[0] ?? "en";
+
+  return supportedLngs.includes(language)
+    ? language
+    : "en";
+};
+
 export const initI18n = async () => {
-  const { value: storedLng } = await Preferences.get({ key: 'i18nextLng' });
+  let language = "en";
+
+  // Try existing user preference first
+  const settings = await db.userSettings
+    .where("key")
+    .equals("settings")
+    .first();
+
+  if (settings?.language && supportedLngs.includes(settings.language)) {
+    language = settings.language;
+  } else {
+    // First launch: use device language
+    language = await getDeviceLanguage();
+  }
 
   await i18n
     .use(initReactI18next)
     .init({
       resources,
-      lng: storedLng || 'en', // use stored language or fallback
-      fallbackLng: 'en',
+      lng: language,
+      fallbackLng: "en",
       interpolation: { escapeValue: false },
-      supportedLngs: ['en', 'es', 'fr', 'pt'],
+      supportedLngs,
     });
 };
 

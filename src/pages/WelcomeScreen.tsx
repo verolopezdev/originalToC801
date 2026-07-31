@@ -1,9 +1,7 @@
 // src/pages/WelcomeScreen.tsx
 import React from 'react';
 import { useHistory } from 'react-router';
-import i18n from '../i18n';
 import { useTranslation } from 'react-i18next';
-
 
 // Ionic's components
 import { 
@@ -26,47 +24,38 @@ const WelcomeScreen: React.FC = () => {
   };
 
   return (
-    <>
-      <div className="ion-page ion-justify-content-center ion-align-items-center ion-padding">
-        <h2>Welcome</h2>
-        <button onClick={handleHaveAccount}>Have Account</button>
-        <button onClick={handleContinueFree}>Continue Free</button>
-      </div>
-
-      <IonPage>
-        <IonContent className="ion-padding-horizontal">
-          <div className="centered-screen">  
-            {/* Logo and app name */}
-            <div className="centered-container">
-              <img
-                src="/assets/images/logo.png"
-                alt="App logo"
-                className="big-logo"
-              />
-              <h1 className='app-name'>AppName</h1>
-              <h4 className='app-type'>Expense Tracker</h4>
-            </div>
-  
-            {/* Screen headers */}
-            <h1 className='big-header'>{t('country_selection.big_heading')}</h1>
-            <h5 className='country-header-prompt'>{t('country_selection.subheading')}</h5>
-  
-            {/* Have account button */}
-            <IonButton expand="block" onClick={handleHaveAccount}>
-              Have Account
-            </IonButton>
-
-            {/* Free button */}
-            <IonButton expand="block" fill="outline" onClick={handleContinueFree}>
-              Continue Free
-            </IonButton>
-
+    <IonPage>
+      <IonContent className="ion-padding-horizontal">
+        <div className="centered-screen">  
+          {/* Logo and app name */}
+          <div className="centered-container">
+            <img
+              src="/assets/images/logo.png"
+              alt="App logo"
+              className="big-logo"
+            />
+            <h1 className='app-name'>AppName</h1>
+            <h4 className='app-type'>Expense Tracker</h4>
           </div>
-  
-        </IonContent>
-      </IonPage>
-      
-    </>
+
+          {/* Screen headers */}
+          <h1 className='big-header'>{t('country_selection.big_heading')}</h1>
+          <h5 className='country-header-prompt'>{t('country_selection.subheading')}</h5>
+
+          {/* Have account button */}
+          <IonButton expand="block" onClick={handleHaveAccount}>
+            {t('accounts.have_account')}
+          </IonButton>
+
+          {/* Free button */}
+          <IonButton expand="block" fill="outline" onClick={handleContinueFree}>
+            {t('accounts.continue_free')}
+          </IonButton>
+
+        </div>
+
+      </IonContent>
+    </IonPage>
   );
 };
 

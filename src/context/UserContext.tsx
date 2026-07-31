@@ -104,7 +104,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         user,
         userId: user.userId,
         categorylessId,
-        updateUser,
+        updateUser, 
         resetUser,
       }}
     >

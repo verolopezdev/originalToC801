@@ -11,6 +11,11 @@
   object-fit: cover; /* Maintains aspect ratio and fills the container */
 }
 
+.medium-logo {
+  width: 80px;
+  height: 80px;
+}
+
 h1.app-name {
   font-size: 2em;
   line-height: 40px;

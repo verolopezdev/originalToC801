@@ -105,38 +105,26 @@ const CountrySelectionPage: React.FC = () => {
       .catch((err) => console.error("Error loading countries:", err));
   }, []);
 
-  // 2. Detect device locale
   useEffect(() => {
     if (jsonCountries.length === 0) return;
-
-    const detectDeviceLanguage = async () => {
-      const { value: savedCountry } = await Preferences.get({ key: 'selectedCountry' });
-      if (savedCountry) return;
-
+  
+    const detectCountry = async () => {
       const { value: deviceLocale } = await Device.getLanguageTag();
-      
+  
       let matched = jsonCountries.find(
-        c => c.locale.toLowerCase() === (deviceLocale || '').toLowerCase()
+        c => c.locale.toLowerCase() === deviceLocale?.toLowerCase()
       );
-
+  
       if (!matched) {
-        const langOnly = (deviceLocale || '').split('-')[0];
-        matched = jsonCountries.find(c => c.locale.startsWith(langOnly));
+        const language = deviceLocale?.split("-")[0] ?? "";
+        matched = jsonCountries.find(c => c.locale.startsWith(language));
       }
-
-      if (!matched) matched = jsonCountries[0];
-
-      if (matched) {
-        setSelectedCountry(matched);
-        const userLang = matched.locale.split('-')[0];
-        const langToUse = supportedLngs.includes(userLang) ? userLang : 'en';
-        await i18n.changeLanguage(langToUse);
-      }
+  
+      setSelectedCountry(matched ?? jsonCountries[0]);
     };
-
-    detectDeviceLanguage();
+  
+    detectCountry();
   }, [jsonCountries]);
-
 
   // 3. Strict prefix search filter
   const cleanSearchQuery = searchText.trim().toLowerCase();
@@ -163,35 +151,21 @@ const CountrySelectionPage: React.FC = () => {
     // Create a fresh clone so we don't mutate state objects directly
     const countryToSave = { ...selectedCountry };
 
-    const userLang = countryToSave.locale.split('-')[0];
-    const langToUse = supportedLngs.includes(userLang) ? userLang : 'en';
-
-    await i18n.changeLanguage(langToUse);
-    await Preferences.set({ key: 'i18nextLng', value: langToUse });
-    await saveAppMetadata('i18nextLng', langToUse);
-
-
     const numberFormat = new Intl.NumberFormat(countryToSave.locale);
     const exampleFormatted = numberFormat.format(1234567.89);
 
     countryToSave.thousandSeparator = exampleFormatted.replace(/\d/g, '').charAt(0);
     countryToSave.decimalSeparator = (1.1).toLocaleString(countryToSave.locale).substring(1, 2);
-
     
     await seedInitialData(countryToSave);  
     await setDefaultCurrency(countryToSave);
     await updateActualCurrency(countryToSave);
 
-    await Preferences.set({ key: 'selectedCountry', value: countryToSave.country });
-    await saveAppMetadata('selectedCountry', countryToSave.country);
     await Preferences.set({ key: 'userMode', value: 'free' });
 
     history.replace('/app/dashboard');
   };
 
-  if (jsonCountries.length === 0) {
-    return <div className="loading-state">{t('common.loading')}</div>;
-  }
 
   return (
     <IonPage className="country-page">

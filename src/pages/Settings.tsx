@@ -112,7 +112,7 @@ const Settings: React.FC = () => {
 
   const handleInterval = (value: "weekly" | "monthly" | "yearly") => {
     setSelectedInterval(value); // Update state
-    updateUser({ interval: value }); // Update the UserContext
+    updateUser({ interval: value }); // Update the UserContext  
   };
 
   const handleWeekStartDay = (value: "sunday" | "monday") => {

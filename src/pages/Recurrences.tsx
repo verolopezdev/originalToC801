@@ -288,113 +288,115 @@ const Reccurrences: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding-horizontal"  ref={contentRef}>
-        {/* Screen Header */}
-        <div className='centered-container'>
-          <h2 className='screen-title'>{t('expenses.recurrent_exp')}</h2>
-        </div>
+        <div className="page-container">
+          {/* Screen Header */}
+          <div className='centered-container'>
+            <h2 className='screen-title'>{t('expenses.recurrent_exp')}</h2>
+          </div>
 
-        {!isLoading && activeRecurrences.length === 0 && inactiveRecurrences.length === 0 && (
-          <section className='centered-container'>
-            <IonIcon icon={calendarOutline} className="no-favourites-screen" />
-            <h4 className="screen-title">{t('expenses.no_recurrences')}</h4>
-            <p className="screen-prompt">
-              {t('expenses.no_recurrences_msg')}
-            </p>
-          </section>
-        )}
+          {!isLoading && activeRecurrences.length === 0 && inactiveRecurrences.length === 0 && (
+            <section className='centered-container'>
+              <IonIcon icon={calendarOutline} className="no-favourites-screen" />
+              <h4 className="screen-title">{t('expenses.no_recurrences')}</h4>
+              <p className="screen-prompt">
+                {t('expenses.no_recurrences_msg')}
+              </p>
+            </section>
+          )}
 
-				<div className='mt-20'>
-          {/* Show active recurrences */}
-					{activeRecurrences.map((rec) => {
-						const category = getCategory(rec.categoryId);
-            const subcategory = getSubcategory(rec.subcategoryId);
-            const accountName = getAccountName(rec.accountId)?.accountName || '';
-            const overdueExpense = overdueExpenses[rec.seriesId];
-            
-            // Compute isEstimated dynamically
-            const newIsEstimated =
-              rec.estimatedAmount > 0 &&
-              rec.amountDefault === 0 &&
-              rec.amountAlt === 0;
+          <div className='mt-20'>
+            {/* Show active recurrences */}
+            {activeRecurrences.map((rec) => {
+              const category = getCategory(rec.categoryId);
+              const subcategory = getSubcategory(rec.subcategoryId);
+              const accountName = getAccountName(rec.accountId)?.accountName || '';
+              const overdueExpense = overdueExpenses[rec.seriesId];
+              
+              // Compute isEstimated dynamically
+              const newIsEstimated =
+                rec.estimatedAmount > 0 &&
+                rec.amountDefault === 0 &&
+                rec.amountAlt === 0;
 
-            const expenseAmount =
-              rec.estimatedAmount > 0 && (rec.amountDefault === 0 && rec.amountAlt === 0) // Checks if rec.estimatedAmount is greater than 0 → if yes, that’s used directly.
-                ? rec.estimatedAmount
-                : [ // Otherwise, it runs your existing fallback logic
-                    overdueExpense?.expenseAmountAlt,
-                    overdueExpense?.expenseAmountDefault,
-                    rec.amountAlt,
-                    rec.amountDefault,
-                  ].find(v => v !== undefined && v !== 0) ?? 0;
+              const expenseAmount =
+                rec.estimatedAmount > 0 && (rec.amountDefault === 0 && rec.amountAlt === 0) // Checks if rec.estimatedAmount is greater than 0 → if yes, that’s used directly.
+                  ? rec.estimatedAmount
+                  : [ // Otherwise, it runs your existing fallback logic
+                      overdueExpense?.expenseAmountAlt,
+                      overdueExpense?.expenseAmountDefault,
+                      rec.amountAlt,
+                      rec.amountDefault,
+                    ].find(v => v !== undefined && v !== 0) ?? 0;
 
-            const dueDate = overdueExpense?.dueDate ?? rec.nextDueDate;
+              const dueDate = overdueExpense?.dueDate ?? rec.nextDueDate;
 
-            return (
-              <ReccurrenceItem      
+              return (
+                <ReccurrenceItem      
+                  key={rec.seriesId}
+                  seriesId={rec.seriesId}
+                  categoryIcon={subcategory?.subcategoryIcon || category?.categoryIcon || ""}
+                  categoryColor={subcategory?.subcategoryColor || category?.categoryColor || ""}
+                  categoryName={subcategory?.subcategoryName || category?.categoryName || t('common.unkonwn')}
+                  accountName={accountName}
+                  expenseNote={rec.note}
+                  expenseAmount={expenseAmount}
+                  startDate={new Date(rec.startDate)}
+                  endDate={rec.endDate}
+                  expenseCurrencyCode={rec.currencyCode}
+                  interval={rec.interval}
+                  unit={rec.unit}
+                  totalInstallments={rec.totalOccurrences ?? undefined}
+                  autoLogged={rec.logAutomatically}
+                  nextDueDate={dueDate} 
+                  isActive={rec.isActive}
+                  lastLoggedDate={rec.lastLoggedDate} 
+                  amountVaries={newIsEstimated}
+                />
+              );
+            })}
+
+            {/* Show inactive recurrences if available and selected */}
+            {showInactiveRecurrences && inactiveRecurrences.map((rec, idx) => {
+              const category = getCategory(rec.categoryId);
+              const subcategory = getSubcategory(rec.subcategoryId);
+              const accountName = getAccountName(rec.accountId)?.accountName || '';
+              const amount =
+                rec.amountAlt > 0 ? rec.amountAlt :
+                rec.amountDefault;
+
+              return (
+                <div
                 key={rec.seriesId}
-                seriesId={rec.seriesId}
-                categoryIcon={subcategory?.subcategoryIcon || category?.categoryIcon || ""}
-                categoryColor={subcategory?.subcategoryColor || category?.categoryColor || ""}
-                categoryName={subcategory?.subcategoryName || category?.categoryName || t('common.unkonwn')}
-                accountName={accountName}
-                expenseNote={rec.note}
-                expenseAmount={expenseAmount}
-                startDate={new Date(rec.startDate)}
-                endDate={rec.endDate}
-                expenseCurrencyCode={rec.currencyCode}
-                interval={rec.interval}
-                unit={rec.unit}
-                totalInstallments={rec.totalOccurrences ?? undefined}
-                autoLogged={rec.logAutomatically}
-                nextDueDate={dueDate} 
-                isActive={rec.isActive}
-                lastLoggedDate={rec.lastLoggedDate} 
-                amountVaries={newIsEstimated}
-              />
-						);
-					})}
+                ref={idx === 0 ? firstInactiveRef : null}
+              >
 
-          {/* Show inactive recurrences if available and selected */}
-          {showInactiveRecurrences && inactiveRecurrences.map((rec, idx) => {
-						const category = getCategory(rec.categoryId);
-						const subcategory = getSubcategory(rec.subcategoryId);
-						const accountName = getAccountName(rec.accountId)?.accountName || '';
-						const amount =
-							rec.amountAlt > 0 ? rec.amountAlt :
-							rec.amountDefault;
+                <ReccurrenceItem
+                  key={rec.seriesId}
+                  seriesId={rec.seriesId}
+                  categoryIcon={subcategory?.subcategoryIcon || category?.categoryIcon || ""}
+                  categoryColor={subcategory?.subcategoryColor || category?.categoryColor || ""}
+                  categoryName={subcategory?.subcategoryName || category?.categoryName || t('common.unkonwn')}
+                  accountName={accountName}
+                  expenseNote={rec.note}
+                  expenseAmount={amount}
+                  startDate={new Date(rec.startDate)}
+                  endDate={rec.endDate}
+                  expenseCurrencyCode={rec.currencyCode}
+                  interval={rec.interval}
+                  unit={rec.unit}
+                  totalInstallments={rec.totalOccurrences ?? undefined}
+                  autoLogged={rec.logAutomatically}
+                  nextDueDate={rec.nextDueDate}
+                  isActive={rec.isActive}
+                  lastLoggedDate={rec.lastLoggedDate}
+                  amountVaries={rec.estimatedAmount > 0}
+                />
+                </div>
+              );
+            })}
 
-						return (
-              <div
-              key={rec.seriesId}
-              ref={idx === 0 ? firstInactiveRef : null}
-            >
-
-							<ReccurrenceItem
-								key={rec.seriesId}
-								seriesId={rec.seriesId}
-								categoryIcon={subcategory?.subcategoryIcon || category?.categoryIcon || ""}
-								categoryColor={subcategory?.subcategoryColor || category?.categoryColor || ""}
-								categoryName={subcategory?.subcategoryName || category?.categoryName || t('common.unkonwn')}
-								accountName={accountName}
-								expenseNote={rec.note}
-								expenseAmount={amount}
-								startDate={new Date(rec.startDate)}
-                endDate={rec.endDate}
-								expenseCurrencyCode={rec.currencyCode}
-								interval={rec.interval}
-								unit={rec.unit}
-								totalInstallments={rec.totalOccurrences ?? undefined}
-								autoLogged={rec.logAutomatically}
-                nextDueDate={rec.nextDueDate}
-                isActive={rec.isActive}
-                lastLoggedDate={rec.lastLoggedDate}
-                amountVaries={rec.estimatedAmount > 0}
-							/>
-              </div>
-						);
-					})}
-
-				</div>
+          </div>
+        </div>
       </IonContent>
       <Footer appPages={translatedMenuItems} />
     </IonPage>

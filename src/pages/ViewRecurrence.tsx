@@ -524,242 +524,244 @@ const ViewRecurrence: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
-        <section className='centered-container'>
-        <h2 className='screen-title'>
-          {note.length > 15 ? `${note.substring(0, 20)}...` : note}
-        </h2>
-          <div className="mt-20">
-            <CategoryPreview
-              categoryColor={showCategoryColor}
-              categoryIcon={categoryIcon}
-            />
-          </div>
-
-          <div className='recurrence-amount'>
-            <div className="view-recurrence-amount">
-              {isEstimated && <span className='note'>(est)</span>}
-              <h1 className={isEstimated ? 'estimated-amount' : ''}>
-                {typeof showDueAmount === 'number' && showDueAmount > 0 && currencyCode ? (
-                  <FormatAmount amount={showDueAmount / 100} currencyCode={currencyCode} />
-                ) : null}
-              </h1>
+        <div className="page-container">
+          <section className='centered-container'>
+            <h2 className='screen-title'>
+              {note.length > 15 ? `${note.substring(0, 20)}...` : note}
+            </h2>
+            <div className="mt-20">
+              <CategoryPreview
+                categoryColor={showCategoryColor}
+                categoryIcon={categoryIcon}
+              />
             </div>
 
-            {currencyCode !== currency.defaultCurrency.code && (
-              <div className="converted-recurrence-amount">
-                ≈ <span className='converted-amount-code'>{currency.defaultCurrency.code}</span>
-                {convertedAmountText}
+            <div className='recurrence-amount'>
+              <div className="view-recurrence-amount">
+                {isEstimated && <span className='note'>(est)</span>}
+                <h1 className={isEstimated ? 'estimated-amount' : ''}>
+                  {typeof showDueAmount === 'number' && showDueAmount > 0 && currencyCode ? (
+                    <FormatAmount amount={showDueAmount / 100} currencyCode={currencyCode} />
+                  ) : null}
+                </h1>
               </div>
-            )}
-          </div>
-          
-          <div className='recurrence-due-date'>
-            {showDueDate && (<FormattedDate date={new Date(showDueDate)} format="long" />)}
-            {dueInfo && (
-              <div className={`status-label-no-wrap ${dueInfo.className}`}>
-                <IonIcon icon={getIcon(dueInfo.className)} style={{ color: 'inherit' }} />
-                {recurrence.isRecurring === 2 ? `Finalized with ${dueInfo.label}` : dueInfo.label}
-              </div>
-            )}
-            <span className='log-type'>{recurrence.logAutomatically ? t('expenses.auto_logging') : t('expenses.man_logging')}</span>
-          </div>
 
-          <div className="info-container">
-            <p>
-              {t(`date.frequency.${recurrence.unit}`, { count: recurrence.interval })}
-              {typeof recurrence.totalOccurrences === 'number' && ` x ${recurrence.totalOccurrences}`}
-              {recurrence.endDate && (
-                <>
-                  {t('expenses.config_until')}{" "}
-                  {new Date(recurrence.endDate).toLocaleDateString()}
-                </>
+              {currencyCode !== currency.defaultCurrency.code && (
+                <div className="converted-recurrence-amount">
+                  ≈ <span className='converted-amount-code'>{currency.defaultCurrency.code}</span>
+                  {convertedAmountText}
+                </div>
               )}
-            </p>
-            {showAccountName && (
-              <p>{showAccountName.accountName}</p>
-            )}
-          </div>
-
-          {recurrence.isRecurring === 1 && (
-            <div className='button-container mt-5'>
-              <IonButton 
-                className='medium success'
-                onClick={() => {
-                  router.push(`/app/logrecurrenceexpense/${seriesId}`, 'forward');
-                }}
-              >
-                {t('expenses.log_exp')}
-              </IonButton>
-              <IonButton 
-                className='medium danger'
-                onClick={() => {
-                  setShowDeleteExpenseAlert(true);
-                }}
-              >
-                {t('expenses.delete_exp')}
-              </IonButton>
             </div>
-          )}
-        </section>
+            
+            <div className='recurrence-due-date'>
+              {showDueDate && (<FormattedDate date={new Date(showDueDate)} format="long" />)}
+              {dueInfo && (
+                <div className={`status-label-no-wrap ${dueInfo.className}`}>
+                  <IonIcon icon={getIcon(dueInfo.className)} style={{ color: 'inherit' }} />
+                  {recurrence.isRecurring === 2 ? `Finalized with ${dueInfo.label}` : dueInfo.label}
+                </div>
+              )}
+              <span className='log-type'>{recurrence.logAutomatically ? t('expenses.auto_logging') : t('expenses.man_logging')}</span>
+            </div>
 
-        {/* Payment history section - Now rendering all records without pagination */}
-        <section>
-          <div className='section-header mt-20'>
+            <div className="info-container">
+              <p>
+                {t(`date.frequency.${recurrence.unit}`, { count: recurrence.interval })}
+                {typeof recurrence.totalOccurrences === 'number' && ` x ${recurrence.totalOccurrences}`}
+                {recurrence.endDate && (
+                  <>
+                    {t('expenses.config_until')}{" "}
+                    {new Date(recurrence.endDate).toLocaleDateString()}
+                  </>
+                )}
+              </p>
+              {showAccountName && (
+                <p>{showAccountName.accountName}</p>
+              )}
+            </div>
+
+            {recurrence.isRecurring === 1 && (
+              <div className='button-container mt-5'>
+                <IonButton 
+                  className='medium success'
+                  onClick={() => {
+                    router.push(`/app/logrecurrenceexpense/${seriesId}`, 'forward');
+                  }}
+                >
+                  {t('expenses.log_exp')}
+                </IonButton>
+                <IonButton 
+                  className='medium danger'
+                  onClick={() => {
+                    setShowDeleteExpenseAlert(true);
+                  }}
+                >
+                  {t('expenses.delete_exp')}
+                </IonButton>
+              </div>
+            )}
+          </section>
+
+          {/* Payment history section - Now rendering all records without pagination */}
+          <section>
+            <div className='section-header mt-20'>
+              <div>
+                <h6 className="section-title">{t('expenses.payment_history')}</h6>
+              </div>
+            </div>
+
             <div>
-              <h6 className="section-title">{t('expenses.payment_history')}</h6>
+              {expenses && expenses.length > 0 ? (
+                expenses.map((exp) => {
+                  const dateFromExp = exp.dueDate ? new Date(exp.dueDate) : null;
+                  const originalDueDate = dateFromExp && !isNaN(dateFromExp.getTime()) ? dateFromExp : new Date();
+
+                  const amount = 
+                    exp.expenseAmountAlt > 0 ? exp.expenseAmountAlt :
+                    exp.expenseAmountDefault;
+
+                  return (
+                    <ExpenseItem        
+                      key={exp.expenseId}
+                      expenseId={exp.expenseId}
+                      expenseAmount={amount}
+                      expenseAmountDefault={
+                        exp.expenseAmountAlt > 0
+                          ? exp.expenseAmountDefault
+                          : undefined
+                      }
+                      dueDate={originalDueDate}
+                      deletionDate={exp.deletionDate ? new Date(exp.deletionDate) : null}
+                      expenseDate={exp.expenseDate}
+                      expenseCurrencyCode={exp.expenseCurrencyCode}
+                      installmentIndex={exp.installmentIndex}
+                      totalInstallments={exp.totalInstallments}
+                      paymentStatus={exp.isActive}
+                      seriesId={passedRecurrenceId}
+                    />
+                  );
+                })
+              ) : (
+                <div>{t('expenses.no_exp_found')}</div>
+              )}
             </div>
-          </div>
+          </section>
 
-          <div>
-            {expenses && expenses.length > 0 ? (
-              expenses.map((exp) => {
-                const dateFromExp = exp.dueDate ? new Date(exp.dueDate) : null;
-                const originalDueDate = dateFromExp && !isNaN(dateFromExp.getTime()) ? dateFromExp : new Date();
-
-                const amount = 
-                  exp.expenseAmountAlt > 0 ? exp.expenseAmountAlt :
-                  exp.expenseAmountDefault;
-
-                return (
-                  <ExpenseItem        
-                    key={exp.expenseId}
-                    expenseId={exp.expenseId}
-                    expenseAmount={amount}
-                    expenseAmountDefault={
-                      exp.expenseAmountAlt > 0
-                        ? exp.expenseAmountDefault
-                        : undefined
-                    }
-                    dueDate={originalDueDate}
-                    deletionDate={exp.deletionDate ? new Date(exp.deletionDate) : null}
-                    expenseDate={exp.expenseDate}
-                    expenseCurrencyCode={exp.expenseCurrencyCode}
-                    installmentIndex={exp.installmentIndex}
-                    totalInstallments={exp.totalInstallments}
-                    paymentStatus={exp.isActive}
-                    seriesId={passedRecurrenceId}
-                  />
-                );
-              })
-            ) : (
-              <div>{t('expenses.no_exp_found')}</div>
-            )}
-          </div>
-        </section>
-
-        {/* Alerts and Modals */}
-        <IonAlert
-          isOpen={showDeleteRecurrenceAlert}
-          className='custom-alert'
-          onDidDismiss={() => setShowDeleteRecurrenceAlert(false)}
-          header={t('expenses.delete_recurrence_q')}
-          message={t('expenses.delete_recurrence_a')}
-          buttons={[
-            {
-              text: t('common.cancel'),
-              role: 'cancel',
-              handler: () => {
-                setShowDeleteRecurrenceAlert(false);
-                setRecurrenceToDelete(null);  
-              }
-            },
-            {
-              text: t('common.delete'),
-              role: 'destructive',
-              cssClass: 'alert-button-destructive',
-              handler: () => {
-                if (recurrenceToDelete !== null) {
-                  handleDeleteRecurrence(recurrenceToDelete);
+          {/* Alerts and Modals */}
+          <IonAlert
+            isOpen={showDeleteRecurrenceAlert}
+            className='custom-alert'
+            onDidDismiss={() => setShowDeleteRecurrenceAlert(false)}
+            header={t('expenses.delete_recurrence_q')}
+            message={t('expenses.delete_recurrence_a')}
+            buttons={[
+              {
+                text: t('common.cancel'),
+                role: 'cancel',
+                handler: () => {
+                  setShowDeleteRecurrenceAlert(false);
+                  setRecurrenceToDelete(null);  
                 }
-                setShowDeleteRecurrenceAlert(false);
-                setRecurrenceToDelete(null);
+              },
+              {
+                text: t('common.delete'),
+                role: 'destructive',
+                cssClass: 'alert-button-destructive',
+                handler: () => {
+                  if (recurrenceToDelete !== null) {
+                    handleDeleteRecurrence(recurrenceToDelete);
+                  }
+                  setShowDeleteRecurrenceAlert(false);
+                  setRecurrenceToDelete(null);
+                }
               }
-            }
-          ]}
-        />
+            ]}
+          />
 
-        <IonAlert
-          isOpen={showStopAlert}
-          className='custom-alert'
-          onDidDismiss={() => setShowStopAlert(false)}
-          header={t('expenses.stop_recurrence')}
-          message={t('expenses.stop_recurrence_msg')}
-          buttons={[
-            { 
-              text: t('common.cancel'), 
-              role: "cancel", 
-              handler: () => { setShowStopAlert(false) } 
-            },
-            {
-              text: t('date.stop_today'),
-              handler: async () => await stopRecurringSeries(),
-            },
-            {
-              text: t('date.pick_date'),
-              handler: handleStopDate,
-            },
-          ]}
-        />
-
-        <IonAlert
-          isOpen={showStopInstallmentRecAlert}
-          className='custom-alert'
-          onDidDismiss={() => setShowStopInstallmentRecAlert(false)}
-          header={t('expenses.stop_recurrence_q')}
-          message={t("expenses.unpaid_installments_warning", { count: unpaidCount })}          
-          buttons={[
-            {
-              text: t('expenses.pay_all_stop'),
-              handler: () => {
-                setShowStopInstallmentRecAlert(false);
-                router.push(`/app/logrecurrenceexpense/${seriesId}?mode=remaining`, 'forward');
+          <IonAlert
+            isOpen={showStopAlert}
+            className='custom-alert'
+            onDidDismiss={() => setShowStopAlert(false)}
+            header={t('expenses.stop_recurrence')}
+            message={t('expenses.stop_recurrence_msg')}
+            buttons={[
+              { 
+                text: t('common.cancel'), 
+                role: "cancel", 
+                handler: () => { setShowStopAlert(false) } 
               },
-            },
-            {
-              text: t('expenses.stop_without_paying'),
-              role: "destructive",
-              cssClass: 'alert-button-destructive',
-              handler: () => {
-                setShowStopInstallmentRecAlert(false);
-                stopRecurrenceWithoutPaying();
+              {
+                text: t('date.stop_today'),
+                handler: async () => await stopRecurringSeries(),
               },
-            },
-            {
-              text: t('common.cancel'),
-              role: "cancel",
-            },
-          ]}
-        />
+              {
+                text: t('date.pick_date'),
+                handler: handleStopDate,
+              },
+            ]}
+          />
 
-        <IonAlert
-          className='custom-alert'
-          isOpen={showDeleteExpenseAlert}
-          onDidDismiss={() => setShowDeleteExpenseAlert(false)}
-          header={t('expenses.delete_exp')}
-          message={t('expenses.delete_exp_msg')}
-          buttons={[
-            { 
-              text: t('common.cancel'), 
-              role: "cancel", 
-              handler: () => { setShowDeleteExpenseAlert(false) } 
-            },
-            {
-              text: t('common.delete'),
-              role: "destructive",
-              cssClass: 'alert-button-destructive',
-              handler: handleDeleteExpense,
-            },
-          ]}
-        />
+          <IonAlert
+            isOpen={showStopInstallmentRecAlert}
+            className='custom-alert'
+            onDidDismiss={() => setShowStopInstallmentRecAlert(false)}
+            header={t('expenses.stop_recurrence_q')}
+            message={t("expenses.unpaid_installments_warning", { count: unpaidCount })}          
+            buttons={[
+              {
+                text: t('expenses.pay_all_stop'),
+                handler: () => {
+                  setShowStopInstallmentRecAlert(false);
+                  router.push(`/app/logrecurrenceexpense/${seriesId}?mode=remaining`, 'forward');
+                },
+              },
+              {
+                text: t('expenses.stop_without_paying'),
+                role: "destructive",
+                cssClass: 'alert-button-destructive',
+                handler: () => {
+                  setShowStopInstallmentRecAlert(false);
+                  stopRecurrenceWithoutPaying();
+                },
+              },
+              {
+                text: t('common.cancel'),
+                role: "cancel",
+              },
+            ]}
+          />
 
-        <Modal
-          isOpen={isConfirmationModalOpen}
-          icon={modalConfig.icon}
-          title={modalConfig.title}
-          content={modalConfig.content}
-          closeModal={() => setIsConfirmationModalOpen(false)}
-          actions={modalConfig.actions}
-        />
+          <IonAlert
+            className='custom-alert'
+            isOpen={showDeleteExpenseAlert}
+            onDidDismiss={() => setShowDeleteExpenseAlert(false)}
+            header={t('expenses.delete_exp')}
+            message={t('expenses.delete_exp_msg')}
+            buttons={[
+              { 
+                text: t('common.cancel'), 
+                role: "cancel", 
+                handler: () => { setShowDeleteExpenseAlert(false) } 
+              },
+              {
+                text: t('common.delete'),
+                role: "destructive",
+                cssClass: 'alert-button-destructive',
+                handler: handleDeleteExpense,
+              },
+            ]}
+          />
+
+          <Modal
+            isOpen={isConfirmationModalOpen}
+            icon={modalConfig.icon}
+            title={modalConfig.title}
+            content={modalConfig.content}
+            closeModal={() => setIsConfirmationModalOpen(false)}
+            actions={modalConfig.actions}
+          />
+        </div>
       </IonContent>
     </IonPage>
   );

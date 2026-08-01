@@ -316,8 +316,6 @@ const NewExpense: React.FC = () => {
   };
 
 
-
-
   const showToast = (message: string, type: 'info' | 'error') => {
     setToastMessage(message);
     setToastType(type);
@@ -339,8 +337,6 @@ const NewExpense: React.FC = () => {
     setAmountInCents(newAmount);
     setIsFormValid(validateForm(newAmount, error));
   };
-
-
 
   // Handle Note Validation  
   const handleNoteChange = async (value: string) => {
@@ -535,352 +531,347 @@ const NewExpense: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding-horizontal">
-        {/* Screen Header */}
-        <div className='centered-container mb-20'>
-          <h2 className='screen-title'>{t('expenses.new_exp')}</h2>
-        </div>
-
-        <AccountSlider  
-          key={`account-slider-${resetTrigger}`}
-          accounts={sortedAccounts}
-          editAccount={selectedAccountId}
-          onAccountSelect={handleAccountSelect} // Pass the callback to SliderComponent
-        />  
-
-        {/* Amount input */}
-        <div className='amount'>
-          {selectedCurrency && 
-            <AmountInput
-              key={`amount-input-${resetTrigger}`}
-              locale={selectedCurrency.locale}
-              decimalSeparator={selectedCurrency.decimalSeparator}
-              thousandSeparator={selectedCurrency.thousandSeparator}
-              currencySymbol={selectedCurrency.symbol}
-              currencyCode={selectedCurrency.code}
-              onAmountChange={handleAmountChange} 
-              showCurrencyCode={isAlternativeCurrency}
-            />
-          }
-
-          {expenseCurrencyCode !== currency.defaultCurrency.code && (
-            <div className="converted-amount">
-              ≈ <span className='converted-amount-code'>{currency.defaultCurrency.code}</span>
-              {convertedAmountText}
-            </div>
-          )}
-        </div>
-        
-
-        {/* Additional configuration */}
-        <div className='additional-config'>
-          
-          {/* Categories */}
-          <div className='aditional-btn'>   
-            <div>
-              <IonIcon icon={gridOutline} className='small-icon-btn primary' />
-            </div>
-            <div 
-              className='selected-info' 
-              onClick={() => setIsOpenCategoryModal(true)}
-            >
-              {subcategoryId ? (
-                <>
-                  <span className="title">{t('expenses.config_subcat')}</span>
-                  <span className='data'>{subcategory && subcategory.subcategoryName}</span>
-                </>
-              ) : (
-                <>
-                  <span className="title">{t('expenses.config_cat')}</span>
-                  <span className='data'>{category && category.categoryName}</span>
-                </>
-              )}
-            </div>
+        <div className="page-container">
+          {/* Screen Header */}
+          <div className='centered-container mb-20'>
+            <h2 className='screen-title'>{t('expenses.new_exp')}</h2>
           </div>
 
-          {/* Date */}
-          <div className='aditional-btn'>
-            <div>
-              <IonIcon icon={calendarOutline} className='small-icon-btn primary' />
-            </div>
-            <div className='selected-info' onClick={() => handleDateChange()}>
-              <span className="title">{t('expenses.config_date')}</span>
-              <span className='data'><FormattedDate date={selectedDate} format="short" /></span>
-            </div>
-          </div>
+          <AccountSlider  
+            key={`account-slider-${resetTrigger}`}
+            accounts={sortedAccounts}
+            editAccount={selectedAccountId}
+            onAccountSelect={handleAccountSelect} // Pass the callback to SliderComponent
+          />  
 
-          {/* Frecuency */}
-          <div
-            className={`aditional-btn ${isTravelMode && 'disabled'}`}
-            onClick={isTravelMode ? undefined : () => setShowFrequencyModal(true)}
-          >
-            <div>
-              <IonIcon icon={syncOutline} className='small-icon-btn primary' />
-            </div>
-            <div className='selected-info'>
-              <span className="title">{t('expenses.config_freq')}</span>
-              {!recurrence.isRecurring ? (
-                <span className='data'>{t('expenses.config_only_once')}</span>
-              ) : (
-                <span className='data'>
-                  {t(`date.frequency.${recurrence.unit}`, { count: recurrence.interval })}
-                  {typeof recurrence.totalOccurrences === 'number' && ` x ${recurrence.totalOccurrences}`}
-                  {recurrence.endDate && (
-                    <>
-                      {t('expenses.config_until')}{" "}
-                      {new Date(recurrence.endDate).toLocaleDateString()}
-                    </>
-                  )}
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Currency */}
-          <div className='aditional-btn' onClick={() => setIsAlternativeModalOpen(true)}>
-            <IonAvatar className="country-avatar country-avatar-small">
-              <img
-                src={getFlagImage(selectedCurrency)}
-                alt={selectedCurrency && selectedCurrency.name}
-                className="country-flag"
+          {/* Amount input */}
+          <div className='amount'>
+            {selectedCurrency && 
+              <AmountInput
+                key={`amount-input-${resetTrigger}`}
+                locale={selectedCurrency.locale}
+                decimalSeparator={selectedCurrency.decimalSeparator}
+                thousandSeparator={selectedCurrency.thousandSeparator}
+                currencySymbol={selectedCurrency.symbol}
+                currencyCode={selectedCurrency.code}
+                onAmountChange={handleAmountChange} 
+                showCurrencyCode={isAlternativeCurrency}
               />
-            </IonAvatar>
-            <div className='selected-info'>
-              <span className="title">{t('expenses.config_currency')}</span>
-              <span className='data'>{selectedCurrency?.name}</span>  
-            </div>
+            }
+
+            {expenseCurrencyCode !== currency.defaultCurrency.code && (
+              <div className="converted-amount">
+                ≈ <span className='converted-amount-code'>{currency.defaultCurrency.code}</span>
+                {convertedAmountText}
+              </div>
+            )}
           </div>
-
-
-          {/* Add notification if recurrence */}
-          {recurrence.isRecurring === 1 && (
-            <>
-              {/* Notify */}
-              <div className='aditional-btn' onClick={() => setShowNotifyModal(true)}>
-                <div>
-                  {notification ? (
-                    <IonIcon icon={notificationsOutline} className='small-icon-btn primary'/>
-                ) : (
-                    <IonIcon icon={notificationsOffOutline} className='small-icon-btn primary' />
-                  )}
-
-                </div>
-                <div className='selected-info'>
-                  <span className="title">{t('common.notify')}</span>
-                  {notification ? (
-                    <span className='data'>{notification.amount} {notification.unit} at {notification.time}</span>
-                  ) : (
-                    <span className='data'>{t('common.no')}</span>
-                  )}
-                </div>
-              </div>
-
-              {/* Log expense automatically / manually */}
-              <div 
-                className='aditional-btn' 
-                onClick={() =>
-                  setRecurrence(prev => ({
-                    ...prev,
-                    logAutomatically: !prev.logAutomatically
-                  }))
-                }
-              >
-                <div>
-                    <IonIcon icon={gitCompareOutline} className='small-icon-btn primary' />
-                </div>
-                <div className='selected-info'>
-                  <span className="title">{t('expenses.log_exp')}</span>
-                  <span className='data'>{recurrence.logAutomatically ? t('expenses.config_auto') : t('expenses.config_man')}</span>
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* Trip Expense */}
-          {isTravelMode && (
-            <div className='aditional-btn full-width disabled'>
+        
+          {/* Additional configuration */}
+          <div className='additional-config'>
+            
+            {/* Categories */}
+            <div className='aditional-btn'>   
               <div>
-                <IonIcon icon={airplaneOutline} />
+                <IonIcon icon={gridOutline} className='small-icon-btn primary' />
+              </div>
+              <div 
+                className='selected-info' 
+                onClick={() => setIsOpenCategoryModal(true)}
+              >
+                {subcategoryId ? (
+                  <>
+                    <span className="title">{t('expenses.config_subcat')}</span>
+                    <span className='data'>{subcategory && subcategory.subcategoryName}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="title">{t('expenses.config_cat')}</span>
+                    <span className='data'>{category && category.categoryName}</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Date */}
+            <div className='aditional-btn'>
+              <div>
+                <IonIcon icon={calendarOutline} className='small-icon-btn primary' />
+              </div>
+              <div className='selected-info' onClick={() => handleDateChange()}>
+                <span className="title">{t('expenses.config_date')}</span>
+                <span className='data'><FormattedDate date={selectedDate} format="short" /></span>
+              </div>
+            </div>
+
+            {/* Frecuency */}
+            <div
+              className={`aditional-btn ${isTravelMode && 'disabled'}`}
+              onClick={isTravelMode ? undefined : () => setShowFrequencyModal(true)}
+            >
+              <div>
+                <IonIcon icon={syncOutline} className='small-icon-btn primary' />
               </div>
               <div className='selected-info'>
-                <span className="title">{t('expenses.config_trip_exp')}</span>
-                <span className='data'>{tripId ? selectedTrip?.tripName : t('common.no')}</span>
+                <span className="title">{t('expenses.config_freq')}</span>
+                {!recurrence.isRecurring ? (
+                  <span className='data'>{t('expenses.config_only_once')}</span>
+                ) : (
+                  <span className='data'>
+                    {t(`date.frequency.${recurrence.unit}`, { count: recurrence.interval })}
+                    {typeof recurrence.totalOccurrences === 'number' && ` x ${recurrence.totalOccurrences}`}
+                    {recurrence.endDate && (
+                      <>
+                        {t('expenses.config_until')}{" "}
+                        {new Date(recurrence.endDate).toLocaleDateString()}
+                      </>
+                    )}
+                  </span>
+                )}
               </div>
             </div>
-          )}
 
-
-        </div>
-
-        {/* Add note */}
-        <div className="form-item">
-          <div className="parent-input">  
-            <div className="input-container">
-            <textarea
-                value={note}
-                maxLength={120}
-                placeholder={t('expenses.config_note')}
-                onChange={(e) => handleNoteChange(e.target.value)}
-                className={`textarea ${error ? 'invalid' : ''}`}
-                rows={3} // Optional: Sets the initial visible height (defaults to 2)
-              />
-              {error && <p className="error-text">{error}</p>}
+            {/* Currency */}
+            <div className='aditional-btn' onClick={() => setIsAlternativeModalOpen(true)}>
+              <IonAvatar className="country-avatar country-avatar-small">
+                <img
+                  src={getFlagImage(selectedCurrency)}
+                  alt={selectedCurrency && selectedCurrency.name}
+                  className="country-flag"
+                />
+              </IonAvatar>
+              <div className='selected-info'>
+                <span className="title">{t('expenses.config_currency')}</span>
+                <span className='data'>{selectedCurrency?.name}</span>  
+              </div>
             </div>
-            {isTravelMode && (
-              <button 
-                id="open-toast"
-                onClick={handleTripId}
-              >
-                {tripId ? <IonIcon icon={airplane} /> : <IonIcon icon={airplaneOutline} />}
-              </button>
-            )}
-          </div>
-        </div>
 
 
-        {/* Save changes button */}
-        <IonButton
-          className="block mb-60"
-          onClick={() => {
-            if (isFormValid) {
-              addNewExpense();
-            }
-          }}
-          disabled={!isFormValid} // Disable the button if the form is invalid
-        >
-          {t('expenses.add_new_exp')}
-        </IonButton>
+            {/* Add notification if recurrence */}
+            {recurrence.isRecurring === 1 && (
+              <>
+                {/* Notify */}
+                <div className='aditional-btn' onClick={() => setShowNotifyModal(true)}>
+                  <div>
+                    {notification ? (
+                      <IonIcon icon={notificationsOutline} className='small-icon-btn primary'/>
+                  ) : (
+                      <IonIcon icon={notificationsOffOutline} className='small-icon-btn primary' />
+                    )}
 
-
-        {/* Category picker modal */}
-        <IonModal isOpen={isOpenCategoryModal}>
-          <IonHeader className="ion-no-border">
-            <IonToolbar>
-              <IonButtons slot="start">
-                <IonButton onClick={() => setIsOpenCategoryModal(false)}>
-                  <IonIcon aria-hidden="true" icon={arrowBackOutline} className='close-modal'></IonIcon>
-                </IonButton>  
-              </IonButtons>
-              <IonButtons slot="end">
-                <IonButton onClick={() => setShowFavourites(prevState => !prevState)}>
-                  {showFavourites ? (
-                      <IonChip>
-                        {t('common.view_all')}
-                      </IonChip>
+                  </div>
+                  <div className='selected-info'>
+                    <span className="title">{t('common.notify')}</span>
+                    {notification ? (
+                      <span className='data'>{notification.amount} {notification.unit} at {notification.time}</span>
                     ) : (
-                      <IonChip>
-                        {t('common.view_favs')}
-                      </IonChip>
-                  )}
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding">
-            <CategoryPicker
-              selectedCategory={categoryId}
-              selectedSubcategory={subcategoryId}
-              onCategorySelect={handleCategorySelect} // Updated to use the handler
-              showFavourites={showFavourites}
-            />
-          </IonContent>
-        </IonModal>
+                      <span className='data'>{t('common.no')}</span>
+                    )}
+                  </div>
+                </div>
 
-
-        {/* modal for default and alternative currency selection */}
-        <IonModal isOpen={isAlternativeModalOpen} onDidDismiss={() => setIsAlternativeModalOpen(false)}>
-          <IonHeader className="ion-no-border">
-            <IonToolbar>
-              <IonButtons slot="end">
-                <IonButton onClick={() => setIsAlternativeModalOpen(false)}>
-                  <IonIcon aria-hidden="true" icon={closeOutline} className='close-modal'></IonIcon>
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding">
-            <div className="header-text-container">
-              <h1>{t('currency.select_currency')}</h1>
-            </div>
-            {allSelectedCurrencies.length > 0 ? (
-              allSelectedCurrencies.map((currencyItem) => (
-                <IonItem
-                  key={currencyItem.code}
-                  button
-                  onClick={() => selectExpenseCurrency(currencyItem)}
-                  disabled={currencyItem.code === selectedCurrency.code}
+                {/* Log expense automatically / manually */}
+                <div 
+                  className='aditional-btn' 
+                  onClick={() =>
+                    setRecurrence(prev => ({
+                      ...prev,
+                      logAutomatically: !prev.logAutomatically
+                    }))
+                  }
                 >
-                  <IonAvatar className="country-avatar country-avatar-small mr-10">
-                    <img
-                      src={getFlagImage(currencyItem)}
-                      alt={selectedCurrency && selectedCurrency.name}
-                      className="country-flag"
-                    />
-                  </IonAvatar>
-                  <IonLabel>{`${currencyItem.name} (${currencyItem.symbol})`}</IonLabel>
-                </IonItem>
-              ))
-            ) : (
-              <p>{t('currency.no_alt_curr_add')}</p>
+                  <div>
+                      <IonIcon icon={gitCompareOutline} className='small-icon-btn primary' />
+                  </div>
+                  <div className='selected-info'>
+                    <span className="title">{t('expenses.log_exp')}</span>
+                    <span className='data'>{recurrence.logAutomatically ? t('expenses.config_auto') : t('expenses.config_man')}</span>
+                  </div>
+                </div>
+              </>
             )}
-          </IonContent>
-        </IonModal>
+
+            {/* Trip Expense */}
+            {isTravelMode && (
+              <div className='aditional-btn full-width disabled'>
+                <div>
+                  <IonIcon icon={airplaneOutline} />
+                </div>
+                <div className='selected-info'>
+                  <span className="title">{t('expenses.config_trip_exp')}</span>
+                  <span className='data'>{tripId ? selectedTrip?.tripName : t('common.no')}</span>
+                </div>
+              </div>
+            )}
 
 
-        {/* Frequency modal */}
-        <IonModal 
-          isOpen={showFrequencyModal} 
-          onDidDismiss={() => setShowFrequencyModal(false)}
-          className="small-modal"
-        >
-          <div className="small-modal-content">
-            <h3 className="mb-20 centered-container">{t('common.repeat')}</h3>
-
-            <FrequencyForm  
-              startDate={selectedDate.toISOString()}
-              onDone={(settings: RecurrenceSettings) => {
-                setRecurrence(settings);         // Save the recurrence data
-                setShowFrequencyModal(false);    // Close modal
-              }}
-              initialSettings={recurrence}
-            />
           </div>
-        </IonModal>
 
-        {/* Notify modal */}
-        <IonModal 
-          isOpen={showNotifyModal} 
-          onDidDismiss={() => setShowNotifyModal(false)}
-          className="small-modal"
-        >
-          <div className="small-modal-content">
-            <h3 className="mb-30 centered-container">{t('expenses.config_notify')}</h3>
-
-            <NotificationForm
-              onSave={handleSave}
-              onCancel={() => setShowNotifyModal(false)}
-              initialValue={notification}
-            />
+          {/* Add note */}
+          <div className="form-item">
+            <div className="parent-input">  
+              <div className="input-container">
+              <textarea
+                  value={note}
+                  maxLength={120}
+                  placeholder={t('expenses.config_note')}
+                  onChange={(e) => handleNoteChange(e.target.value)}
+                  className={`textarea ${error ? 'invalid' : ''}`}
+                  rows={3} // Optional: Sets the initial visible height (defaults to 2)
+                />
+                {error && <p className="error-text">{error}</p>}
+              </div>
+              {isTravelMode && (
+                <button 
+                  id="open-toast"
+                  onClick={handleTripId}
+                >
+                  {tripId ? <IonIcon icon={airplane} /> : <IonIcon icon={airplaneOutline} />}
+                </button>
+              )}
+            </div>
           </div>
-        </IonModal>
 
+          {/* Save changes button */}
+          <IonButton
+            className="block mb-60"
+            onClick={() => {
+              if (isFormValid) {
+                addNewExpense();
+              }
+            }}
+            disabled={!isFormValid} // Disable the button if the form is invalid
+          >
+            {t('expenses.add_new_exp')}
+          </IonButton>
 
-        {/* Confirmation Modal */}
-        <Modal
-          isOpen={isConfirmationModalOpen}
-          icon={modalConfig.icon}
-          title={modalConfig.title}
-          content={modalConfig.content}
-          closeModal={() => setIsConfirmationModalOpen(false)}
-          actions={modalConfig.actions}
-        />
+          {/* Category picker modal */}
+          <IonModal isOpen={isOpenCategoryModal}>
+            <IonHeader className="ion-no-border">
+              <IonToolbar>
+                <IonButtons slot="start">
+                  <IonButton onClick={() => setIsOpenCategoryModal(false)}>
+                    <IonIcon aria-hidden="true" icon={arrowBackOutline} className='close-modal'></IonIcon>
+                  </IonButton>  
+                </IonButtons>
+                <IonButtons slot="end">
+                  <IonButton onClick={() => setShowFavourites(prevState => !prevState)}>
+                    {showFavourites ? (
+                        <IonChip>
+                          {t('common.view_all')}
+                        </IonChip>
+                      ) : (
+                        <IonChip>
+                          {t('common.view_favs')}
+                        </IonChip>
+                    )}
+                  </IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent className="ion-padding">
+              <CategoryPicker
+                selectedCategory={categoryId}
+                selectedSubcategory={subcategoryId}
+                onCategorySelect={handleCategorySelect} // Updated to use the handler
+                showFavourites={showFavourites}
+              />
+            </IonContent>
+          </IonModal>
 
-        <CustomToast
-          message={toastMessage}
-          isOpen={toastOpen}
-          onDismiss={() => setToastOpen(false)}
-          type={toastType ?? undefined}
-        />
+          {/* modal for default and alternative currency selection */}
+          <IonModal isOpen={isAlternativeModalOpen} onDidDismiss={() => setIsAlternativeModalOpen(false)}>
+            <IonHeader className="ion-no-border">
+              <IonToolbar>
+                <IonButtons slot="end">
+                  <IonButton onClick={() => setIsAlternativeModalOpen(false)}>
+                    <IonIcon aria-hidden="true" icon={closeOutline} className='close-modal'></IonIcon>
+                  </IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent className="ion-padding">
+              <div className="header-text-container">
+                <h1>{t('currency.select_currency')}</h1>
+              </div>
+              {allSelectedCurrencies.length > 0 ? (
+                allSelectedCurrencies.map((currencyItem) => (
+                  <IonItem
+                    key={currencyItem.code}
+                    button
+                    onClick={() => selectExpenseCurrency(currencyItem)}
+                    disabled={currencyItem.code === selectedCurrency.code}
+                  >
+                    <IonAvatar className="country-avatar country-avatar-small mr-10">
+                      <img
+                        src={getFlagImage(currencyItem)}
+                        alt={selectedCurrency && selectedCurrency.name}
+                        className="country-flag"
+                      />
+                    </IonAvatar>
+                    <IonLabel>{`${currencyItem.name} (${currencyItem.symbol})`}</IonLabel>
+                  </IonItem>
+                ))
+              ) : (
+                <p>{t('currency.no_alt_curr_add')}</p>
+              )}
+            </IonContent>
+          </IonModal>
 
+          {/* Frequency modal */}
+          <IonModal 
+            isOpen={showFrequencyModal} 
+            onDidDismiss={() => setShowFrequencyModal(false)}
+            className="small-modal"
+          >
+            <div className="small-modal-content">
+              <h3 className="mb-20 centered-container">{t('common.repeat')}</h3>
+
+              <FrequencyForm  
+                startDate={selectedDate.toISOString()}
+                onDone={(settings: RecurrenceSettings) => {
+                  setRecurrence(settings);         // Save the recurrence data
+                  setShowFrequencyModal(false);    // Close modal
+                }}
+                initialSettings={recurrence}
+              />
+            </div>
+          </IonModal>
+
+          {/* Notify modal */}
+          <IonModal 
+            isOpen={showNotifyModal} 
+            onDidDismiss={() => setShowNotifyModal(false)}
+            className="small-modal"
+          >
+            <div className="small-modal-content">
+              <h3 className="mb-30 centered-container">{t('expenses.config_notify')}</h3>
+
+              <NotificationForm
+                onSave={handleSave}
+                onCancel={() => setShowNotifyModal(false)}
+                initialValue={notification}
+              />
+            </div>
+          </IonModal>
+
+          {/* Confirmation Modal */}
+          <Modal
+            isOpen={isConfirmationModalOpen}
+            icon={modalConfig.icon}
+            title={modalConfig.title}
+            content={modalConfig.content}
+            closeModal={() => setIsConfirmationModalOpen(false)}
+            actions={modalConfig.actions}
+          />
+
+          <CustomToast
+            message={toastMessage}
+            isOpen={toastOpen}
+            onDismiss={() => setToastOpen(false)}
+            type={toastType ?? undefined}
+          />
+        </div>
 
       </IonContent>
     </IonPage>

@@ -628,455 +628,446 @@ const EditSubcategory: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
-        {/* Screen Header */}
-        <div className='centered-container'>
-          <h2 className='screen-title'>{t('categories.edit_subcategory')}</h2>  
-        </div>
-
-        {/* Show Category Design */}
-        <section>
-          <div className="centered-container mt-20">
-            <CategoryPreview
-              categoryColor= {isActiveSubcategory ? subcategoryColor : "neutral"}
-              categoryIcon={subcategoryIcon}
-            />
+        <div className="page-container">
+          {/* Screen Header */}
+          <div className='centered-container'>
+            <h2 className='screen-title'>{t('categories.edit_subcategory')}</h2>  
           </div>
-        </section>
 
-        {/* Subcategory name and Favourite */}
-        <section>
-          <div className="parent-input">
-            <div className="input-container">
-              <input
-                type="text"
-                value={subcategoryName}
+          {/* Show Category Design */}
+          <section>
+            <div className="centered-container mt-20">
+              <CategoryPreview
+                categoryColor= {isActiveSubcategory ? subcategoryColor : "neutral"}
+                categoryIcon={subcategoryIcon}
+              />
+            </div>
+          </section>
+
+          {/* Subcategory name and Favourite */}
+          <section>
+            <div className="parent-input">
+              <div className="input-container">
+                <input
+                  type="text"
+                  value={subcategoryName}
+                  disabled={!isActiveSubcategory}
+                  maxLength={20}
+                  onChange={(e) => handleInputChange(e.target.value) }
+                  placeholder={t('categories.subcat_name')}
+                  className={`input capitalize ${error ? 'invalid' : ''} ${!isActiveSubcategory ? 'disabled' : ''}`}
+                />
+                {error && <p className="error-text">{error}</p>}
+              </div>
+              <button 
+                id="open-toast"
                 disabled={!isActiveSubcategory}
-                maxLength={20}
-                onChange={(e) => handleInputChange(e.target.value) }
-                placeholder={t('categories.subcat_name')}
-                className={`input capitalize ${error ? 'invalid' : ''} ${!isActiveSubcategory ? 'disabled' : ''}`}
-              />
-              {error && <p className="error-text">{error}</p>}
+                className={`${!isActiveSubcategory ? 'disabled' : ''}`}
+                onClick={() => handleFavourite(subcategoryId, isFavouriteSubcategory)}
+              >
+                {isFavouriteSubcategory ? <IonIcon icon={heart} /> : <IonIcon icon={heartOutline} />}
+              </button>
             </div>
-            <button 
-              id="open-toast"
+          </section>
+
+          {/* Color picker */}
+          <section>
+            <h6 className='section-title'>{t('themes.choose_color')}</h6>
+            <ColorPicker 
+              onColorSelect={handleColorSelect} 
+              initialColor={subcategoryColor} 
+              isDisabled={!isActiveSubcategory}
+            />
+          </section>
+
+          {/* Icon picker */}
+          <section>
+            <h6 className="section-title">{t('categories.choose_icon')}</h6>
+            <div className='mt-10'>
+            <IonItem 
+              button 
+              detail={false}
+              onClick={() => setIsOpenCategoryModal(true)}
               disabled={!isActiveSubcategory}
-              className={`${!isActiveSubcategory ? 'disabled' : ''}`}
-              onClick={() => handleFavourite(subcategoryId, isFavouriteSubcategory)}
             >
-              {isFavouriteSubcategory ? <IonIcon icon={heart} /> : <IonIcon icon={heartOutline} />}
-            </button>
-          </div>
-        </section>
-
-        {/* Color picker */}
-        <section>
-          <h6 className='section-title'>{t('themes.choose_color')}</h6>
-          <ColorPicker 
-            onColorSelect={handleColorSelect} 
-            initialColor={subcategoryColor} 
-            isDisabled={!isActiveSubcategory}
-          />
-        </section>
-
-        {/* Icon picker */}
-        <section>
-          <h6 className="section-title">{t('categories.choose_icon')}</h6>
-          <div className='mt-10'>
-          <IonItem 
-            button 
-            detail={false}
-            onClick={() => setIsOpenCategoryModal(true)}
-            disabled={!isActiveSubcategory}
-          >
-            <div className='list-item-select'>
-              <span>{t('categories.selected_icon')}</span>
-              <div>
-                <span>
-                  {subcategoryIcon
-                    ? <i className={`fas ${subcategoryIcon} icon`}></i>
-                    : t('categories.make_a_selection')}
-                </span>
-                <IonIcon icon={chevronForwardOutline}></IonIcon>
-              </div>
-            </div>
-          </IonItem>
-          </div>
-        </section>
-
-        {/* Parent Category */}
-        <section>
-          <h6 className="section-title">{t('categories.parent_category')}</h6>
-          {parentCategory ? (
-            <div 
-              className={`category-container centered-container mt-20 ${
-                isActiveSubcategory ? "active-category" : "inactive-category"
-              }`}
-              onClick={isActiveSubcategory ? () => setIsOpenParentModal(true) : undefined}
-              style={isActiveSubcategory ? {} : { opacity: 0.5, cursor: "not-allowed" }}
-            >
-              <CategoryIcon 
-                categoryColor={parentColor} 
-                iconName={parentIcon} 
-              />
-              <div className="category-name">
-                <span>{parentName}</span>
-              </div>
-            </div>
-            ) : (
-              <p>{t('common.loading')}</p>
-          )}
-        </section>
-
-        
-        {/* Update category button */}
-        <IonButton
-          className="block mb-20"
-          onClick={() => {
-            if (isFormValid) {
-              updateSubcategory(subcategoryId);
-            }
-          }}
-          disabled={!isFormValid || !isActiveSubcategory} // Disable the button if the form is invalid
-        >
-          {t('categories.update_subcategory')}
-        </IonButton>
-
-
-        {/* Confirmation Modal */}
-        <Modal
-          isOpen={isModalOpen}
-          icon={modalConfig.icon}
-          title={modalConfig.title}
-          content={modalConfig.content}
-          closeModal={() => setIsModalOpen(false)}
-          actions={modalConfig.actions}
-          destination={modalConfig.destination}
-        />
-
-
-        {/* Category icon picker modal */}
-        <IonModal isOpen={isOpenCategoryModal}>
-          <IonHeader>
-            <IonToolbar>
-              <IonTitle>{t('categories.select_an_icon')}</IonTitle>
-              <IonButtons slot="end">
-                <IonButton onClick={() => setIsOpenCategoryModal(false)}>
-                  <IonIcon aria-hidden="true" icon={closeOutline} className='close-modal'></IonIcon>
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding">
-          <IconPicker
-            selectedIcon={subcategoryIcon}
-            onIconSelect={(icon) => {
-              setSubcategoryIcon(icon); // Update the selected category
-              setIsOpenCategoryModal(false); // Close the modal
-            }}
-          />
-          </IonContent>
-        </IonModal>
-
-
-        {/* Parent Category picker modal */}
-        <IonModal isOpen={isOpenParentModal}>
-          <IonHeader>
-            <IonToolbar>
-              <IonTitle>{t('categories.select_parent_cat')}</IonTitle>
-              <IonButtons slot="end">
-                <IonButton onClick={() => setIsOpenParentModal(false)}>
-                  <IonIcon aria-hidden="true" icon={closeOutline} className='close-modal'></IonIcon>
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding">
-            <CategoryPicker
-              selectedCategory={parentCategoryId} 
-              onCategorySelect={handleParentSelect} // Updated to use the handler
-              excludeFirst={true}
-              onlyCategories={true}
-            />
-          </IonContent>
-        </IonModal>
-
-
-        {/* Subcategory Merge Modal */}
-        <IonModal 
-          isOpen={isMergeModalOpen} 
-          onDidDismiss={() => {
-            setIsMergeModalOpen(false);
-            setAgreedToMerge(false); // Reset the toggle state here
-          }}
-        >
-          <IonHeader className="ion-no-border">
-            <IonToolbar>
-              <IonButtons slot="start">
-                {/* Changed back button to close the modal */}
-                <IonButton onClick={() => setIsMergeModalOpen(false)}>
-                  <IonIcon aria-hidden="true" icon={arrowBackOutline} className='close-modal'></IonIcon>
-                </IonButton>  
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          
-          <IonContent className="ion-padding">
-            {/* Modal title */}
-            <div className='attention-modal-title'>
-              <h2>
-                {t('categories.merge_subcat')}
-              </h2>
-            </div>
-
-            <section>
-              <p>
-                <Trans
-                  i18nKey="categories.merge_confirm_subcat"
-                  values={{ subcategoryName }}
-                  components={[
-                    <span key="0" className="dotted-underlined" />
-                  ]}
-                />
-              </p>
-            </section>
-
-            <section>
-              <h6 className="section-title">{t('categories.what_happens_merge')}</h6>
-              <ul className='attention-modal-list'>
-                <li>
-                  <Trans
-                    i18nKey="categories.what_happens_merge_1"
-                    values={{ expensesCount }}
-                    components={[<b key="0" />]}
-                  />
-                </li>
-                <li>{t('categories.what_happens_subcat_merge_2')}</li>
-                <li>{t('categories.what_happens_no_undone')}</li>
-              </ul>
-            </section>
-
-            {/* Select target category */}
-            <section>
-            <h6 className="section-title">{t('categories.select_target_cat')}</h6>
-              <div className="parent-input">
-                <div className="input-container" >
-                  <input
-                    type="text"
-                    value={targetName}
-                    maxLength={20}
-                    disabled={true}
-                    placeholder={t('categories.select_target')}
-                    className='input capitalize'
-                  />
+              <div className='list-item-select'>
+                <span>{t('categories.selected_icon')}</span>
+                <div>
+                  <span>
+                    {subcategoryIcon
+                      ? <i className={`fas ${subcategoryIcon} icon`}></i>
+                      : t('categories.make_a_selection')}
+                  </span>
+                  <IonIcon icon={chevronForwardOutline}></IonIcon>
                 </div>
-                <button onClick={() => setIsOpenCategoryMergeModal(true)}>
-                  <IonIcon icon={searchOutline}/>
-                </button>
               </div>
-            </section>
-            
+            </IonItem>
+            </div>
+          </section>
 
-            {/* I Understad toggle */}
-            <section>
-              <h6 className="section-title">{t('common.confirmation')}</h6>
-
-              <div className='flex ion-align-items-center mt-20'>
-                <IonToggle
-                  checked={agreedToMerge} 
-                  disabled={targetCategoryId === null || targetCategoryId === subcategoryId} 
-                  onIonChange={(e) => setAgreedToMerge(e.detail.checked)}                  
-                  color="danger"
-                  className='mr-10'
+          {/* Parent Category */}
+          <section>
+            <h6 className="section-title">{t('categories.parent_category')}</h6>
+            {parentCategory ? (
+              <div 
+                className={`category-container centered-container mt-20 ${
+                  isActiveSubcategory ? "active-category" : "inactive-category"
+                }`}
+                onClick={isActiveSubcategory ? () => setIsOpenParentModal(true) : undefined}
+                style={isActiveSubcategory ? {} : { opacity: 0.5, cursor: "not-allowed" }}
+              >
+                <CategoryIcon 
+                  categoryColor={parentColor} 
+                  iconName={parentIcon} 
                 />
-                <span className={`ion-text-wrap ${targetCategoryId === null ? 'disabled' : ''}`}>
-                  {t('categories.i_have_read')}
-                </span>
+                <div className="category-name">
+                  <span>{parentName}</span>
+                </div>
               </div>
+              ) : (
+                <p>{t('common.loading')}</p>
+            )}
+          </section>
+        
+          {/* Update category button */}
+          <IonButton
+            className="block mb-20"
+            onClick={() => {
+              if (isFormValid) {
+                updateSubcategory(subcategoryId);
+              }
+            }}
+            disabled={!isFormValid || !isActiveSubcategory} // Disable the button if the form is invalid
+          >
+            {t('categories.update_subcategory')}
+          </IonButton>
 
-              <IonNote className='mt-10'>
-                <Trans
-                  i18nKey={key}
-                  values={{ subcategoryName, targetName }}
-                  components={[
-                    <span key="0" className="dotted-underlined" />,
-                    <span key="1" className="dotted-underlined" />
-                  ]}
-                /> 
-              </IonNote>            
-            </section>
+          {/* Confirmation Modal */}
+          <Modal
+            isOpen={isModalOpen}
+            icon={modalConfig.icon}
+            title={modalConfig.title}
+            content={modalConfig.content}
+            closeModal={() => setIsModalOpen(false)}
+            actions={modalConfig.actions}
+            destination={modalConfig.destination}
+          />
 
-            {/* Buttons */}
-            <div className="flex ion-justify-content-between ion-margin-top">
-              <IonButton 
-                  fill='outline'
-                  color='medium'
-                  onClick={() => {
-                    setIsMergeModalOpen(false);
-                    setAgreedToMerge(false); // Reset the toggle state here
-                  }}
-              >
-                {t('common.cancel')}
-              </IonButton>
-              <IonButton
-                onClick={mergeSubcategory}
-                disabled={!agreedToMerge || targetCategoryId === null || targetCategoryId === subcategoryId} 
-                color="danger"
-              >
-                  Merge
-              </IonButton>
-            </div>
-
-          </IonContent>
-        </IonModal>
-
-
-        {/* Category picker modal for merge */}
-        <IonModal isOpen={isOpenCategoryMergeModal}>
-          <IonHeader className="ion-no-border">
-            <IonToolbar>
-              <IonButtons slot="start">
-                <IonButton onClick={() => setIsOpenCategoryMergeModal(false)}>
-                  <IonIcon aria-hidden="true" icon={arrowBackOutline} className='close-modal'></IonIcon>
-                </IonButton>  
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding">
-            {/* Modal title */}
-            <div className='attention-modal-title'>
-              <h2>
-                {t('categories.merge')} {subcategoryName}
-              </h2>
-            </div>
-
-            <CategoryPicker
-              selectedCategory={targetCategoryId ?? undefined} // Use the new target state
-              selectedSubcategory={undefined} // Not relevant for this context
-              onCategorySelect={handleTargetCategorySelect} // Use the new handler
-              currentCategoryId={parentCategoryId} 
-              currentSubcategoryId={subcategoryId}
+          {/* Category icon picker modal */}
+          <IonModal isOpen={isOpenCategoryModal}>
+            <IonHeader>
+              <IonToolbar>
+                <IonTitle>{t('categories.select_an_icon')}</IonTitle>
+                <IonButtons slot="end">
+                  <IonButton onClick={() => setIsOpenCategoryModal(false)}>
+                    <IonIcon aria-hidden="true" icon={closeOutline} className='close-modal'></IonIcon>
+                  </IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent className="ion-padding">
+            <IconPicker
+              selectedIcon={subcategoryIcon}
+              onIconSelect={(icon) => {
+                setSubcategoryIcon(icon); // Update the selected category
+                setIsOpenCategoryModal(false); // Close the modal
+              }}
             />
-          </IonContent>
-        </IonModal>
+            </IonContent>
+          </IonModal>
 
+          {/* Parent Category picker modal */}
+          <IonModal isOpen={isOpenParentModal}>
+            <IonHeader>
+              <IonToolbar>
+                <IonTitle>{t('categories.select_parent_cat')}</IonTitle>
+                <IonButtons slot="end">
+                  <IonButton onClick={() => setIsOpenParentModal(false)}>
+                    <IonIcon aria-hidden="true" icon={closeOutline} className='close-modal'></IonIcon>
+                  </IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent className="ion-padding">
+              <CategoryPicker
+                selectedCategory={parentCategoryId} 
+                onCategorySelect={handleParentSelect} // Updated to use the handler
+                excludeFirst={true}
+                onlyCategories={true}
+              />
+            </IonContent>
+          </IonModal>
 
-        {/* Category Deletion Confirmation Modal */}
-        <IonModal 
-          isOpen={showDeleteModal} 
-          onDidDismiss={() => setShowDeleteModal(false)}
-        >
-          <IonHeader className='page-header ion-no-border'>
-            <IonToolbar>
-              <IonButtons slot="end">
-                <IonButton onClick={() => setShowDeleteModal(false)}>
-                  <IonIcon aria-hidden="true" icon={closeOutline} className='close-modal'></IonIcon>
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
+          {/* Subcategory Merge Modal */}
+          <IonModal 
+            isOpen={isMergeModalOpen} 
+            onDidDismiss={() => {
+              setIsMergeModalOpen(false);
+              setAgreedToMerge(false); // Reset the toggle state here
+            }}
+          >
+            <IonHeader className="ion-no-border">
+              <IonToolbar>
+                <IonButtons slot="start">
+                  {/* Changed back button to close the modal */}
+                  <IonButton onClick={() => setIsMergeModalOpen(false)}>
+                    <IonIcon aria-hidden="true" icon={arrowBackOutline} className='close-modal'></IonIcon>
+                  </IonButton>  
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            
+            <IonContent className="ion-padding">
+              {/* Modal title */}
+              <div className='attention-modal-title'>
+                <h2>
+                  {t('categories.merge_subcat')}
+                </h2>
+              </div>
 
-          <IonContent className="ion-padding">
-            {/* Modal title */}
-            <div className='attention-modal-title'>
-              <h2>
-                {t('categories.delete_subcategory')}
-              </h2>
-            </div>
-
-            {/* Modal text and item */}
-            <section>
-              <p>
-                <Trans
-                  i18nKey="categories.delete_confirm_subcat"
-                  values={{ subcategoryName }}
-                  components={[
-                    <span key="0" className="dotted-underlined" />
-                  ]}
-                />
-              </p>
-            </section>
-
-            <section>
-              <h6 className="section-title">{t('categories.what_happens_delete')}</h6>
-              <ul className='attention-modal-list'>
-                <li>
+              <section>
+                <p>
                   <Trans
-                    i18nKey="categories.what_happens_delete_1"
-                    values={{ expensesCount }}
+                    i18nKey="categories.merge_confirm_subcat"
+                    values={{ subcategoryName }}
                     components={[
-                      <b key="0" />, 
-                      <span key="1" className="dotted-underlined" />
+                      <span key="0" className="dotted-underlined" />
                     ]}
                   />
-                </li>
-                <li>{t('categories.what_happens_delete_2_subcat')}</li>
-                <li>{t('categories.what_happens_no_undone')}</li>
-              </ul>
-            </section>
+                </p>
+              </section>
 
-            {/* I Understad toggle */}
-            <section>
-              <h6 className="section-title">{t('common.confirmation')}</h6>
+              <section>
+                <h6 className="section-title">{t('categories.what_happens_merge')}</h6>
+                <ul className='attention-modal-list'>
+                  <li>
+                    <Trans
+                      i18nKey="categories.what_happens_merge_1"
+                      values={{ expensesCount }}
+                      components={[<b key="0" />]}
+                    />
+                  </li>
+                  <li>{t('categories.what_happens_subcat_merge_2')}</li>
+                  <li>{t('categories.what_happens_no_undone')}</li>
+                </ul>
+              </section>
 
-              <div className='flex ion-align-items-center mt-20'>
-                <IonToggle
-                  checked={agreedToDelete}
-                  onIonChange={(e) => setAgreedToDelete(e.detail.checked)}
+              {/* Select target category */}
+              <section>
+              <h6 className="section-title">{t('categories.select_target_cat')}</h6>
+                <div className="parent-input">
+                  <div className="input-container" >
+                    <input
+                      type="text"
+                      value={targetName}
+                      maxLength={20}
+                      disabled={true}
+                      placeholder={t('categories.select_target')}
+                      className='input capitalize'
+                    />
+                  </div>
+                  <button onClick={() => setIsOpenCategoryMergeModal(true)}>
+                    <IonIcon icon={searchOutline}/>
+                  </button>
+                </div>
+              </section>
+              
+
+              {/* I Understad toggle */}
+              <section>
+                <h6 className="section-title">{t('common.confirmation')}</h6>
+
+                <div className='flex ion-align-items-center mt-20'>
+                  <IonToggle
+                    checked={agreedToMerge} 
+                    disabled={targetCategoryId === null || targetCategoryId === subcategoryId} 
+                    onIonChange={(e) => setAgreedToMerge(e.detail.checked)}                  
+                    color="danger"
+                    className='mr-10'
+                  />
+                  <span className={`ion-text-wrap ${targetCategoryId === null ? 'disabled' : ''}`}>
+                    {t('categories.i_have_read')}
+                  </span>
+                </div>
+
+                <IonNote className='mt-10'>
+                  <Trans
+                    i18nKey={key}
+                    values={{ subcategoryName, targetName }}
+                    components={[
+                      <span key="0" className="dotted-underlined" />,
+                      <span key="1" className="dotted-underlined" />
+                    ]}
+                  /> 
+                </IonNote>            
+              </section>
+
+              {/* Buttons */}
+              <div className="flex ion-justify-content-between ion-margin-top">
+                <IonButton 
+                    fill='outline'
+                    color='medium'
+                    onClick={() => {
+                      setIsMergeModalOpen(false);
+                      setAgreedToMerge(false); // Reset the toggle state here
+                    }}
+                >
+                  {t('common.cancel')}
+                </IonButton>
+                <IonButton
+                  onClick={mergeSubcategory}
+                  disabled={!agreedToMerge || targetCategoryId === null || targetCategoryId === subcategoryId} 
                   color="danger"
-                  className='mr-10'
-                />
-                <span className='ion-text-wrap'>
-                  {t('categories.i_have_read')}
-                </span>
+                >
+                    Merge
+                </IonButton>
               </div>
 
-              <IonNote className='mt-10'>
-                {t('categories.delete_toggle_confirm')} <span className='dotted-underlined'>{subcategoryName}</span>.
-              </IonNote>
-            </section>
-            
+            </IonContent>
+          </IonModal>
 
-            {/* Buttons */}
-            <div className="flex ion-justify-content-between ion-margin-top">
-              <IonButton 
-                  fill='outline'
-                  color='medium'
-                  onClick={() => setShowDeleteModal(false)}
-              >
-                {t('common.cancel')}
-              </IonButton>
-              <IonButton
-                  onClick={handleFinalDelete}
-                  disabled={!agreedToDelete} 
-                  color="danger"
-              >
-                {t('common.delete_perm')}
-              </IonButton>
-            </div>
-          </IonContent>
-        </IonModal>
-        
+          {/* Category picker modal for merge */}
+          <IonModal isOpen={isOpenCategoryMergeModal}>
+            <IonHeader className="ion-no-border">
+              <IonToolbar>
+                <IonButtons slot="start">
+                  <IonButton onClick={() => setIsOpenCategoryMergeModal(false)}>
+                    <IonIcon aria-hidden="true" icon={arrowBackOutline} className='close-modal'></IonIcon>
+                  </IonButton>  
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent className="ion-padding">
+              {/* Modal title */}
+              <div className='attention-modal-title'>
+                <h2>
+                  {t('categories.merge')} {subcategoryName}
+                </h2>
+              </div>
 
+              <CategoryPicker
+                selectedCategory={targetCategoryId ?? undefined} // Use the new target state
+                selectedSubcategory={undefined} // Not relevant for this context
+                onCategorySelect={handleTargetCategorySelect} // Use the new handler
+                currentCategoryId={parentCategoryId} 
+                currentSubcategoryId={subcategoryId}
+              />
+            </IonContent>
+          </IonModal>
 
-        {/* Updated Favourite */}
-        <IonToast
-          isOpen={showToast}
-          message={toastMessage}
-          icon={isFavouriteSubcategory ? heart : heartOutline}
-          duration={3000}
-          position='bottom'
-          className="custom-toast"
-          buttons={[
-            {
-              text: t('common.dismiss'),
-              role: 'cancel',
-            },
-          ]}
-          onDidDismiss={() => setShowToast(false)}
-        />      
-        
-        
+          {/* Category Deletion Confirmation Modal */}
+          <IonModal 
+            isOpen={showDeleteModal} 
+            onDidDismiss={() => setShowDeleteModal(false)}
+          >
+            <IonHeader className='page-header ion-no-border'>
+              <IonToolbar>
+                <IonButtons slot="end">
+                  <IonButton onClick={() => setShowDeleteModal(false)}>
+                    <IonIcon aria-hidden="true" icon={closeOutline} className='close-modal'></IonIcon>
+                  </IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+
+            <IonContent className="ion-padding">
+              {/* Modal title */}
+              <div className='attention-modal-title'>
+                <h2>
+                  {t('categories.delete_subcategory')}
+                </h2>
+              </div>
+
+              {/* Modal text and item */}
+              <section>
+                <p>
+                  <Trans
+                    i18nKey="categories.delete_confirm_subcat"
+                    values={{ subcategoryName }}
+                    components={[
+                      <span key="0" className="dotted-underlined" />
+                    ]}
+                  />
+                </p>
+              </section>
+
+              <section>
+                <h6 className="section-title">{t('categories.what_happens_delete')}</h6>
+                <ul className='attention-modal-list'>
+                  <li>
+                    <Trans
+                      i18nKey="categories.what_happens_delete_1"
+                      values={{ expensesCount }}
+                      components={[
+                        <b key="0" />, 
+                        <span key="1" className="dotted-underlined" />
+                      ]}
+                    />
+                  </li>
+                  <li>{t('categories.what_happens_delete_2_subcat')}</li>
+                  <li>{t('categories.what_happens_no_undone')}</li>
+                </ul>
+              </section>
+
+              {/* I Understad toggle */}
+              <section>
+                <h6 className="section-title">{t('common.confirmation')}</h6>
+
+                <div className='flex ion-align-items-center mt-20'>
+                  <IonToggle
+                    checked={agreedToDelete}
+                    onIonChange={(e) => setAgreedToDelete(e.detail.checked)}
+                    color="danger"
+                    className='mr-10'
+                  />
+                  <span className='ion-text-wrap'>
+                    {t('categories.i_have_read')}
+                  </span>
+                </div>
+
+                <IonNote className='mt-10'>
+                  {t('categories.delete_toggle_confirm')} <span className='dotted-underlined'>{subcategoryName}</span>.
+                </IonNote>
+              </section>
+              
+
+              {/* Buttons */}
+              <div className="flex ion-justify-content-between ion-margin-top">
+                <IonButton 
+                    fill='outline'
+                    color='medium'
+                    onClick={() => setShowDeleteModal(false)}
+                >
+                  {t('common.cancel')}
+                </IonButton>
+                <IonButton
+                    onClick={handleFinalDelete}
+                    disabled={!agreedToDelete} 
+                    color="danger"
+                >
+                  {t('common.delete_perm')}
+                </IonButton>
+              </div>
+            </IonContent>
+          </IonModal>
+
+          {/* Updated Favourite */}
+          <IonToast
+            isOpen={showToast}
+            message={toastMessage}
+            icon={isFavouriteSubcategory ? heart : heartOutline}
+            duration={3000}
+            position='bottom'
+            className="custom-toast"
+            buttons={[
+              {
+                text: t('common.dismiss'),
+                role: 'cancel',
+              },
+            ]}
+            onDidDismiss={() => setShowToast(false)}
+          />      
+        </div>
       </IonContent>
     </IonPage>
   );

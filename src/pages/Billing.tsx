@@ -46,26 +46,28 @@ const Billing: React.FC = () => {
 
 
       <IonContent className="ion-padding-horizontal"  ref={contentRef}>
-        {/* Screen Header */}
-        <section className='centered-container'>
-          <h2 className='screen-title'>{t('billing.billing_title')}</h2>
-          <IonImg
-            src={`assets/images/billing/${color}-billing.svg`} // Dynamically set the SVG source
-            alt="Backup image"
-            className='screen-wide-img'
-          ></IonImg>
-          <h3>{t('billing.your_plan')}</h3>
-        </section>
+        <div className="page-container">
+          {/* Screen Header */}
+          <section className='centered-container'>
+            <h2 className='screen-title'>{t('billing.billing_title')}</h2>
+            <IonImg
+              src={`assets/images/billing/${color}-billing.svg`} // Dynamically set the SVG source
+              alt="Backup image"
+              className='screen-wide-img'
+            ></IonImg>
+            <h3>{t('billing.your_plan')}</h3>
+          </section>
 
-        {/* Choose a Plan */}
-        <section>
-          <Plans />
-          <p>{t('billing.renew')} June 3, 2025</p>
-        </section>
+          {/* Choose a Plan */}
+          <section>
+            <Plans />
+            <p>{t('billing.renew')} June 3, 2025</p>
+          </section>
 
-        <section className='centered-container'>
-          <a className='link' href='https://www.datasur.net.ar/'>{t('common.learn_more')}</a>
-        </section>
+          <section className='centered-container'>
+            <a className='link' href='https://www.datasur.net.ar/'>{t('common.learn_more')}</a>
+          </section>
+        </div>
       </IonContent>
     </IonPage>
   );

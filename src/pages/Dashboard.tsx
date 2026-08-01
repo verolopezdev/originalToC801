@@ -266,48 +266,47 @@ const Dashboard: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
-
-        {/* Cards */}
-        <div className='mt-30'>
-        {selectedInterval && (
-          <DashboardMainCard 
-            selectedInterval={selectedInterval} 
-            setSelectedInterval={setSelectedInterval} 
-            currentDate={currentDate}   
-            start={start}
-            end={end}
-          />
-        )}
-        </div>
-
-        {travelMode && (
-          <DashboardMainTrip
-            tripId={tripId}
-            tripIcon={tripIcon}
-            tripName={tripName}
-            fromDate={fromDate}
-            toDate={toDate}
-            currencyCode={tripCurrencyCode}
-            totalSpent={tripTotal ?? 0} // if tripTotal is null or undefined, use 0 instead to avoid flicker (shows icon for a split second)
-          />
-        )}
-
-        
-        <section>
-          <div className='mb-20'>
-            <h6 className="section-title">{t('dashboard.recent_expenses')}</h6>
-          </div>
+        <div className="page-container">
+          {/* Cards */}
+          <div className='mt-30'>
           {selectedInterval && (
-            <TransactionList 
+            <DashboardMainCard 
               selectedInterval={selectedInterval} 
+              setSelectedInterval={setSelectedInterval} 
+              currentDate={currentDate}   
               start={start}
               end={end}
-              reverse={true}
-              fixedLimit={10} 
             />
           )}
-        </section>
+          </div>
 
+          {travelMode && (
+            <DashboardMainTrip
+              tripId={tripId}
+              tripIcon={tripIcon}
+              tripName={tripName}
+              fromDate={fromDate}
+              toDate={toDate}
+              currencyCode={tripCurrencyCode}
+              totalSpent={tripTotal ?? 0} // if tripTotal is null or undefined, use 0 instead to avoid flicker (shows icon for a split second)
+            />
+          )}
+        
+          <section>
+            <div className='mb-20'>
+              <h6 className="section-title">{t('dashboard.recent_expenses')}</h6>
+            </div>
+            {selectedInterval && (
+              <TransactionList 
+                selectedInterval={selectedInterval} 
+                start={start}
+                end={end}
+                reverse={true}
+                fixedLimit={10} 
+              />
+            )}
+          </section>
+        </div>
       </IonContent>
       <Footer appPages={translatedMenuItems} />
     </IonPage>

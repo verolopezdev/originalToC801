@@ -424,6 +424,7 @@ const EditAccount: React.FC = () => {
       </IonHeader>
     
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
+        <div className="page-container">
           <div>
             {/* Screen Header */}
             <div className='centered-container mb-20'>
@@ -534,17 +535,16 @@ const EditAccount: React.FC = () => {
             </IonButton>
           </div>
 
-
-        {/* Confirmation Modal */}
-        <Modal
-          isOpen={isConfirmationModalOpen}
-          icon={modalConfig.icon}
-          title={modalConfig.title}
-          content={modalConfig.content}
-          closeModal={() => setIsConfirmationModalOpen(false)}
-          actions={modalConfig.actions}
-        />
-
+          {/* Confirmation Modal */}
+          <Modal
+            isOpen={isConfirmationModalOpen}
+            icon={modalConfig.icon}
+            title={modalConfig.title}
+            content={modalConfig.content}
+            closeModal={() => setIsConfirmationModalOpen(false)}
+            actions={modalConfig.actions}
+          />
+        </div>
       </IonContent>
     </IonPage>
     

@@ -49,7 +49,7 @@ const GetPremium: React.FC = () => {
 
 
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
-        
+        <div className="page-container">
           {isPremium ? (
             <>
               {/* Header */}
@@ -128,9 +128,10 @@ const GetPremium: React.FC = () => {
             </>
           )}
 
-        <section className='centered-container'>
-          <a className='link' href='https://www.datasur.net.ar/'>{t('common.learn_more')}</a>
-        </section>
+          <section className='centered-container'>
+            <a className='link' href='https://www.datasur.net.ar/'>{t('common.learn_more')}</a>
+          </section>
+        </div>
       </IonContent>
     </IonPage>
   );

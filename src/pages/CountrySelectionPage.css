@@ -1,7 +1,4 @@
-
-.big-logo {
-  width: 120px;
-  height: 120px;
+.app-logo {
   border-radius: 50%;
   border: 2px solid var(--ion-avatar-inner-border);
   box-shadow: 0 0 0 1px var(--ion-avatar-outer-border); /* Gray border around the white border */
@@ -9,6 +6,11 @@
   justify-content: center;
   align-items: center;
   object-fit: cover; /* Maintains aspect ratio and fills the container */
+}
+
+.big-logo {
+  width: 120px;
+  height: 120px;
 }
 
 .medium-logo {

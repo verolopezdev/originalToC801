@@ -194,168 +194,171 @@ const Profile: React.FC = () => {
       </IonHeader>
       
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
-        <div className="centered-container mb-20">
-          <h2 className='screen-title'>{t('profile.profile_title')}</h2>
-        </div>
-        {/* Profile */}
-        <section>
-          <div className="centered-container">
-            <div className="profile-container" id="open-modal">
-              {avatar ? (
-                // Display the avatar image if it exists
-                <img
-                  src={avatar}
-                  alt={`${userName}'s Avatar`}
-                  className="avatar-profile-image"
+        <div className="page-container">
+          <div className="centered-container mb-20">
+            <h2 className='screen-title'>{t('profile.profile_title')}</h2>
+          </div>
+
+          {/* Profile */}
+          <section>
+            <div className="centered-container">
+              <div className="profile-container" id="open-modal">
+                {avatar ? (
+                  // Display the avatar image if it exists
+                  <img
+                    src={avatar}
+                    alt={`${userName}'s Avatar`}
+                    className="avatar-profile-image"
+                  />
+                ) : (
+                  // Display initials if no avatar is set
+                  <div className="avatar-profile">
+                    {userName.charAt(0)}
+                    {userLastName && userLastName.charAt(0)}
+                  </div>
+                )}
+                <IonIcon
+                  icon={cameraOutline}
+                  className="icon-lower-right"
                 />
+              </div>
+              <h3>{userName} {userLastName}</h3>
+              {userEmail ? (
+                <IonNote>{userEmail}</IonNote>
               ) : (
-                // Display initials if no avatar is set
-                <div className="avatar-profile">
-                  {userName.charAt(0)}
-                  {userLastName && userLastName.charAt(0)}
-                </div>
+                <IonNote>{t('profile.your_email')}</IonNote>
               )}
-              <IonIcon
-                icon={cameraOutline}
-                className="icon-lower-right"
-              />
+              
             </div>
-            <h3>{userName} {userLastName}</h3>
-            {userEmail ? (
-              <IonNote>{userEmail}</IonNote>
-            ) : (
-              <IonNote>{t('profile.your_email')}</IonNote>
-            )}
-            
-          </div>
-        </section>
+          </section>
 
-        {/* Form Section */}
-        <section>
-          <div className="section-header">
-            <h6 className="section-title">{t('profile.user_info')}</h6>
-          </div>
-            {/* User's name */}
-            <div className='form-item'>
-              <div className="input-container"> 
-                <label>{t('profile.first_name')}</label>
-                <input
-                  type="text"
-                  value={userName === t('common.default_user_name') ? '' : userName}
-                  maxLength={20}
-                  onChange={(e) =>
-                    handleInputChange(
-                      'userName',
-                      e.target.value,
-                      setUserName,
-                      validateName,
-                      t('common.invalid_name')
-                    )
-                  }
-                  placeholder={t('profile.type_name')}
-                  className={`input ${errors.userName ? 'invalid' : ''}`} 
-                />
-                {errors.userName && <p className="error-text">{errors.userName}</p>}
-              </div>
-            </div>  
-
-            {/* User's last name */}
-            <div className='form-item'>
-              <div className="input-container">
-                <label>{t('profile.last_name')}</label>
-                <input
-                  type="text"
-                  value={userLastName}
-                  maxLength={20}
-                  onChange={(e) =>
-                    handleInputChange(
-                      'userLastName',
-                      e.target.value,
-                      setUserLastName,
-                      validateName,
-                      t('common.invalid_name')
-                    )
-                  }
-                  placeholder={t('profile.type_last_name')}
-                  className={`input ${errors.userLastName ? 'invalid' : ''}`}
-                />
-                {errors.userLastName && <p className="error-text">{errors.userLastName}</p>}
-              </div>
+          {/* Form Section */}
+          <section>
+            <div className="section-header">
+              <h6 className="section-title">{t('profile.user_info')}</h6>
             </div>
+              {/* User's name */}
+              <div className='form-item'>
+                <div className="input-container"> 
+                  <label>{t('profile.first_name')}</label>
+                  <input
+                    type="text"
+                    value={userName === t('common.default_user_name') ? '' : userName}
+                    maxLength={20}
+                    onChange={(e) =>
+                      handleInputChange(
+                        'userName',
+                        e.target.value,
+                        setUserName,
+                        validateName,
+                        t('common.invalid_name')
+                      )
+                    }
+                    placeholder={t('profile.type_name')}
+                    className={`input ${errors.userName ? 'invalid' : ''}`} 
+                  />
+                  {errors.userName && <p className="error-text">{errors.userName}</p>}
+                </div>
+              </div>  
 
-            {/* User's email */}
-            <div className='form-item'>
-              <div className="input-container">
-                <label>Email</label>
-                <input
-                  type="email"
-                  value={userEmail}
-                  onChange={(e) =>
-                    handleInputChange(
-                      'userEmail',
-                      e.target.value,
-                      setUserEmail,
-                      validateEmail,
-                      t('profile.invalid_email')
-                    )
-                  }
-                  placeholder={t('profile.type_email')}
-                  className={`input ${errors.userEmail ? 'invalid' : ''}`}
-                />
-                  {errors.userEmail && <p className="error-text">{errors.userEmail}</p>}
+              {/* User's last name */}
+              <div className='form-item'>
+                <div className="input-container">
+                  <label>{t('profile.last_name')}</label>
+                  <input
+                    type="text"
+                    value={userLastName}
+                    maxLength={20}
+                    onChange={(e) =>
+                      handleInputChange(
+                        'userLastName',
+                        e.target.value,
+                        setUserLastName,
+                        validateName,
+                        t('common.invalid_name')
+                      )
+                    }
+                    placeholder={t('profile.type_last_name')}
+                    className={`input ${errors.userLastName ? 'invalid' : ''}`}
+                  />
+                  {errors.userLastName && <p className="error-text">{errors.userLastName}</p>}
+                </div>
               </div>
-            </div>
 
-        </section>
+              {/* User's email */}
+              <div className='form-item'>
+                <div className="input-container">
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    value={userEmail}
+                    onChange={(e) =>
+                      handleInputChange(
+                        'userEmail',
+                        e.target.value,
+                        setUserEmail,
+                        validateEmail,
+                        t('profile.invalid_email')
+                      )
+                    }
+                    placeholder={t('profile.type_email')}
+                    className={`input ${errors.userEmail ? 'invalid' : ''}`}
+                  />
+                    {errors.userEmail && <p className="error-text">{errors.userEmail}</p>}
+                </div>
+              </div>
+
+          </section>
         
-        {/* Save changes button */}
-        <IonButton
-          className="block"
-          onClick={() => {
-            if (isFormValid) {
-              updateUser({ name: userName, lastName: userLastName, email: userEmail });
-              openInfoModal();
-            }
-          }}
-          disabled={!isFormValid} // Disable the button if the form is invalid
-        >
-          {t('common.save_changes')}
-        </IonButton>
+          {/* Save changes button */}
+          <IonButton
+            className="block"
+            onClick={() => {
+              if (isFormValid) {
+                updateUser({ name: userName, lastName: userLastName, email: userEmail });
+                openInfoModal();
+              }
+            }}
+            disabled={!isFormValid} // Disable the button if the form is invalid
+          >
+            {t('common.save_changes')}
+          </IonButton>
 
-        {/* Modal for profile photo */}
-        <IonModal
-          ref={modal}
-          trigger="open-modal"
-          initialBreakpoint={1}
-          breakpoints={[0, 1]}
-          backdropDismiss={true}
-          className="sheet-modal"
-        >
-          <IonList lines="none" className='modal-list'>
-            <IonListHeader>
-              <IonLabel className='modal-title'>{t('profile.modal_title')}</IonLabel>
-            </IonListHeader>
-            <IonItem button onClick={handleCamera}>
-              <OptionIcon icon={cameraOutline} />
-              <IonLabel>{t('profile.take_photo')}</IonLabel>
-            </IonItem>
-            <IonItem button onClick={handleGallery}>
-              <OptionIcon icon={imageOutline} />
-              <IonLabel>{t('profile.choose_gallery')}</IonLabel>
-            </IonItem>
-          </IonList>
-        </IonModal>
+          {/* Modal for profile photo */}
+          <IonModal
+            ref={modal}
+            trigger="open-modal"
+            initialBreakpoint={1}
+            breakpoints={[0, 1]}
+            backdropDismiss={true}
+            className="sheet-modal"
+          >
+            <IonList lines="none" className='modal-list'>
+              <IonListHeader>
+                <IonLabel className='modal-title'>{t('profile.modal_title')}</IonLabel>
+              </IonListHeader>
+              <IonItem button onClick={handleCamera}>
+                <OptionIcon icon={cameraOutline} />
+                <IonLabel>{t('profile.take_photo')}</IonLabel>
+              </IonItem>
+              <IonItem button onClick={handleGallery}>
+                <OptionIcon icon={imageOutline} />
+                <IonLabel>{t('profile.choose_gallery')}</IonLabel>
+              </IonItem>
+            </IonList>
+          </IonModal>
 
-        {/* Success Confirmation Modal */}
-        <Modal
-          isOpen={isModalOpen}
-          icon={modalConfig.icon}
-          title={modalConfig.title}
-          content={modalConfig.content}
-          closeModal={() => setIsModalOpen(false)}
-          actions={modalConfig.actions} 
-          destination={modalConfig.destination}
-        />
+          {/* Success Confirmation Modal */}
+          <Modal
+            isOpen={isModalOpen}
+            icon={modalConfig.icon}
+            title={modalConfig.title}
+            content={modalConfig.content}
+            closeModal={() => setIsModalOpen(false)}
+            actions={modalConfig.actions} 
+            destination={modalConfig.destination}
+          />
+        </div>
       </IonContent>
     </IonPage>
   );

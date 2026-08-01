@@ -189,133 +189,131 @@ const OtherPeriods: React.FC = () => {
       </IonHeader>
 
       <IonContent id="statistics-content" className="ion-padding-horizontal"  ref={contentRef}>
-        {/* Page title */}
-        <div className="centered-container mb-20">
-          <h2 className='screen-title'>{t('date.other_periods')}</h2>
-        </div>
-
-        {/* Period Section */}
-        <div>
-          <div className="flex-row-right">
-            <IonItem onClick={() => setShowMonthPicker(true)}>
-              <span>{year}</span>
-              <span className="period-month-label">{getMonthLabel(month)}</span>
-              <IonIcon icon={caretDownOutline} slot="end" className="caret-icon"></IonIcon>
-            </IonItem>
+        <div className="page-container">
+          {/* Page title */}
+          <div className="centered-container mb-20">
+            <h2 className='screen-title'>{t('date.other_periods')}</h2>
           </div>
-        </div>
 
-
-        {/* Total for the period */}
-        <h1 className='statistics-total'>
-          <FormatAmount
-            amount={showTotal}
-            currencyCode={currency.defaultCurrency.code}
-          />
-        </h1>
-        
-
-        {/* Show chart only when fully loaded */}
-        {!isLoading && hasExpenses === 0 ? (
-          <p style={{ textAlign: "center", padding: 20 }}>
-            {t('expenses.none_to_display')}
-          </p>
-        ) : !isLoading && hasExpenses > 0 && isVisible && (
-          <div 
-            id="expenses-chart"
-            style={{
-              width: "100%",
-              minHeight: "250px",   // <= ESSENTIAL
-              display: "block"
-            }}
-          >
-          {month === "all" ? (
-            <YearlyChart expenses={expenses} year={year} />
-          ) : (
-            <MonthlyChart
-              expenses={expenses}
-              categories={categories}
-              sortOption={sortOption}
-              year={year}
-              month={months.indexOf(month) - 1}  // returns 0–11
-            />
-          )}
-          </div>
-        )}
-
-
-        {/* Period selection modal */}
-        <IonModal isOpen={showMonthPicker} onDidDismiss={() => setShowMonthPicker(false)}>
-          <IonHeader className="ion-no-border">
-            <IonToolbar className="transparent">
-              <IonTitle>{t('date.select_period')}</IonTitle>
-              <IonButtons slot="end">
-                <IonButton onClick={() => setShowMonthPicker(false)}>
-                  <IonIcon aria-hidden="true" icon={closeOutline} className="close-modal"></IonIcon>
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-
-          <IonContent>
-            <div className="month-picker-modal ion-padding">
-
-              {/* Year selection */}
-              <h5 className="picker-section-title">{t('date.select_year')}</h5>
-              <IonGrid className="year-picker-grid">
-                <IonRow>
-                  {availableYears.map((y) => (
-                    <IonCol size="4" key={y}>
-                      <div
-                        className={`year-item ${year === y ? "selected" : ""}`}
-                        onClick={() => setYear(y)}
-                      >
-                        {y}
-                      </div>
-                    </IonCol>
-                  ))}
-                </IonRow>
-              </IonGrid>
-
-              {/* Month selection */}
-              <h5 className="picker-section-title mt-20">{t('date.select_month')}</h5>
-
-              <IonGrid className="month-picker-grid">
-                <IonRow>
-                  <IonCol size="12" className="month-col">
-                  <div
-                    className={`month-item all-option ${month === "all" ? "selected" : ""}`}
-                    onClick={() => {
-                      setMonth("all");
-                      setShowMonthPicker(false);
-                    }}
-                  >
-                    {t("date.all_year")}
-                  </div>
-                  </IonCol>
-                </IonRow>
-
-                <IonRow>
-                  {Array.from({ length: 12 }, (_, i) => (
-                    <IonCol size="4" key={i} className="month-col">
-                      <div
-                        className={`month-item ${month === i ? "selected" : ""}`}
-                        onClick={() => {
-                          setMonth(i);
-                          setShowMonthPicker(false);
-                        }}
-                      >
-                        {getMonthLabel(i)}
-                      </div>
-                    </IonCol>
-                  ))}
-                </IonRow>
-              </IonGrid>
-
+          {/* Period Section */}
+          <div>
+            <div className="flex-row-right">
+              <IonItem onClick={() => setShowMonthPicker(true)}>
+                <span>{year}</span>
+                <span className="period-month-label">{getMonthLabel(month)}</span>
+                <IonIcon icon={caretDownOutline} slot="end" className="caret-icon"></IonIcon>
+              </IonItem>
             </div>
-          </IonContent>
-        </IonModal>
+          </div>
 
+          {/* Total for the period */}
+          <h1 className='statistics-total'>
+            <FormatAmount
+              amount={showTotal}
+              currencyCode={currency.defaultCurrency.code}
+            />
+          </h1>
+
+          {/* Show chart only when fully loaded */}
+          {!isLoading && hasExpenses === 0 ? (
+            <p style={{ textAlign: "center", padding: 20 }}>
+              {t('expenses.none_to_display')}
+            </p>
+          ) : !isLoading && hasExpenses > 0 && isVisible && (
+            <div 
+              id="expenses-chart"
+              style={{
+                width: "100%",
+                minHeight: "250px",   // <= ESSENTIAL
+                display: "block"
+              }}
+            >
+            {month === "all" ? (
+              <YearlyChart expenses={expenses} year={year} />
+            ) : (
+              <MonthlyChart
+                expenses={expenses}
+                categories={categories}
+                sortOption={sortOption}
+                year={year}
+                month={months.indexOf(month) - 1}  // returns 0–11
+              />
+            )}
+            </div>
+          )}
+
+          {/* Period selection modal */}
+          <IonModal isOpen={showMonthPicker} onDidDismiss={() => setShowMonthPicker(false)}>
+            <IonHeader className="ion-no-border">
+              <IonToolbar className="transparent">
+                <IonTitle>{t('date.select_period')}</IonTitle>
+                <IonButtons slot="end">
+                  <IonButton onClick={() => setShowMonthPicker(false)}>
+                    <IonIcon aria-hidden="true" icon={closeOutline} className="close-modal"></IonIcon>
+                  </IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+
+            <IonContent>
+              <div className="month-picker-modal ion-padding">
+
+                {/* Year selection */}
+                <h5 className="picker-section-title">{t('date.select_year')}</h5>
+                <IonGrid className="year-picker-grid">
+                  <IonRow>
+                    {availableYears.map((y) => (
+                      <IonCol size="4" key={y}>
+                        <div
+                          className={`year-item ${year === y ? "selected" : ""}`}
+                          onClick={() => setYear(y)}
+                        >
+                          {y}
+                        </div>
+                      </IonCol>
+                    ))}
+                  </IonRow>
+                </IonGrid>
+
+                {/* Month selection */}
+                <h5 className="picker-section-title mt-20">{t('date.select_month')}</h5>
+
+                <IonGrid className="month-picker-grid">
+                  <IonRow>
+                    <IonCol size="12" className="month-col">
+                    <div
+                      className={`month-item all-option ${month === "all" ? "selected" : ""}`}
+                      onClick={() => {
+                        setMonth("all");
+                        setShowMonthPicker(false);
+                      }}
+                    >
+                      {t("date.all_year")}
+                    </div>
+                    </IonCol>
+                  </IonRow>
+
+                  <IonRow>
+                    {Array.from({ length: 12 }, (_, i) => (
+                      <IonCol size="4" key={i} className="month-col">
+                        <div
+                          className={`month-item ${month === i ? "selected" : ""}`}
+                          onClick={() => {
+                            setMonth(i);
+                            setShowMonthPicker(false);
+                          }}
+                        >
+                          {getMonthLabel(i)}
+                        </div>
+                      </IonCol>
+                    ))}
+                  </IonRow>
+                </IonGrid>
+
+              </div>
+            </IonContent>
+          </IonModal>
+        </div>
       </IonContent>
     </IonPage>
   );

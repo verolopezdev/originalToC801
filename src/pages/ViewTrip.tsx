@@ -207,44 +207,45 @@ const ViewTrip: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
-        {/* Screen Header */}
-        <div className='centered-container'>
-          <h2 className='screen-title'>{t("trip.trip_title", { trip: tripName })}</h2>
-        </div>
-
-        <section className='mt-20'>
-          <TripData 
-            tripIcon={tripIcon}
-            fromDate={fromDate}
-            toDate={toDate}
-            currencyName={selectedCurrency.name}
-            currencySymbol={selectedCurrency.symbol}
-            currencyCode={selectedCurrency.code}
-            locale={selectedCurrency.locale}
-            totalSpent={tripTotal ?? 0} // if tripTotal is null or undefined, use 0 instead to avoid flicker (shows icon for a split second)
-          />
-          {selectedCurrency.code !== defaultCurrencyCode && (
-            <ExchangeRateDisplay targetCurrency={selectedCurrency.code} showLastUpdated={true} />
-          )}
-        </section>
-
-        <section>
-          <h6 className="section-title">{t('trip.trip_exps')}</h6>
-          <div className='mt-10'>
-          <TripExpensesList tripId={passedTripId} onTotalChange={setTripTotal} />   
+        <div className="page-container">
+          {/* Screen Header */}
+          <div className='centered-container'>
+            <h2 className='screen-title'>{t("trip.trip_title", { trip: tripName })}</h2>
           </div>
-        </section>  
 
-        {/* Confirmation Modal */}
-        <Modal
-          isOpen={isConfirmationModalOpen}
-          icon={modalConfig.icon}
-          title={modalConfig.title}
-          content={modalConfig.content}
-          closeModal={() => setIsConfirmationModalOpen(false)}
-          actions={modalConfig.actions}
-        />
+          <section className='mt-20'>
+            <TripData 
+              tripIcon={tripIcon}
+              fromDate={fromDate}
+              toDate={toDate}
+              currencyName={selectedCurrency.name}
+              currencySymbol={selectedCurrency.symbol}
+              currencyCode={selectedCurrency.code}
+              locale={selectedCurrency.locale}
+              totalSpent={tripTotal ?? 0} // if tripTotal is null or undefined, use 0 instead to avoid flicker (shows icon for a split second)
+            />
+            {selectedCurrency.code !== defaultCurrencyCode && (
+              <ExchangeRateDisplay targetCurrency={selectedCurrency.code} showLastUpdated={true} />
+            )}
+          </section>
 
+          <section>
+            <h6 className="section-title">{t('trip.trip_exps')}</h6>
+            <div className='mt-10'>
+            <TripExpensesList tripId={passedTripId} onTotalChange={setTripTotal} />   
+            </div>
+          </section>  
+
+          {/* Confirmation Modal */}
+          <Modal
+            isOpen={isConfirmationModalOpen}
+            icon={modalConfig.icon}
+            title={modalConfig.title}
+            content={modalConfig.content}
+            closeModal={() => setIsConfirmationModalOpen(false)}
+            actions={modalConfig.actions}
+          />
+        </div>
       </IonContent>
     </IonPage>
   );

@@ -52,24 +52,24 @@ const ThemePage: React.FC = () => {
       </IonHeader>
       
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
-        
-        {/* Screen Header */}
-        <section className='centered-container'>
-          <h2 className='screen-title'>{t('themes.theme_title')}</h2>
-          <IonImg
-            src={`assets/images/themes/${color}-theming.svg`} // Dynamically set the SVG source
-            alt="Theme image"
-            className='screen-narrow-img'
-          ></IonImg>
-          <p className='screen-prompt'>{t('themes.theme_prompt')}</p>
-        </section>
+        <div className="page-container">
+          {/* Screen Header */}
+          <section className='centered-container'>
+            <h2 className='screen-title'>{t('themes.theme_title')}</h2>
+            <IonImg
+              src={`assets/images/themes/${color}-theming.svg`} // Dynamically set the SVG source
+              alt="Theme image"
+              className='screen-narrow-img'
+            ></IonImg>
+            <p className='screen-prompt'>{t('themes.theme_prompt')}</p>
+          </section>
 
-        {/* Color Picker */}
-        <section>
-          <h6 className='section-title'>{t('themes.choose_color')}</h6>
-          <ColorPicker onColorSelect={handleColorSelect} />
-        </section>
-        
+          {/* Color Picker */}
+          <section>
+            <h6 className='section-title'>{t('themes.choose_color')}</h6>
+            <ColorPicker onColorSelect={handleColorSelect} />
+          </section>
+        </div>
       </IonContent>
     </IonPage>
   );

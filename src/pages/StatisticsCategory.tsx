@@ -17,10 +17,6 @@ import FormatAmount from '../components/FormatAmount';
 import FormattedDate from '../components/FormattedDate';
 
 
-// Utility functions
-import { formatDate } from '../utils/chartFunctions';
-
-
 // Ionic's components
 import { 
   IonAlert,
@@ -163,67 +159,67 @@ const StatisticsCategory: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
+        <div className="page-container">
+          {!isLoading && (
+            <>
+              {/* Screen Header */}
+              <div className='centered-container mb-20'>
+                <h2 className='screen-title'>{category?.categoryName}</h2>
+              </div>
 
-        {!isLoading && (
-          <>
-            {/* Screen Header */}
-            <div className='centered-container mb-20'>
-              <h2 className='screen-title'>{category?.categoryName}</h2>
-            </div>
-
-            {/* Total for the period */}
-            <h1 className='statistics-total'>
-              <FormatAmount
-                amount={categoryTotal}
-                currencyCode={currency.defaultCurrency.code}
-              />
-            </h1> 
-
-            {/* Period title and date range */}
-            <div>
-              <div className="flex">
-                <h6 className='section-title'>
-                  <FormattedDate date={date} format="monthYear" />  
-                </h6> 
-                <IonIcon 
-                  icon={informationCircleOutline} 
-                  className="info-icon"
-                  onClick={() => setShowInfo(true)}
+              {/* Total for the period */}
+              <h1 className='statistics-total'>
+                <FormatAmount
+                  amount={categoryTotal}
+                  currencyCode={currency.defaultCurrency.code}
                 />
-              </div>
-            </div>
+              </h1> 
 
-            {/* Category chart */}
-            <CategoryPieChart 
-              groupedExpenses={groupedExpenses} 
-              parentCategoryColor={categoryColor ? categoryColor : 'categoryless'}
-            />
-
-            <section>
-              <div className='section-header'>
-                  <h6 className="section-title">{t('common.details')}</h6>
+              {/* Period title and date range */}
+              <div>
+                <div className="flex">
+                  <h6 className='section-title'>
+                    <FormattedDate date={date} format="monthYear" />  
+                  </h6> 
+                  <IonIcon 
+                    icon={informationCircleOutline} 
+                    className="info-icon"
+                    onClick={() => setShowInfo(true)}
+                  />
+                </div>
               </div>
-              
-              {/* Accordion list of subcategories & expenses */}
-              <TransactionListBySubcategory 
-                groupedExpenses={groupedExpenses}
-                parentCategoryColor={categoryColor}
-                parentIcon={categoryIcon}
+
+              {/* Category chart */}
+              <CategoryPieChart 
+                groupedExpenses={groupedExpenses} 
+                parentCategoryColor={categoryColor ? categoryColor : 'categoryless'}
               />
-            </section>
-          </>
-        )}       
+
+              <section>
+                <div className='section-header'>
+                    <h6 className="section-title">{t('common.details')}</h6>
+                </div>
+                
+                {/* Accordion list of subcategories & expenses */}
+                <TransactionListBySubcategory 
+                  groupedExpenses={groupedExpenses}
+                  parentCategoryColor={categoryColor}
+                  parentIcon={categoryIcon}
+                />
+              </section>
+            </>
+          )}       
         
-        {/* Show title info */}
-        <IonAlert
-          isOpen={showInfo}
-          className='custom-alert'
-          onDidDismiss={() => setShowInfo(false)}
-          header={chartTitle}
-          message={infoMsg}
-          buttons={['OK']}
-        />
-        
+          {/* Show title info */}
+          <IonAlert
+            isOpen={showInfo}
+            className='custom-alert'
+            onDidDismiss={() => setShowInfo(false)}
+            header={chartTitle}
+            message={infoMsg}
+            buttons={['OK']}
+          />
+        </div>
       </IonContent>
     </IonPage>
   );

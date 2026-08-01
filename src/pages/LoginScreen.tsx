@@ -103,51 +103,53 @@ const LoginScreen: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
-        <div className="centered-screen">
-          <div className="centered-container">
-            <img
-              src="/assets/images/logo.png"
-              alt="App logo"
-              className="big-logo"
-            />
-            <h1 className='app-name'>AppName</h1>
-            <h4 className='app-type'>Expense Tracker</h4>
-          </div>
-          <h1>Welcome back!</h1>
-          <p>Let's get you signed in. Enter your registered email below.</p>
-          
-          <section>
-            {/* User's email */}
-            <div className='form-item'>
-              <div className="input-container">
-                <label>Email</label>
-                <input
-                  type="email"
-                  value={userEmail}
-                  onChange={(e) =>
-                    handleInputChange(
-                      'userEmail',
-                      e.target.value,
-                      setUserEmail,
-                      validateEmail,
-                      t('profile.invalid_email')
-                    )
-                  }
-                  placeholder={t('profile.type_email')}
-                  className={`input ${errors.userEmail ? 'invalid' : ''}`}
-                />
-                {errors.userEmail && <p className="error-text">{errors.userEmail}</p>}
-              </div>
+        <div className="page-container">
+          <div className="centered-screen">
+            <div className="centered-container">
+              <img
+                src="/assets/images/logo.png"
+                alt="App logo"
+                className="big-logo"
+              />
+              <h1 className='app-name'>AppName</h1>
+              <h4 className='app-type'>Expense Tracker</h4>
             </div>
+            <h1>Welcome back!</h1>
+            <p>Let's get you signed in. Enter your registered email below.</p>
+            
+            <section>
+              {/* User's email */}
+              <div className='form-item'>
+                <div className="input-container">
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    value={userEmail}
+                    onChange={(e) =>
+                      handleInputChange(
+                        'userEmail',
+                        e.target.value,
+                        setUserEmail,
+                        validateEmail,
+                        t('profile.invalid_email')
+                      )
+                    }
+                    placeholder={t('profile.type_email')}
+                    className={`input ${errors.userEmail ? 'invalid' : ''}`}
+                  />
+                  {errors.userEmail && <p className="error-text">{errors.userEmail}</p>}
+                </div>
+              </div>
 
-            <IonButton
-              className="block"
-              disabled={!isFormValid || isLoading}
-              onClick={handleSignIn}
-            >
-              {isLoading ? 'Connecting...' : t('common.continue')}
-            </IonButton>
-          </section>
+              <IonButton
+                className="block"
+                disabled={!isFormValid || isLoading}
+                onClick={handleSignIn}
+              >
+                {isLoading ? 'Connecting...' : t('common.continue')}
+              </IonButton>
+            </section>
+          </div>
         </div>
       </IonContent>
     </IonPage>

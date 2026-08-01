@@ -280,88 +280,90 @@ const Accounts: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
-         {/* Screen title */}
-        <div className="centered-container mb-20">
-          <h2 className='screen-title'>{t('accounts.accounts_title')}</h2>
-        </div>
-
-        {/* Subtitle, info and Cancel/Done buttons */}
-        <div className="section-header">
-          {/* Subtitle and info */}
-          <div className="flex-top ml-20">
-            <h6 className='section-title'>{t('accounts.manage_accounts')}</h6>   
-            <IonIcon 
-              icon={informationCircleOutline} 
-              className="info-icon"
-              onClick={() => setShowInfo(true)}
-            />
+        <div className="page-container">
+          {/* Screen title */}
+          <div className="centered-container mb-20">
+            <h2 className='screen-title'>{t('accounts.accounts_title')}</h2>
           </div>
 
-          {/* Cancel / Done buttons */}
-          {isReordering && (
-            <div className='icon-menu-bar mr-5'>
-              {/* Cancel button */}
+          {/* Subtitle, info and Cancel/Done buttons */}
+          <div className="section-header">
+            {/* Subtitle and info */}
+            <div className="flex-top ml-20">
+              <h6 className='section-title'>{t('accounts.manage_accounts')}</h6>   
               <IonIcon 
-                icon={closeOutline} 
-                onClick={handleCancel}
-                className='medium-icon-btn danger'
-              />
-
-              {/* Done button */}
-              <IonIcon 
-                icon={checkmarkOutline}
-                onClick={handleDone} 
-                className='medium-icon-btn success'
+                icon={informationCircleOutline} 
+                className="info-icon"
+                onClick={() => setShowInfo(true)}
               />
             </div>
-          )}
-        </div>
-        
-        {/* Accounts list */}
-        <div className='centered-container mb-60'>
-          <IonList lines="none" className='account-list' key={resetKey}>
-            <IonReorderGroup 
-              disabled={!isReordering} // Only allow reordering when mode is active
-              onIonItemReorder={handleReorder}
-            >           
-              {items?.map((item) => (
-                <IonItem 
-                  key={item.accountId} 
-                  lines="none" 
-                  detail={false} 
-                  // Add a class to the IonItem to target the content later
-                  className={`reorder-item-wrapper ${isReordering ? 'is-reordering' : ''}`}   
-                >
-                  
-                  {/* This is the new content wrapper for the animation */}
-                  <div className='reorder-item-content'> 
-                    <IonRouterLink
-                      routerLink={`/app/editaccount/${item.accountId}`} 
-                      routerDirection="forward"
-                      className='default-card-router-link'
-                    >
-                      <DefaultCard  
-                        title={item.accountName}
-                        color={item.activeAccount ? item.accountColor : "slateGray"}
-                        identifier={item.accountIdentifier}
-                        logo={item.accountLogo}
-                        amount='' // don't show amount in this screen
-                        editMode={false}
-                      />
-                    </IonRouterLink>
-                  </div>
 
-                  {/* Only render IonReorder for this account if reordering is ON and the account is active */}
-                  {isReordering && item.activeAccount && (
-                    <IonReorder 
-                      slot="end" 
-                      className='reorder-handle' 
-                    />
-                  )}
-                </IonItem>
-              ))}
-            </IonReorderGroup>     
-          </IonList>
+            {/* Cancel / Done buttons */}
+            {isReordering && (
+              <div className='icon-menu-bar mr-5'>
+                {/* Cancel button */}
+                <IonIcon 
+                  icon={closeOutline} 
+                  onClick={handleCancel}
+                  className='medium-icon-btn danger'
+                />
+
+                {/* Done button */}
+                <IonIcon 
+                  icon={checkmarkOutline}
+                  onClick={handleDone} 
+                  className='medium-icon-btn success'
+                />
+              </div>
+            )}
+          </div>
+        
+          {/* Accounts list */}
+          <div className='centered-container mb-60'>
+            <IonList lines="none" className='account-list' key={resetKey}>
+              <IonReorderGroup 
+                disabled={!isReordering} // Only allow reordering when mode is active
+                onIonItemReorder={handleReorder}
+              >           
+                {items?.map((item) => (
+                  <IonItem 
+                    key={item.accountId} 
+                    lines="none" 
+                    detail={false} 
+                    // Add a class to the IonItem to target the content later
+                    className={`reorder-item-wrapper ${isReordering ? 'is-reordering' : ''}`}   
+                  >
+                    
+                    {/* This is the new content wrapper for the animation */}
+                    <div className='reorder-item-content'> 
+                      <IonRouterLink
+                        routerLink={`/app/editaccount/${item.accountId}`} 
+                        routerDirection="forward"
+                        className='default-card-router-link'
+                      >
+                        <DefaultCard  
+                          title={item.accountName}
+                          color={item.activeAccount ? item.accountColor : "slateGray"}
+                          identifier={item.accountIdentifier}
+                          logo={item.accountLogo}
+                          amount='' // don't show amount in this screen
+                          editMode={false}
+                        />
+                      </IonRouterLink>
+                    </div>
+
+                    {/* Only render IonReorder for this account if reordering is ON and the account is active */}
+                    {isReordering && item.activeAccount && (
+                      <IonReorder 
+                        slot="end" 
+                        className='reorder-handle' 
+                      />
+                    )}
+                  </IonItem>
+                ))}
+              </IonReorderGroup>     
+            </IonList>
+          </div>
         </div>
       </IonContent>
 

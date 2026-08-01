@@ -13,8 +13,6 @@ import { useCurrency } from '../context/CurrencyContext';
 // Custom hooks
 import useScrollToTop from '../hooks/useScrollToTop';
 
-// Utility functions
-import { saveAppMetadata } from '../utils/appMetadata';
 
 // Ionic components
 import { 
@@ -178,79 +176,81 @@ const CountrySelectionPage: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
-        <div className="header-text-container">
-          <h1>{t('country_selection.select_country')}</h1>
-          <p className="subtitle-text">
-            {t('country_selection.select_country_text')}
-          </p>
-        </div>
+        <div className="page-container">
+          <div className="header-text-container">
+            <h1>{t('country_selection.select_country')}</h1>
+            <p className="subtitle-text">
+              {t('country_selection.select_country_text')}
+            </p>
+          </div>
 
-        {/* Controlled Searchbar */}
-        <div className="search-wrapper">
-          <IonSearchbar
-            value={searchText}
-            onIonInput={(e) => setSearchText(e.detail.value ?? '')}
-            showClearButton="never"
-            placeholder={t('country_selection.search_country')}
-            searchIcon={searchOutline}
-            className='custom mb-20'
-            debounce={0}
-          />
-        </div>
+          {/* Controlled Searchbar */}
+          <div className="search-wrapper">
+            <IonSearchbar
+              value={searchText}
+              onIonInput={(e) => setSearchText(e.detail.value ?? '')}
+              showClearButton="never"
+              placeholder={t('country_selection.search_country')}
+              searchIcon={searchOutline}
+              className='custom mb-20'
+              debounce={0}
+            />
+          </div>
 
-        {/* List of Countries */}
-        <IonRadioGroup
-          value={selectedCountry?.country}
-          onIonChange={(e) => {
-            const chosen = jsonCountries.find(
-              c => c.country === e.detail.value
-            );
-            if (chosen) {
-              setSelectedCountry(chosen);
-            }
-          }}
-        >
-          {filteredCountries.map((countryItem) => {
-            const isSelected = selectedCountry?.country === countryItem.country;
-            return (
-              <div
-                key={countryItem.country}
-                ref={(el) => {
-                  if (isSelected) {
-                    selectedItemRef.current = el;
-                  }
-                }}
-              >
-                <IonItem
-                  lines="none"
-                  className={`country-item ${isSelected ? 'country-item-selected' : ''}`}
-                  onClick={() => setSelectedCountry(countryItem)}
+          {/* List of Countries */}
+          <IonRadioGroup
+            value={selectedCountry?.country}
+            onIonChange={(e) => {
+              const chosen = jsonCountries.find(
+                c => c.country === e.detail.value
+              );
+              if (chosen) {
+                setSelectedCountry(chosen);
+              }
+            }}
+          >
+            {filteredCountries.map((countryItem) => {
+              const isSelected = selectedCountry?.country === countryItem.country;
+              return (
+                <div
+                  key={countryItem.country}
+                  ref={(el) => {
+                    if (isSelected) {
+                      selectedItemRef.current = el;
+                    }
+                  }}
                 >
-                  <IonAvatar slot="start" className="country-avatar">
-                    <img
-                      src={`/assets/flags/${countryItem.locale.split('-')[1].toLowerCase()}.svg`}
-                      alt={countryItem.country}
-                      className="country-flag"
+                  <IonItem
+                    lines="none"
+                    className={`country-item ${isSelected ? 'country-item-selected' : ''}`}
+                    onClick={() => setSelectedCountry(countryItem)}
+                  >
+                    <IonAvatar slot="start" className="country-avatar">
+                      <img
+                        src={`/assets/flags/${countryItem.locale.split('-')[1].toLowerCase()}.svg`}
+                        alt={countryItem.country}
+                        className="country-flag"
+                      />
+                    </IonAvatar>
+
+                    <IonLabel className="country-label">
+                      <div className="country-main-name">{countryItem.country}</div>
+                      {countryItem.nativeName && countryItem.nativeName !== countryItem.country && (
+                        <div className="country-native-subtext">{countryItem.nativeName}</div>
+                      )}
+                    </IonLabel>
+
+                    <IonRadio
+                      slot="end"
+                      value={countryItem.country}
+                      aria-label={countryItem.country}
                     />
-                  </IonAvatar>
-
-                  <IonLabel className="country-label">
-                    <div className="country-main-name">{countryItem.country}</div>
-                    {countryItem.nativeName && countryItem.nativeName !== countryItem.country && (
-                      <div className="country-native-subtext">{countryItem.nativeName}</div>
-                    )}
-                  </IonLabel>
-
-                  <IonRadio
-                    slot="end"
-                    value={countryItem.country}
-                    aria-label={countryItem.country}
-                  />
-                </IonItem>
-              </div>
-            );
-          })}
-        </IonRadioGroup>
+                  </IonItem>
+                </div>
+              );
+            })}
+          </IonRadioGroup>
+        </div>
       </IonContent>
 
       <div className="fixed-footer-button">

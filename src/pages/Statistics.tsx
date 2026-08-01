@@ -368,116 +368,118 @@ const statistics: React.FC = () => {
       </IonHeader>
 
       <IonContent id="statistics-content" className="ion-padding-horizontal" ref={contentRef}>
-        {!isLoading && (
-          <div className='mb-10'>
-            {/* Page title */}
-            <div className="centered-container mb-20">
-              <h2 className='screen-title'>{t('stats.stats_title')}</h2>
-            </div>
+        <div className="page-container">
+          {!isLoading && (
+            <div className='mb-10'>
+              {/* Page title */}
+              <div className="centered-container mb-20">
+                <h2 className='screen-title'>{t('stats.stats_title')}</h2>
+              </div>
 
-            {/* Total for the period */}
-            <h1 className='statistics-total'>
-              <FormatAmount
-                amount={showTotal}
-                currencyCode={currency.defaultCurrency.code}
-              />
-            </h1>
-
-            {/* Period title, info and date range */}
-            <div>
-              <div className="flex">
-                <h6 className='section-title'>{chartTitle}</h6> 
-                <IonIcon 
-                  icon={informationCircleOutline} 
-                  className="info-icon"
-                  onClick={() => setShowInfo(true)}
+              {/* Total for the period */}
+              <h1 className='statistics-total'>
+                <FormatAmount
+                  amount={showTotal}
+                  currencyCode={currency.defaultCurrency.code}
                 />
-              </div>
-              <span className='date-range-title'>{dateRangeTitle}</span>
-            </div>
-            
-            {/* Chart bar */}
-            <div className='chart-bar'>
-              {/* Left content */}
-              <div className="left-content">
-                {selectedRange === "12M" ? (
-                  <IonMenuButton
-                    menu="categoryMenu" // this links to your custom menu
-                    autoHide={false} // optional, prevents it from hiding automatically
-                  >
-                    <IonIcon icon={layersOutline} />
-                  </IonMenuButton>
-                ) : (selectedRange === '1M' || selectedRange === '2M') && (
-                  <IonSelect
-                    value={sortOption}
-                    onIonChange={(e) => setSortOption(e.detail.value)}
-                    interface='popover'
-                    mode="ios"
-                  >
-                    <IonSelectOption value="thisMonth">{t('stats.sort_amount')}</IonSelectOption>
-                    {selectedRange === '2M' && (
-                      <IonSelectOption value="change">{t('stats.sort_change')}</IonSelectOption>
-                    )}
-                    <IonSelectOption value="alphabetical">{t('stats.sort_name')}</IonSelectOption>
-                  </IonSelect>
-                )}
-              </div>
+              </h1>
 
-              {/* Right content: Time range buttons */}
-              <div className='report-time-btns'>        
-                {ranges.map(range => (
-                  <span
-                    key={range}
-                    className={selectedRange === range ? "selected" : ""}
-                    onClick={() => setSelectedRange(range)}
-                  >
-                    {range}
-                  </span>
-                ))}
+              {/* Period title, info and date range */}
+              <div>
+                <div className="flex">
+                  <h6 className='section-title'>{chartTitle}</h6> 
+                  <IonIcon 
+                    icon={informationCircleOutline} 
+                    className="info-icon"
+                    onClick={() => setShowInfo(true)}
+                  />
+                </div>
+                <span className='date-range-title'>{dateRangeTitle}</span>
+              </div>
+              
+              {/* Chart bar */}
+              <div className='chart-bar'>
+                {/* Left content */}
+                <div className="left-content">
+                  {selectedRange === "12M" ? (
+                    <IonMenuButton
+                      menu="categoryMenu" // this links to your custom menu
+                      autoHide={false} // optional, prevents it from hiding automatically
+                    >
+                      <IonIcon icon={layersOutline} />
+                    </IonMenuButton>
+                  ) : (selectedRange === '1M' || selectedRange === '2M') && (
+                    <IonSelect
+                      value={sortOption}
+                      onIonChange={(e) => setSortOption(e.detail.value)}
+                      interface='popover'
+                      mode="ios"
+                    >
+                      <IonSelectOption value="thisMonth">{t('stats.sort_amount')}</IonSelectOption>
+                      {selectedRange === '2M' && (
+                        <IonSelectOption value="change">{t('stats.sort_change')}</IonSelectOption>
+                      )}
+                      <IonSelectOption value="alphabetical">{t('stats.sort_name')}</IonSelectOption>
+                    </IonSelect>
+                  )}
+                </div>
+
+                {/* Right content: Time range buttons */}
+                <div className='report-time-btns'>        
+                  {ranges.map(range => (
+                    <span
+                      key={range}
+                      className={selectedRange === range ? "selected" : ""}
+                      onClick={() => setSelectedRange(range)}
+                    >
+                      {range}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
         
-        {/* Show chart only when fully loaded */}
-        {!isLoading && hasExpenses === 0 ? (
-          <p style={{ textAlign: "center", padding: 20 }}>
-            {t('expenses.none_to_display')}
-          </p>
-        ) : !isLoading && hasExpenses > 0 && isVisible && (
-          <div id="expenses-chart">
-            {/* Charts */}
-            {selectedRange === "1M" && (
-              <MonthlyChart
-                expenses={expenses}
-                categories={categories}
-                sortOption={sortOption}
-                year={year}
-                month={month} 
+          {/* Show chart only when fully loaded */}
+          {!isLoading && hasExpenses === 0 ? (
+            <p style={{ textAlign: "center", padding: 20 }}>
+              {t('expenses.none_to_display')}
+            </p>
+          ) : !isLoading && hasExpenses > 0 && isVisible && (
+            <div id="expenses-chart">
+              {/* Charts */}
+              {selectedRange === "1M" && (
+                <MonthlyChart
+                  expenses={expenses}
+                  categories={categories}
+                  sortOption={sortOption}
+                  year={year}
+                  month={month} 
+                />
+              )}
+              {selectedRange === "2M" && (
+                <TwoMonthsChart expenses={expenses} sortOption={sortOption} />
+              )}
+              {selectedRange === "12M" && (
+                <TwelveMonthChart 
+                expenses={expenses} 
+                categories={categories ?? []} 
+                visibleCategoryIds={visibleCategories} // 👈 Change selectedCategories to visibleCategoryIds
               />
-            )}
-            {selectedRange === "2M" && (
-              <TwoMonthsChart expenses={expenses} sortOption={sortOption} />
-            )}
-            {selectedRange === "12M" && (
-              <TwelveMonthChart 
-              expenses={expenses} 
-              categories={categories ?? []} 
-              visibleCategoryIds={visibleCategories} // 👈 Change selectedCategories to visibleCategoryIds
-            />
-            )}
-            {selectedRange === "YTD" && <YearlyChart expenses={expenses} year={currentYear} />}
-          </div>
-        )}
+              )}
+              {selectedRange === "YTD" && <YearlyChart expenses={expenses} year={currentYear} />}
+            </div>
+          )}
 
-        <IonAlert
-          isOpen={showInfo}
-          className='custom-alert'
-          onDidDismiss={() => setShowInfo(false)}
-          header={chartTitle}
-          message={infoMsg}
-          buttons={['OK']}
-        />
+          <IonAlert
+            isOpen={showInfo}
+            className='custom-alert'
+            onDidDismiss={() => setShowInfo(false)}
+            header={chartTitle}
+            message={infoMsg}
+            buttons={['OK']}
+          />
+        </div>
       </IonContent>
     </IonPage>
   );

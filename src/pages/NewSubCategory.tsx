@@ -244,138 +244,137 @@ const NewSubCategory: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
-        {/* Screen Header */}
-        <div className='centered-container'>
-          <h2 className='screen-title'>{t('categories.add_subcat')}</h2>
-        </div>
-
-        {/* Show Category Design */}
-        <section className='mt-20'>
-          <div className="centered-container">
-            <CategoryPreview
-              categoryColor= {subcategoryColor}
-              categoryIcon= {subcategoryIcon}
-            />
+        <div className="page-container">
+          {/* Screen Header */}
+          <div className='centered-container'>
+            <h2 className='screen-title'>{t('categories.add_subcat')}</h2>
           </div>
-        </section>
 
-
-        {/* Form Section */}
-        <section>
-          {/* Category name */}
-          <div className='parent-input'>
-            <div className="input-container">
-              <input
-                type="text"
-                value={subcategoryName}
-                maxLength={20}
-                onChange={(e) => handleInputChange(e.target.value) }
-                placeholder={t('categories.subcat_name')}
-                className={`input capitalize ${error ? 'invalid' : ''}`}
+          {/* Show Category Design */}
+          <section className='mt-20'>
+            <div className="centered-container">
+              <CategoryPreview
+                categoryColor= {subcategoryColor}
+                categoryIcon= {subcategoryIcon}
               />
-              {error && <p className="error-text">{error}</p>}
             </div>
-            <button 
-              id="open-toast"
-              onClick={() => setFavouriteSubcategory(!favouriteSubcategory)}
-            >
-              {favouriteSubcategory ? <IonIcon icon={heart} /> : <IonIcon icon={heartOutline} />}
-            </button>
-          </div>
-        </section>
+          </section>
 
-        {/* Color picker */}
-        <section>
-          <h6 className='section-title'>{t('themes.choose_color')}</h6>
-          <ColorPicker onColorSelect={handleColorSelect} initialColor={subcategoryColor} />
-        </section>
-
-
-        {/* Icon picker */}
-        <section>
-          <h6 className="section-title">{t('categories.choose_icon')}</h6>
-          <IonItem button onClick={() => setIsOpenCategoryModal(true)} className='mt-10'>
-            <div className='list-item-select'>
-              <span>{t('categories.selected_icon')}</span>
-              <div>
-                <span>
-                  {subcategoryIcon
-                    ? <i className={`fas ${subcategoryIcon} icon`}></i>
-                    : t('categories.make_a_selection')}
-                </span>
-                <IonIcon icon={chevronForwardOutline}></IonIcon>
-              </div>
-            </div>
-          </IonItem>
-        </section>
-
-        {/* Parent Category */}
-        <section>
-          <h6 className="section-title">{t('categories.parent_category')}</h6>
-            <div className='mt-10'>
-            {parentCategoryId ? (
-              <div className="category-container centered-container">
-                <CategoryIcon 
-                  categoryColor={parentColor} 
-                  iconName={parentIcon} 
+          {/* Form Section */}
+          <section>
+            {/* Category name */}
+            <div className='parent-input'>
+              <div className="input-container">
+                <input
+                  type="text"
+                  value={subcategoryName}
+                  maxLength={20}
+                  onChange={(e) => handleInputChange(e.target.value) }
+                  placeholder={t('categories.subcat_name')}
+                  className={`input capitalize ${error ? 'invalid' : ''}`}
                 />
-                <div className="category-name">
-                  <span>{parentName}</span>
+                {error && <p className="error-text">{error}</p>}
+              </div>
+              <button 
+                id="open-toast"
+                onClick={() => setFavouriteSubcategory(!favouriteSubcategory)}
+              >
+                {favouriteSubcategory ? <IonIcon icon={heart} /> : <IonIcon icon={heartOutline} />}
+              </button>
+            </div>
+          </section>
+
+          {/* Color picker */}
+          <section>
+            <h6 className='section-title'>{t('themes.choose_color')}</h6>
+            <ColorPicker onColorSelect={handleColorSelect} initialColor={subcategoryColor} />
+          </section>
+
+          {/* Icon picker */}
+          <section>
+            <h6 className="section-title">{t('categories.choose_icon')}</h6>
+            <IonItem button onClick={() => setIsOpenCategoryModal(true)} className='mt-10'>
+              <div className='list-item-select'>
+                <span>{t('categories.selected_icon')}</span>
+                <div>
+                  <span>
+                    {subcategoryIcon
+                      ? <i className={`fas ${subcategoryIcon} icon`}></i>
+                      : t('categories.make_a_selection')}
+                  </span>
+                  <IonIcon icon={chevronForwardOutline}></IonIcon>
                 </div>
               </div>
-              ) : (
-                <p>{t('common.loading')}</p>
-              )}
-          </div>
-        </section>
+            </IonItem>
+          </section>
 
-        {/* Add category button */}
-        <IonButton
-          className="block mb-60"
-          onClick={() => {
-            if (isFormValid) {
-              addSubcategory();
-            }
-          }}
-          disabled={!isFormValid} // Disable the button if the form is invalid
-        >
-          {t('categories.add_subcat')}
-        </IonButton>
+          {/* Parent Category */}
+          <section>
+            <h6 className="section-title">{t('categories.parent_category')}</h6>
+              <div className='mt-10'>
+              {parentCategoryId ? (
+                <div className="category-container centered-container">
+                  <CategoryIcon 
+                    categoryColor={parentColor} 
+                    iconName={parentIcon} 
+                  />
+                  <div className="category-name">
+                    <span>{parentName}</span>
+                  </div>
+                </div>
+                ) : (
+                  <p>{t('common.loading')}</p>
+                )}
+            </div>
+          </section>
 
-        {/* Confirmation Modal */}
-        <Modal
-          isOpen={isConfirmationModalOpen}
-          icon={modalConfig.icon}
-          title={modalConfig.title}
-          content={modalConfig.content}
-          closeModal={() => setIsConfirmationModalOpen(false)}
-          actions={modalConfig.actions}
-          destination={modalConfig.destination}
-        />
-
-        {/* Category picker modal */}
-        <IonModal isOpen={isOpenCategoryModal}>
-          <IonHeader>
-            <IonToolbar>
-              <IonTitle>{t('categories.select_an_icon')}</IonTitle>
-              <IonButtons slot="end">
-                <IonButton onClick={() => setIsOpenCategoryModal(false)}>
-                  <IonIcon aria-hidden="true" icon={closeOutline} className='close-modal'></IonIcon>
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding">
-          <IconPicker
-            selectedIcon={subcategoryIcon}
-            onIconSelect={(icon) => {
-              setSubcategoryIcon(icon); // Update the selected category
-              setIsOpenCategoryModal(false); // Close the modal
+          {/* Add category button */}
+          <IonButton
+            className="block mb-60"
+            onClick={() => {
+              if (isFormValid) {
+                addSubcategory();
+              }
             }}
+            disabled={!isFormValid} // Disable the button if the form is invalid
+          >
+            {t('categories.add_subcat')}
+          </IonButton>
+
+          {/* Confirmation Modal */}
+          <Modal
+            isOpen={isConfirmationModalOpen}
+            icon={modalConfig.icon}
+            title={modalConfig.title}
+            content={modalConfig.content}
+            closeModal={() => setIsConfirmationModalOpen(false)}
+            actions={modalConfig.actions}
+            destination={modalConfig.destination}
           />
-          </IonContent>
-        </IonModal>
-        
+
+          {/* Category picker modal */}
+          <IonModal isOpen={isOpenCategoryModal}>
+            <IonHeader>
+              <IonToolbar>
+                <IonTitle>{t('categories.select_an_icon')}</IonTitle>
+                <IonButtons slot="end">
+                  <IonButton onClick={() => setIsOpenCategoryModal(false)}>
+                    <IonIcon aria-hidden="true" icon={closeOutline} className='close-modal'></IonIcon>
+                  </IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent className="ion-padding">
+            <IconPicker
+              selectedIcon={subcategoryIcon}
+              onIconSelect={(icon) => {
+                setSubcategoryIcon(icon); // Update the selected category
+                setIsOpenCategoryModal(false); // Close the modal
+              }}
+            />
+            </IonContent>
+          </IonModal>
+        </div>
       </IonContent>
     </IonPage>
   );

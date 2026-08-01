@@ -26,13 +26,13 @@ const WelcomeScreen: React.FC = () => {
   return (
     <IonPage>
       <IonContent className="ion-padding-horizontal">
-        <div className="centered-screen">  
+        <div className="page-container centered-screen">  
           {/* Logo and app name */}
           <div className="centered-container">
             <img
               src="/assets/images/logo.png"
               alt="App logo"
-              className="big-logo"
+              className="app-logo big-logo"
             />
             <h1 className='app-name'>AppName</h1>
             <h4 className='app-type'>Expense Tracker</h4>

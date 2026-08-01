@@ -75,12 +75,6 @@ export const downloadAndSaveExchangeRates = async (
 
     const data = await response.json();
 
-    console.log(
-      "Primary API data received:",
-      Object.keys(data.rates ?? {}).length,
-      "rates"
-    );
-
     // Validate expected response structure.
     if (!data.rates) {
       throw new Error("Invalid primary API format");
@@ -98,11 +92,6 @@ export const downloadAndSaveExchangeRates = async (
       primaryError
     );
 
-    console.log(
-      "Calling fallback API:",
-      `${fallbackUrl}${baseLower}.json`
-    );
-
     const response = await fetch(
       `${fallbackUrl}${baseLower}.json`
     );
@@ -114,12 +103,6 @@ export const downloadAndSaveExchangeRates = async (
     const data = await response.json();
 
     const rates = data[baseLower];
-
-    console.log(
-      "Fallback API data received:",
-      Object.keys(rates ?? {}).length,
-      "rates"
-    );
 
     // Validate expected response structure.
     if (!rates) {
@@ -150,7 +133,6 @@ export const downloadAndSaveExchangeRates = async (
     encoding: Encoding.UTF8,
   });
 
-  console.log("Exchange rates file written successfully");
 
   try {
     // Immediate read-back verification to help diagnose filesystem issues.
@@ -160,11 +142,6 @@ export const downloadAndSaveExchangeRates = async (
       encoding: Encoding.UTF8,
     });
 
-    console.log(
-      "Verification read successful:",
-      (verify.data as string).length,
-      "bytes"
-    );
   } catch (error) {
     // Log verification failures without blocking the download process.
     console.error(
@@ -254,11 +231,6 @@ export const updateSavedExchangeRates = async (
   baseCurrency: CurrencyType,
   alternativeCurrencies: CurrencyType[]
 ): Promise<ExchangeRates> => {
-  console.log(
-    "---> [getExchangeRates] ",
-    baseCurrency,
-    alternativeCurrencies
-  );
 
   // Load the complete exchange rates file.
   const file = await Filesystem.readFile({
@@ -300,9 +272,6 @@ export const updateSavedExchangeRates = async (
     value: JSON.stringify(newRates),
   });
   await saveAppMetadata(EXCHANGE_KEY, JSON.stringify(newRates));
-  
-
-  console.log("[getExchangeRates] - Rates in preferences updated.");
 
   return newRates;
 };

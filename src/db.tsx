@@ -72,39 +72,34 @@ export type SubscriptionPlan = "free" | "monthly" | "quarterly" | "yearly";
 
 export interface User {
   userId: string;
+  // Identity
   name: string;
   lastName: string;
   email: string;
   avatar: string;
-  interval: "weekly" | "monthly" | "yearly";
-  showDisabledAccounts: boolean;
-  showDisabledCategories: boolean;
-  weekStartDay: "sunday" | "monday";
-  birthdate: string;
-  localInterval: "weekly" | "monthly" | "yearly";
+  // Language
   language: string;
-  favourites: number;
-  isPremium: boolean;
-  subscriptionPlan: SubscriptionPlan;
-  subscriptionExpirationDate: string | null;
-}
-
-export interface UserSettings {
-  id: string;      // random UUID for Dexie Cloud
-  key: string;     // always "settings"
-
+  selectedCountry?: string;
   // Currency
   defaultCurrency: CurrencyType;
   actualCurrency: CurrencyType;
   travelCurrency: CurrencyType | null;
-  isTravelMode: boolean;
-
-  // Future synced settings
-  language?: string;  
-  selectedCountry?: string;
+  // Subscription
+  isPremium: boolean;
+  subscriptionPlan: SubscriptionPlan;
+  subscriptionExpirationDate: string | null;
+  // Settings
+  interval: "weekly" | "monthly" | "yearly";
+  localInterval: "weekly" | "monthly" | "yearly";
+  showDisabledAccounts: boolean;
+  showDisabledCategories: boolean;
+  favourites: number;
+  weekStartDay: "sunday" | "monday";
   theme?: string;
-  firstDayOfWeek?: number;
+  mode?: string;
+  isTravelMode: boolean;
 }
+
 
 interface Account {
   accountId: string;
@@ -223,7 +218,6 @@ export interface AlternativeCurrency {
 const db = new Dexie('DB', { addons: [dexieCloud] }) as Dexie & {
   appmetadata: EntityTable<AppMetadata, 'id'>;
   users: EntityTable<User, 'userId'>;
-  userSettings: EntityTable<UserSettings, 'id'>;
   accounts: EntityTable<Account, 'accountId'>;
   categories: EntityTable<Category, 'categoryId'>;
   subcategories: EntityTable<Subcategory, 'subcategoryId'>;
@@ -257,7 +251,6 @@ export async function initializeDatabase() {
 db.version(1).stores({
   appmetadata: 'id, key',
   users: 'userId, email',
-  userSettings: "id, key",
   accounts: 'accountId, userId, sortOrder',
   categories: 'categoryId, categoryName',
   subcategories: 'subcategoryId, subcategoryName, parentCategoryId',
@@ -329,7 +322,6 @@ export const seedInitialData = async (
 
   isPopulating = true;
   console.log("🌱 Seeding initial database...");
-  console.log("Initial currency: ", initialCurrency);
 
   try {
     const installationId = crypto.randomUUID();
@@ -338,7 +330,6 @@ export const seedInitialData = async (
       "rw",
       db.appmetadata,
       db.users,
-      db.userSettings,
       db.accounts,
       db.categories,
       async () => {
@@ -357,33 +348,33 @@ export const seedInitialData = async (
 
         await db.users.add({
           userId: crypto.randomUUID(),
+          // Identity
           name: "",
           lastName: "",
           email: "",
           avatar: "",
-          interval: "monthly",
-          showDisabledAccounts: true,
-          showDisabledCategories: true,
-          weekStartDay: "sunday",
-          birthdate: "",
-          localInterval: "monthly",
-          language: "en",
-          favourites: 0,
-          isPremium: false,
-          subscriptionPlan: "free",
-          subscriptionExpirationDate: null,
-        } as User);
-
-        await db.userSettings.add({
-          id: crypto.randomUUID(),
-          key: "settings",
+          // Language
+          language: initialCurrency.locale.split("-")[0],
+          selectedCountry: initialCurrency.country,
+          // Currency
           defaultCurrency: initialCurrency,
           actualCurrency: initialCurrency,
           travelCurrency: null,
+          // Subscription
+          isPremium: false,
+          subscriptionPlan: "free",
+          subscriptionExpirationDate: null,
+          // Settings
+          interval: "monthly",
+          localInterval: "monthly",
+          showDisabledAccounts: true,
+          showDisabledCategories: true,
+          favourites: 0,
+          weekStartDay: "sunday",
+          theme: 'theme-cyan',
+          mode: "system",
           isTravelMode: false,
-          language: initialCurrency.locale.split("-")[0],
-          selectedCountry: initialCurrency.country,
-        });
+        } as User);
 
         await db.accounts.add({
           accountId:crypto.randomUUID(),

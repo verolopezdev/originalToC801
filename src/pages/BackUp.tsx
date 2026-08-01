@@ -349,143 +349,145 @@ const BackUp: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding-horizontal"  ref={contentRef}>
-        {/* Screen Header */}
-        <section className='centered-container'>
-          <h2 className='screen-title'>{t('backup.backup_title')}</h2>
-        </section>
+        <div className="page-container">
+          {/* Screen Header */}
+          <section className='centered-container'>
+            <h2 className='screen-title'>{t('backup.backup_title')}</h2>
+          </section>
         
-        {/* Card section */}
-        <section>
-          {/* DEXIE BACKUP (PREMIUM UPSELL) */}
-          <div className='card'>
-            <div className="flex backup-title mb-10">
-              <IonIcon icon={cloud} className='mr-5' />
-              Dexie Cloud Sync
-            </div>
-
-            <div className='flex-space-bottom'>
-              <span>
-                {t('backup.card_dexie_text')}
-              </span>
-              <div>
-                {/* Changed button text and action to match an upsell flow instead of manual backup */}
-                <IonButton className='ultra-small ml-5' color="primary">
-                  <IonIcon icon={diamond} className='mr-5' />
-                  {t('premium.upgrade')}
-                </IonButton>
-              </div>
-            </div>
-          </div>
-
-          {/* LOCAL BACKUP */}
-          <div className='card mt-20'>
-            <div className="backup-title mb-10">
-              <IonIcon icon={idCard} className='mr-5' />
-              {t('backup.card_device_title')}
-            </div>
-
-            <div className='flex-space-bottom'>
-              <div>
-              <div className={`flex mr-5 ${latestBackup ? 'text-success' : 'text-warning'}`}>
-                <IonIcon
-                  icon={latestBackup ? checkmarkCircle : alertCircle}
-                  className="mr-5"
-                  style={{ color: 'inherit', fontSize: '16px' }}
-                />
-
-                <span>
-                  {latestBackup ? t('backup.last_available') : t('backup.no_backups_yet')}
-                </span>
-              </div>
-
-                <div className='expense-payment-status note'>
-                  {latestBackup
-                    ? `${formatDate(latestBackup.mtime)} (${formatSize(latestBackup.size)})`
-                    : t('backup.create_first')}
-                </div>
-              </div>
-              <div>
-                <IonButton
-                  className='ultra-small'
-                  onClick={createManualBackup}
-                  disabled={isCreatingBackup}
-                >
-                  {isCreatingBackup
-                    ? t('backup.creating_backup')
-                    : t('backup.backup_now')}
-                </IonButton>
-              </div>
-            </div>
-          </div>
-
-            {/* RESTORE FROM FILE SECTION */}
-            <div className='card mt-20'>
-              <div className="backup-title mb-10">
-                <IonIcon icon={server} className='mr-5' />
-                {t('backup.restore_from_file')}
+          {/* Card section */}
+          <section>
+            {/* DEXIE BACKUP (PREMIUM UPSELL) */}
+            <div className='card'>
+              <div className="flex backup-title mb-10">
+                <IonIcon icon={cloud} className='mr-5' />
+                Dexie Cloud Sync
               </div>
 
               <div className='flex-space-bottom'>
                 <span>
-                  {t('backup.restore_from_file_text')}
+                  {t('backup.card_dexie_text')}
                 </span>
                 <div>
-                  <IonButton className='ultra-small' onClick={() => fileInputRef.current?.click()}>
-                    {t('common.select')}
+                  {/* Changed button text and action to match an upsell flow instead of manual backup */}
+                  <IonButton className='ultra-small ml-5' color="primary">
+                    <IonIcon icon={diamond} className='mr-5' />
+                    {t('premium.upgrade')}
                   </IonButton>
                 </div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".json,application/json"
-                  style={{ display: 'none' }}
-                  onChange={handleImportBackup}
-                />
+              </div>
             </div>
-          </div>
-        </section>
 
-        {/* EXISTING BACKUPS */}
-        <section>
-          {files.length > 0 && (
-            <section>
-              <div className='section-header'>
+            {/* LOCAL BACKUP */}
+            <div className='card mt-20'>
+              <div className="backup-title mb-10">
+                <IonIcon icon={idCard} className='mr-5' />
+                {t('backup.card_device_title')}
+              </div>
+
+              <div className='flex-space-bottom'>
                 <div>
-                  <h6 className="section-title">{t('backup.recent_backups')}</h6>
+                <div className={`flex mr-5 ${latestBackup ? 'text-success' : 'text-warning'}`}>
+                  <IonIcon
+                    icon={latestBackup ? checkmarkCircle : alertCircle}
+                    className="mr-5"
+                    style={{ color: 'inherit', fontSize: '16px' }}
+                  />
+
+                  <span>
+                    {latestBackup ? t('backup.last_available') : t('backup.no_backups_yet')}
+                  </span>
+                </div>
+
+                  <div className='expense-payment-status note'>
+                    {latestBackup
+                      ? `${formatDate(latestBackup.mtime)} (${formatSize(latestBackup.size)})`
+                      : t('backup.create_first')}
+                  </div>
+                </div>
+                <div>
+                  <IonButton
+                    className='ultra-small'
+                    onClick={createManualBackup}
+                    disabled={isCreatingBackup}
+                  >
+                    {isCreatingBackup
+                      ? t('backup.creating_backup')
+                      : t('backup.backup_now')}
+                  </IonButton>
                 </div>
               </div>
-                {files.map(file => (
-                  <div className='expense-item' key={file.name}>
-                    <div className='center-col'>
-                      {/* Original due date */}
-                      <h6 className='original-due-date'>{file.name}</h6>
+            </div>
 
-                      {/* Payment status */}
-                      <div className='expense-payment-status note'>
-                        {formatDate(file.mtime)} ({formatSize(file.size)})
+              {/* RESTORE FROM FILE SECTION */}
+              <div className='card mt-20'>
+                <div className="backup-title mb-10">
+                  <IonIcon icon={server} className='mr-5' />
+                  {t('backup.restore_from_file')}
+                </div>
+
+                <div className='flex-space-bottom'>
+                  <span>
+                    {t('backup.restore_from_file_text')}
+                  </span>
+                  <div>
+                    <IonButton className='ultra-small' onClick={() => fileInputRef.current?.click()}>
+                      {t('common.select')}
+                    </IonButton>
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".json,application/json"
+                    style={{ display: 'none' }}
+                    onChange={handleImportBackup}
+                  />
+              </div>
+            </div>
+          </section>
+
+          {/* EXISTING BACKUPS */}
+          <section>
+            {files.length > 0 && (
+              <section>
+                <div className='section-header'>
+                  <div>
+                    <h6 className="section-title">{t('backup.recent_backups')}</h6>
+                  </div>
+                </div>
+                  {files.map(file => (
+                    <div className='expense-item' key={file.name}>
+                      <div className='center-col'>
+                        {/* Original due date */}
+                        <h6 className='original-due-date'>{file.name}</h6>
+
+                        {/* Payment status */}
+                        <div className='expense-payment-status note'>
+                          {formatDate(file.mtime)} ({formatSize(file.size)})
+                        </div>
+                      </div>
+                      <div className='right-col'>
+                        <IonIcon 
+                          icon={shareSocialOutline} 
+                          className='icon-btn'
+                          onClick={() => shareBackup(file.name)} 
+                        >
+                        </IonIcon>                      
                       </div>
                     </div>
-                    <div className='right-col'>
-                      <IonIcon 
-                        icon={shareSocialOutline} 
-                        className='icon-btn'
-                        onClick={() => shareBackup(file.name)} 
-                      >
-                      </IonIcon>                      
-                    </div>
-                  </div>
-                ))}
-            </section>
-          )}
-        </section>
+                  ))}
+              </section>
+            )}
+          </section>
 
-        {/* Backup confirmation toast */}
-        <CustomToast
-          message={toastMessage}
-          isOpen={toastOpen}
-          onDismiss={() => setToastOpen(false)}
-          type={toastType ?? undefined}
-        />
+          {/* Backup confirmation toast */}
+          <CustomToast
+            message={toastMessage}
+            isOpen={toastOpen}
+            onDismiss={() => setToastOpen(false)}
+            type={toastType ?? undefined}
+          />
+        </div>
       </IonContent>
       <Footer appPages={translatedMenuItems} />
     </IonPage>

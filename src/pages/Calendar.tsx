@@ -102,49 +102,50 @@ const Calendar: React.FC = () => {
       </IonHeader>
 
       <IonContent className="calendar-page-content">
-        {/* Screen Header */}
-        <div className='centered-container mt--20'> 
-          <h2 className='screen-title-0'>{viewMode === 'calendar' ? t('calendar.calendar') : t('calendar.forecast')}</h2>
-        </div>
-
-        {viewMode === 'planner' && (
-          <PlannerEstimatedCard
-            totalSpent={estimatedTotal}
-          />
-        )}
-
-        <IntervalToolbar  
-          selectedInterval='monthly'
-          currentDate={currentDate}
-          setCurrentDate={handleDateChange} // Update date from IntervalToolbar 
-          weekStartDay={weekStartDay}
-        />
-
-        
-        {viewMode === 'calendar' ? (
-          <ExpenseCalendar  
-            currentDate={currentDate} 
-            weekStartDay={weekStartDay}
-            onDayClick={(day) => {
-              setCurrentDate(day);     // 1. Set the specific date
-              setViewMode('planner');  // 2. Switch to planner mode
-              setShouldScroll(true);   // 3. 💡 Set the flag to TRUE
-              setHighlightActive(true);
-            }}
-          />
-        ) : (
-          <div className='planner'>
-            <PlannerList  
-              selectedInterval='monthly'      
-              currentDate={currentDate}   
-              targetRef={targetRef}
-              onTodayRendered={handleTodayRendered}
-              scroll={shouldScroll}
-              highlightActive={highlightActive}
-              onEstimatedTotalChange={setEstimatedTotal}
-            />
+        <div className="page-container">
+          {/* Screen Header */}
+          <div className='centered-container mt--20'> 
+            <h2 className='screen-title-0'>{viewMode === 'calendar' ? t('calendar.calendar') : t('calendar.forecast')}</h2>
           </div>
-        )}
+
+          {viewMode === 'planner' && (
+            <PlannerEstimatedCard
+              totalSpent={estimatedTotal}
+            />
+          )}
+
+          <IntervalToolbar  
+            selectedInterval='monthly'
+            currentDate={currentDate}
+            setCurrentDate={handleDateChange} // Update date from IntervalToolbar 
+            weekStartDay={weekStartDay}
+          />
+        
+          {viewMode === 'calendar' ? (
+            <ExpenseCalendar  
+              currentDate={currentDate} 
+              weekStartDay={weekStartDay}
+              onDayClick={(day) => {
+                setCurrentDate(day);     // 1. Set the specific date
+                setViewMode('planner');  // 2. Switch to planner mode
+                setShouldScroll(true);   // 3. 💡 Set the flag to TRUE
+                setHighlightActive(true);
+              }}
+            />
+          ) : (
+            <div className='planner'>
+              <PlannerList  
+                selectedInterval='monthly'      
+                currentDate={currentDate}   
+                targetRef={targetRef}
+                onTodayRendered={handleTodayRendered}
+                scroll={shouldScroll}
+                highlightActive={highlightActive}
+                onEstimatedTotalChange={setEstimatedTotal}
+              />
+            </div>
+          )}
+        </div>
       </IonContent>
     </IonPage>
   );

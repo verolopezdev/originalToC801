@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import Dexie from 'dexie'; 
-import { Preferences } from '@capacitor/preferences'; 
-import { Directory, Filesystem, } from '@capacitor/filesystem'; 
-import { db, setIsSeeding, SubscriptionPlan } from '../db';
+import { SubscriptionPlan } from '../db';
 
 // Custom hooks
 import useScrollToTop from '../hooks/useScrollToTop';
@@ -45,10 +42,8 @@ import {
   layersOutline, 
   lockClosedOutline,
   moonOutline, 
-  peopleOutline, 
   personOutline, 
   refreshOutline, 
-  serverOutline, 
   timeOutline 
 } from 'ionicons/icons';
 
@@ -148,232 +143,232 @@ const Settings: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
-        <div className="centered-container mb-20">
-          <h2 className='screen-title'>{t('common.settings')}</h2>
-        </div>
-
+        <div className="page-container">
+          <div className="centered-container mb-20">
+            <h2 className='screen-title'>{t('common.settings')}</h2>
+          </div>
         
-        {/* Profile Bar */}
-        <IonList className='profile-settings'>
-          <IonItem detail={true} routerLink='/app/profile' lines="none" className='no-padding'>
-            <IonLabel>
-              <div className='profile-avatar-bar'>
-                {avatar ? (
-                  // Display the avatar image if it exists
-                  <img
-                    src={avatar}
-                    alt={`${name}'s Avatar`}
-                    className="profile-avatar-image"
-                  />
-                ) : (
-                  // Display initials if no avatar is set
-                  <div className="profile-avatar">
-                    {name.charAt(0)}
-                    {lastName.charAt(0)}
-                  </div>
-                )}
-                <div className='profile-name'>
-                  <p>{name} {lastName}</p>
-                  {email ? (
-                    <IonNote>{email}</IonNote>
+          {/* Profile Bar */}
+          <IonList className='profile-settings'>
+            <IonItem detail={true} routerLink='/app/profile' lines="none" className='no-padding'>
+              <IonLabel>
+                <div className='profile-avatar-bar'>
+                  {avatar ? (
+                    // Display the avatar image if it exists
+                    <img
+                      src={avatar}
+                      alt={`${name}'s Avatar`}
+                      className="profile-avatar-image"
+                    />
                   ) : (
-                    <IonNote>{t('settings.add_email')}</IonNote>
+                    // Display initials if no avatar is set
+                    <div className="profile-avatar">
+                      {name.charAt(0)}
+                      {lastName.charAt(0)}
+                    </div>
                   )}
+                  <div className='profile-name'>
+                    <p>{name} {lastName}</p>
+                    {email ? (
+                      <IonNote>{email}</IonNote>
+                    ) : (
+                      <IonNote>{t('settings.add_email')}</IonNote>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </IonLabel>
-          </IonItem>
-        </IonList>
-
-        {/* General settings */}
-        <section>
-          <div className="section-header">
-            <h6 className='section-title'>{t('settings.general')}</h6>
-          </div>
-          <IonList> 
-            {/* Language */}
-            <IonItem>
-              <IonIcon aria-hidden="true" icon={languageOutline} slot="start"></IonIcon>
-              <LanguageSelector />
-            </IonItem>
-
-            {/* Week starting day */}
-            <IonItem>
-              <IonIcon aria-hidden="true" icon={calendarOutline} slot="start"></IonIcon>
-              <IonSelect 
-                label={t('date.week-start')}
-                placeholder={t('categories.make_a_selection')}
-                value={selectedWeekStartDay}
-                onIonChange={(e) => handleWeekStartDay(e.detail.value)}
-                interface="popover"
-              >
-                <IonSelectOption value="sunday">{t('date.sunday')}</IonSelectOption>
-                <IonSelectOption value="monday">{t('date.monday')}</IonSelectOption>
-              </IonSelect>
-            </IonItem>
-
-            {/* Data Frecuendy */}
-            <IonItem>
-              <IonIcon aria-hidden="true" icon={timeOutline} slot="start"></IonIcon>
-              <IonSelect 
-                label={t('common.frecuency')}
-                placeholder={t('categories.make_a_selection')}
-                value={selectedInterval}
-                onIonChange={(e) => handleInterval(e.detail.value)}
-                interface="popover"
-              >
-                <IonSelectOption value="weekly">{t('date.weekly')}</IonSelectOption>
-                <IonSelectOption value="monthly">{t('date.monthly')}</IonSelectOption>
-                <IonSelectOption value="yearly">{t('date.yearly')}</IonSelectOption>
-              </IonSelect>
-            </IonItem>
-
-            {/* Currency */}
-            <IonItem detail={true} lines="none" routerLink="/app/currency">
-              <IonIcon aria-hidden="true" icon={cashOutline} slot="start"></IonIcon>
-              <IonLabel>{t('settings.currency')}</IonLabel>
-            </IonItem>
-
-          </IonList>
-        </section>
-
-        {/* Personalization */}
-        <section>
-          <div className="section-header">
-            <h6 className='section-title'>{t('settings.personalization')}</h6>
-          </div>
-          <IonList>
-            {/* Mode preferences */}
-            <IonItem>
-              <IonIcon aria-hidden="true" icon={moonOutline} slot="start"></IonIcon>
-              <ModePreferenceSelector />
-            </IonItem>
-
-            {/* Themes */}
-            <IonItem lines="none" detail={true} routerLink="/app/themes">
-              <IonIcon aria-hidden="true" icon={colorPaletteOutline} slot="start"></IonIcon>
-              <IonLabel>{t('settings.themes')}</IonLabel>
+              </IonLabel>
             </IonItem>
           </IonList>
-        </section>
 
-        {/* Data & Storage */}
-        <section>
-          <div className="section-header">
-            <h6 className='section-title'>{t('settings.data_storage')}</h6>
-          </div>
-          <IonList>
-            {/* Configure Back Up */}
-            <IonItem detail={true} routerLink="/app/backup">
-              <IonIcon aria-hidden="true" icon={arrowDownCircleOutline} slot="start"></IonIcon>
-              <IonLabel>{t('settings.back_up')}</IonLabel>
-            </IonItem>
-          </IonList>
-        </section>
+          {/* General settings */}
+          <section>
+            <div className="section-header">
+              <h6 className='section-title'>{t('settings.general')}</h6>
+            </div>
+            <IonList> 
+              {/* Language */}
+              <IonItem>
+                <IonIcon aria-hidden="true" icon={languageOutline} slot="start"></IonIcon>
+                <LanguageSelector />
+              </IonItem>
 
-        {/* Account */}
-        <section>
-          <div className="section-header">
-            <h6 className='section-title'>{t('settings.account')}</h6>
-          </div>
-          <IonList>
-            {/* Edit Profile */}
-            <IonItem detail={true} routerLink="/app/profile">
-              <IonIcon aria-hidden="true" icon={personOutline} slot="start"></IonIcon>
-              <IonLabel>{t('common.edit_profile')}</IonLabel>
-            </IonItem>
+              {/* Week starting day */}
+              <IonItem>
+                <IonIcon aria-hidden="true" icon={calendarOutline} slot="start"></IonIcon>
+                <IonSelect 
+                  label={t('date.week-start')}
+                  placeholder={t('categories.make_a_selection')}
+                  value={selectedWeekStartDay}
+                  onIonChange={(e) => handleWeekStartDay(e.detail.value)}
+                  interface="popover"
+                >
+                  <IonSelectOption value="sunday">{t('date.sunday')}</IonSelectOption>
+                  <IonSelectOption value="monday">{t('date.monday')}</IonSelectOption>
+                </IonSelect>
+              </IonItem>
 
-            {/* Change Password */}
-            <IonItem detail={true} routerLink="/app/default">
-              <IonIcon aria-hidden="true" icon={lockClosedOutline} slot="start"></IonIcon>
-              <IonLabel>{t('settings.change_pass')}</IonLabel>
-            </IonItem>
+              {/* Data Frecuendy */}
+              <IonItem>
+                <IonIcon aria-hidden="true" icon={timeOutline} slot="start"></IonIcon>
+                <IonSelect 
+                  label={t('common.frecuency')}
+                  placeholder={t('categories.make_a_selection')}
+                  value={selectedInterval}
+                  onIonChange={(e) => handleInterval(e.detail.value)}
+                  interface="popover"
+                >
+                  <IonSelectOption value="weekly">{t('date.weekly')}</IonSelectOption>
+                  <IonSelectOption value="monthly">{t('date.monthly')}</IonSelectOption>
+                  <IonSelectOption value="yearly">{t('date.yearly')}</IonSelectOption>
+                </IonSelect>
+              </IonItem>
 
-            {/* Reset Account */}
-            <IonItem detail={true} routerLink="/app/default">
-              <IonIcon aria-hidden="true" icon={refreshOutline} slot="start"></IonIcon>
-              <IonLabel>{t('settings.reset_account')}</IonLabel>
-            </IonItem>
+              {/* Currency */}
+              <IonItem detail={true} lines="none" routerLink="/app/currency">
+                <IonIcon aria-hidden="true" icon={cashOutline} slot="start"></IonIcon>
+                <IonLabel>{t('settings.currency')}</IonLabel>
+              </IonItem>
 
-            {/* Billing ans Subscription */}
-            <IonItem lines='none' detail={true} routerLink="/app/billing">
-              <IonIcon aria-hidden="true" icon={cardOutline} slot="start"></IonIcon>
-              <IonLabel>{t('settings.billing_subs')}</IonLabel>
-            </IonItem>
-          </IonList>
-        </section>
+            </IonList>
+          </section>
 
-        {/* DEV - File Exporer */}
-        <section>
-          <div className="section-header">
-            <h6 className='section-title'>DEV ONLY</h6>
-          </div>
-          <IonList>
-            {/* File Explorer */}
-            <IonItem detail={true} routerLink="/app/devFileExplorer">
-              <IonIcon aria-hidden="true" icon={folderOpenOutline} slot="start"></IonIcon>
-              <IonLabel>DEV - File Explorer</IonLabel>
-            </IonItem>
+          {/* Personalization */}
+          <section>
+            <div className="section-header">
+              <h6 className='section-title'>{t('settings.personalization')}</h6>
+            </div>
+            <IonList>
+              {/* Mode preferences */}
+              <IonItem>
+                <IonIcon aria-hidden="true" icon={moonOutline} slot="start"></IonIcon>
+                <ModePreferenceSelector />
+              </IonItem>
 
-            {/* Seeding */}
-            <IonItem detail={true} lines="none" routerLink="/app/devSeeding">
-              <IonIcon aria-hidden="true" icon={folderOpenOutline} slot="start"></IonIcon>
-              <IonLabel>Seed Expenses</IonLabel>
-            </IonItem>
+              {/* Themes */}
+              <IonItem lines="none" detail={true} routerLink="/app/themes">
+                <IonIcon aria-hidden="true" icon={colorPaletteOutline} slot="start"></IonIcon>
+                <IonLabel>{t('settings.themes')}</IonLabel>
+              </IonItem>
+            </IonList>
+          </section>
 
-            {/* Simulate subscription plan selection */}
-            <IonItem>
-              <IonIcon aria-hidden="true" icon={cardOutline} slot="start" />
-              <IonSelect
-                label="Subscription plan"
-                placeholder="Select plan"
-                value={selectedPlan}
-                onIonChange={(e) => handleSubscriptionPlan(e.detail.value)}
-                interface="popover"
-              >
-                <IonSelectOption value="free">
-                  Free
-                </IonSelectOption>
+          {/* Data & Storage */}
+          <section>
+            <div className="section-header">
+              <h6 className='section-title'>{t('settings.data_storage')}</h6>
+            </div>
+            <IonList>
+              {/* Configure Back Up */}
+              <IonItem detail={true} routerLink="/app/backup">
+                <IonIcon aria-hidden="true" icon={arrowDownCircleOutline} slot="start"></IonIcon>
+                <IonLabel>{t('settings.back_up')}</IonLabel>
+              </IonItem>
+            </IonList>
+          </section>
 
-                <IonSelectOption value="monthly">
-                  Monthly
-                </IonSelectOption>
+          {/* Account */}
+          <section>
+            <div className="section-header">
+              <h6 className='section-title'>{t('settings.account')}</h6>
+            </div>
+            <IonList>
+              {/* Edit Profile */}
+              <IonItem detail={true} routerLink="/app/profile">
+                <IonIcon aria-hidden="true" icon={personOutline} slot="start"></IonIcon>
+                <IonLabel>{t('common.edit_profile')}</IonLabel>
+              </IonItem>
 
-                <IonSelectOption value="quarterly">
-                  Quarterly
-                </IonSelectOption>
+              {/* Change Password */}
+              <IonItem detail={true} routerLink="/app/default">
+                <IonIcon aria-hidden="true" icon={lockClosedOutline} slot="start"></IonIcon>
+                <IonLabel>{t('settings.change_pass')}</IonLabel>
+              </IonItem>
 
-                <IonSelectOption value="yearly">
-                  Yearly
-                </IonSelectOption>
-              </IonSelect>
-            </IonItem>
+              {/* Reset Account */}
+              <IonItem detail={true} routerLink="/app/default">
+                <IonIcon aria-hidden="true" icon={refreshOutline} slot="start"></IonIcon>
+                <IonLabel>{t('settings.reset_account')}</IonLabel>
+              </IonItem>
 
-            <IonItem  className={!user.isPremium && user.subscriptionPlan === 'free' ? 'disabled' : ''}>
-              <IonIcon aria-hidden="true" icon={checkmarkCircle} slot="start" />
-              <IonSelect
-                label="Subscription status"
-                value={
-                  user.subscriptionPlan === 'free'
-                    ? "free"
-                    : user.isPremium
-                      ? "active"
-                      : "expired"
-                }
-                onIonChange={(e) =>
-                  updateUser({
-                    isPremium: e.detail.value === "active",
-                  })
-                }
-                interface="popover"
-              >
-                <IonSelectOption value="active">Active</IonSelectOption>
-                <IonSelectOption value="expired">Expired</IonSelectOption>
-              </IonSelect>
-            </IonItem>
-          </IonList>
-        </section>
+              {/* Billing ans Subscription */}
+              <IonItem lines='none' detail={true} routerLink="/app/billing">
+                <IonIcon aria-hidden="true" icon={cardOutline} slot="start"></IonIcon>
+                <IonLabel>{t('settings.billing_subs')}</IonLabel>
+              </IonItem>
+            </IonList>
+          </section>
 
+          {/* DEV - File Exporer */}
+          <section>
+            <div className="section-header">
+              <h6 className='section-title'>DEV ONLY</h6>
+            </div>
+            <IonList>
+              {/* File Explorer */}
+              <IonItem detail={true} routerLink="/app/devFileExplorer">
+                <IonIcon aria-hidden="true" icon={folderOpenOutline} slot="start"></IonIcon>
+                <IonLabel>DEV - File Explorer</IonLabel>
+              </IonItem>
+
+              {/* Seeding */}
+              <IonItem detail={true} lines="none" routerLink="/app/devSeeding">
+                <IonIcon aria-hidden="true" icon={folderOpenOutline} slot="start"></IonIcon>
+                <IonLabel>Seed Expenses</IonLabel>
+              </IonItem>
+
+              {/* Simulate subscription plan selection */}
+              <IonItem>
+                <IonIcon aria-hidden="true" icon={cardOutline} slot="start" />
+                <IonSelect
+                  label="Subscription plan"
+                  placeholder="Select plan"
+                  value={selectedPlan}
+                  onIonChange={(e) => handleSubscriptionPlan(e.detail.value)}
+                  interface="popover"
+                >
+                  <IonSelectOption value="free">
+                    Free
+                  </IonSelectOption>
+
+                  <IonSelectOption value="monthly">
+                    Monthly
+                  </IonSelectOption>
+
+                  <IonSelectOption value="quarterly">
+                    Quarterly
+                  </IonSelectOption>
+
+                  <IonSelectOption value="yearly">
+                    Yearly
+                  </IonSelectOption>
+                </IonSelect>
+              </IonItem>
+
+              <IonItem  className={!user.isPremium && user.subscriptionPlan === 'free' ? 'disabled' : ''}>
+                <IonIcon aria-hidden="true" icon={checkmarkCircle} slot="start" />
+                <IonSelect
+                  label="Subscription status"
+                  value={
+                    user.subscriptionPlan === 'free'
+                      ? "free"
+                      : user.isPremium
+                        ? "active"
+                        : "expired"
+                  }
+                  onIonChange={(e) =>
+                    updateUser({
+                      isPremium: e.detail.value === "active",
+                    })
+                  }
+                  interface="popover"
+                >
+                  <IonSelectOption value="active">Active</IonSelectOption>
+                  <IonSelectOption value="expired">Expired</IonSelectOption>
+                </IonSelect>
+              </IonItem>
+            </IonList>
+          </section>
+        </div>
       </IonContent>
 
       <Footer appPages={translatedMenuItems} />

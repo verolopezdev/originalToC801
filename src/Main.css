@@ -1125,6 +1125,13 @@ section {
   text-decoration-color: var(--ion-color-primary);
 }
 
+.page-container {
+  width: 100%;
+  max-width: 768px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
 /* -------- MODALS --------- */
 /* Custom styles for the small modal */
 .small-modal {
@@ -1451,10 +1458,6 @@ ion-note {
   font-size: 16px;
   font-style: italic;
   color: var(--ion-color-note);
-}
-
-ion-page {
-  max-width: 500px;
 }
 
 ion-radio-group.frecuency-radio-group {

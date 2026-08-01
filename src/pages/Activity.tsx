@@ -245,74 +245,74 @@ const Activity: React.FC = () => {
 
 
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
-        {/* Screen Header */}
-        <div className='centered-container mb-20'>
-          <h2 className='screen-title'>{t('common.activity')}</h2>
-        </div>
+        <div className="page-container">
+          {/* Screen Header */}
+          <div className='centered-container mb-20'>
+            <h2 className='screen-title'>{t('common.activity')}</h2>
+          </div>
 
-        {selectedInterval && (
-          <>
-            {/* Card slider */}
-            <AccountTotalSlider        
-              accounts={accountsToShow}
-              onAccountSelect={handleAccountSelect} // Pass the callback to SliderComponent
-              currentDate={currentDate} 
-              selectedInterval={selectedInterval} 
-              setSelectedInterval={setSelectedInterval} 
-              start={start}
-              end={end}
-            />  
+          {selectedInterval && (
+            <>
+              {/* Card slider */}
+              <AccountTotalSlider        
+                accounts={accountsToShow}
+                onAccountSelect={handleAccountSelect} // Pass the callback to SliderComponent
+                currentDate={currentDate} 
+                selectedInterval={selectedInterval} 
+                setSelectedInterval={setSelectedInterval} 
+                start={start}
+                end={end}
+              />  
 
-            {/* Interval */}
-            <IntervalToolbar    
-              selectedInterval={selectedInterval}
-              currentDate={currentDate}
-              setCurrentDate={setCurrentDate} // Update date from IntervalToolbar 
-              weekStartDay={weekStartDay} 
-            />
+              {/* Interval */}
+              <IntervalToolbar    
+                selectedInterval={selectedInterval}
+                currentDate={currentDate}
+                setCurrentDate={setCurrentDate} // Update date from IntervalToolbar 
+                weekStartDay={weekStartDay} 
+              />
 
-            {/* View mode */}
-            <div className='section-header mt-10'>
-              <div className='flex-space'>
-                {/* Title */}
-                <h6 className="section-title">
-                  {viewMode === "date" ? t('activity.by_date') : t('activity.by_category')}
-                </h6>
+              {/* View mode */}
+              <div className='section-header mt-10'>
+                <div className='flex-space'>
+                  {/* Title */}
+                  <h6 className="section-title">
+                    {viewMode === "date" ? t('activity.by_date') : t('activity.by_category')}
+                  </h6>
 
-                {/* View mode icons */}
-                <div className='icon-menu-bar mr-5'>
-                  <IonIcon
-                    icon={viewMode === 'category' ? listOutline : gridOutline}
-                    onClick={toggleViewMode}
-                    className='medium-icon-btn primary'
-                  />
+                  {/* View mode icons */}
+                  <div className='icon-menu-bar mr-5'>
+                    <IonIcon
+                      icon={viewMode === 'category' ? listOutline : gridOutline}
+                      onClick={toggleViewMode}
+                      className='medium-icon-btn primary'
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className='mb-60'>
-            {viewMode === "date" ? (
-              <TransactionList         
-                selectedInterval={selectedInterval}   
-                start={start}
-                end={end}
-                accountId={selectedCardId} 
-              />
-            ) : (
-              <TransactionListByCategory  
-                selectedInterval={selectedInterval}
-                selectedDate={currentDate}
-                start={start}
-                end={end}
-                accountId={selectedCardId} 
-                upToToday={true}
-              />
-            )}
-            </div>
-          </>
-        )}
-        
-
+              <div className='mb-60'>
+              {viewMode === "date" ? (
+                <TransactionList         
+                  selectedInterval={selectedInterval}   
+                  start={start}
+                  end={end}
+                  accountId={selectedCardId} 
+                />
+              ) : (
+                <TransactionListByCategory  
+                  selectedInterval={selectedInterval}
+                  selectedDate={currentDate}
+                  start={start}
+                  end={end}
+                  accountId={selectedCardId} 
+                  upToToday={true}
+                />
+              )}
+              </div>
+            </>
+          )}
+        </div>
       </IonContent>
       <Footer appPages={translatedMenuItems} />
     </IonPage>

@@ -209,117 +209,117 @@ const NewAccount: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
-        {/* Screen Header */}
-        <div className='centered-container mb-10'>
-          <h2 className='screen-title'>{t('accounts.new_account_title')}</h2>
-        </div>
+        <div className="page-container">
+          {/* Screen Header */}
+          <div className='centered-container mb-10'>
+            <h2 className='screen-title'>{t('accounts.new_account_title')}</h2>
+          </div>
         
-        {/* Show Default Card */}
-        <section>
-          <div className="centered-container">
-            <DefaultCard
-              title={accountName}
-              color= {accountColor}
-              identifier={accountIdentifier}
-              logo={accountLogo}
-              amount=""
-              editMode={true}
+          {/* Show Default Card */}
+          <section>
+            <div className="centered-container">
+              <DefaultCard
+                title={accountName}
+                color= {accountColor}
+                identifier={accountIdentifier}
+                logo={accountLogo}
+                amount=""
+                editMode={true}
+              />
+            </div>
+          </section>
+
+          {/* Form Section */}
+          <section>
+            {/* Card name */}
+            <div className='form-item'>
+              <div className="input-container">
+                <label>{t('accounts.card_name')}</label>
+                <input
+                  type="text"
+                  value={accountName}
+                  maxLength={30}
+                  onChange={(e) =>
+                    handleInputChange(
+                      'cardName',
+                      e.target.value,
+                      setAccountName,
+                      validateName,
+                      t('common.invalid_name')
+                    )
+                  }
+                  placeholder={t('accounts.card_name_placeholder')}
+                  className={`input capitalize ${errors.cardName ? 'invalid' : ''}`}
+                />
+                {errors.cardName && <p className="error-text">{errors.cardName}</p>}
+              </div>
+            </div>
+
+            {/* Card identifier */}
+            <div className='form-item'>
+              <div className="input-container">
+                <label>{t('accounts.card_identifier')}</label>
+                <input
+                  type="text"
+                  value={accountIdentifier}
+                  maxLength={30}
+                  onChange={(e) =>
+                    handleInputChange(
+                      'cardIdentifier',
+                      e.target.value,
+                      setAccountIdentifier,
+                      validateName,
+                      t('common.invalid_name')
+                    )
+                  }
+                  placeholder={t('accounts.card_identifier_placeholder')}
+                  className={`input ${errors.cardIdentifier ? 'invalid' : ''}`}
+                />
+                {errors.cardIdentifier && <p className="error-text">{errors.cardIdentifier}</p>}
+              </div>
+            </div>
+          </section>
+
+          {/* Color picker */}
+          <section>
+            <h6 className='section-title'>{t('themes.choose_color')}</h6>
+            <ColorPicker onColorSelect={handleColorSelect} initialColor={accountColor} />
+          </section>
+
+          {/* Logo picker */}
+          <section>
+            <h6 className="section-title">{t('accounts.choose_logo')}</h6>
+            <IconPicker 
+              selectedIcon={accountLogo}
+              onIconSelect={setAccountLogo}
+              defaultView='accounts'
             />
-          </div>
-        </section>
+          </section>
 
-        {/* Form Section */}
-        <section>
-          {/* Card name */}
-          <div className='form-item'>
-            <div className="input-container">
-              <label>{t('accounts.card_name')}</label>
-              <input
-                type="text"
-                value={accountName}
-                maxLength={30}
-                onChange={(e) =>
-                  handleInputChange(
-                    'cardName',
-                    e.target.value,
-                    setAccountName,
-                    validateName,
-                    t('common.invalid_name')
-                  )
-                }
-                placeholder={t('accounts.card_name_placeholder')}
-                className={`input capitalize ${errors.cardName ? 'invalid' : ''}`}
-              />
-              {errors.cardName && <p className="error-text">{errors.cardName}</p>}
-            </div>
-          </div>
+          {/* Add account button */}
+          <IonButton
+            className="block mb-60"
+            onClick={() => {
+              if (isFormValid) {
+                addAccount();
+              }
+            }}
+            disabled={!isFormValid} // Disable the button if the form is invalid
+          >
+            {t('accounts.add_account')}
+          </IonButton>
 
-          {/* Card identifier */}
-          <div className='form-item'>
-            <div className="input-container">
-              <label>{t('accounts.card_identifier')}</label>
-              <input
-                type="text"
-                value={accountIdentifier}
-                maxLength={30}
-                onChange={(e) =>
-                  handleInputChange(
-                    'cardIdentifier',
-                    e.target.value,
-                    setAccountIdentifier,
-                    validateName,
-                    t('common.invalid_name')
-                  )
-                }
-                placeholder={t('accounts.card_identifier_placeholder')}
-                className={`input ${errors.cardIdentifier ? 'invalid' : ''}`}
-              />
-              {errors.cardIdentifier && <p className="error-text">{errors.cardIdentifier}</p>}
-            </div>
-          </div>
-        </section>
-
-        {/* Color picker */}
-        <section>
-          <h6 className='section-title'>{t('themes.choose_color')}</h6>
-          <ColorPicker onColorSelect={handleColorSelect} initialColor={accountColor} />
-        </section>
-
-        {/* Logo picker */}
-        <section>
-          <h6 className="section-title">{t('accounts.choose_logo')}</h6>
-          <IconPicker 
-            selectedIcon={accountLogo}
-            onIconSelect={setAccountLogo}
-            defaultView='accounts'
+          {/* Confirmation Modal */}
+          <Modal
+            isOpen={isModalOpen}
+            icon={modalConfig.icon}
+            title={modalConfig.title}
+            content={modalConfig.content}
+            closeModal={() => setIsModalOpen(false)}
+            actions={modalConfig.actions}
+            destination={modalConfig.destination}
           />
-        </section>
-
-
-        {/* Add account button */}
-        <IonButton
-          className="block mb-60"
-          onClick={() => {
-            if (isFormValid) {
-              addAccount();
-            }
-          }}
-          disabled={!isFormValid} // Disable the button if the form is invalid
-        >
-          {t('accounts.add_account')}
-        </IonButton>
-
-        {/* Confirmation Modal */}
-        <Modal
-          isOpen={isModalOpen}
-          icon={modalConfig.icon}
-          title={modalConfig.title}
-          content={modalConfig.content}
-          closeModal={() => setIsModalOpen(false)}
-          actions={modalConfig.actions}
-          destination={modalConfig.destination}
-        />
-
+        </div>
       </IonContent>
     </IonPage>
   );

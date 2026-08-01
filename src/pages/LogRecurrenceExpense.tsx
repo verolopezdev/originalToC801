@@ -502,293 +502,288 @@ const LogRecurrenceExpense: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding-horizontal"  ref={contentRef}>
-        {/* Screen Header */}
-        <div className='centered-container mb-10'>
-          <h2 className="screen-title">
-            {t(mode === 'remaining' 
-              ? 'expenses.log_and_end_recurrence_title' 
-              : 'expenses.log_title'
-            )}
-          </h2>        
-        </div>
+        <div className="page-container">
+          {/* Screen Header */}
+          <div className='centered-container mb-10'>
+            <h2 className="screen-title">
+              {t(mode === 'remaining' 
+                ? 'expenses.log_and_end_recurrence_title' 
+                : 'expenses.log_title'
+              )}
+            </h2>        
+          </div>
 
-        <AccountSlider
-          editAccount={accountId}
-          key={`account-slider-${resetTrigger}`}
-          accounts={sortedAccounts}
-          onAccountSelect={handleAccountSelect} // Pass the callback to SliderComponent
-        />
-
-				{selectedCurrency && 
-          <AmountInput
-            key={`amount-input-${resetTrigger}`}
-            locale={selectedCurrency.locale}
-            decimalSeparator={selectedCurrency.decimalSeparator}
-            thousandSeparator={selectedCurrency.thousandSeparator}
-            currencySymbol={selectedCurrency.symbol}
-            currencyCode={selectedCurrency.code}
-            passedAmount={amountInCents}
-            onAmountChange={handleAmountChange} 
-            readOnly={mode === 'remaining' ? true : false}
+          <AccountSlider
+            editAccount={accountId}
+            key={`account-slider-${resetTrigger}`}
+            accounts={sortedAccounts}
+            onAccountSelect={handleAccountSelect} // Pass the callback to SliderComponent
           />
-        }
 
-				{/* Additional configuration */}
-				<div className='additional-config'>
-          
-          {/* Categories */}
-          <div className='aditional-btn'>
-            <div>
-              <IonIcon icon={gridOutline} className='small-icon-btn primary'></IonIcon>
-            </div>
-            <div 
-              className='selected-info'
-              onClick={() => setIsOpenCategoryModal(true)}
-            >
-              {subcategoryId ? (
-                <>
-                  <span className="title">{t('categories.subcategory')}</span>
-                  <span className='data'>{subcategory && subcategory.subcategoryName}</span>
-                </>
-              ) : (
-                <>
-                  <span className="title">{t('categories.category')}</span>
-                  <span className='data'>{category && category.categoryName}</span>
-                </>
-              )}
-            </div>
-          </div>
+          {selectedCurrency && 
+            <AmountInput
+              key={`amount-input-${resetTrigger}`}
+              locale={selectedCurrency.locale}
+              decimalSeparator={selectedCurrency.decimalSeparator}
+              thousandSeparator={selectedCurrency.thousandSeparator}
+              currencySymbol={selectedCurrency.symbol}
+              currencyCode={selectedCurrency.code}
+              passedAmount={amountInCents}
+              onAmountChange={handleAmountChange} 
+              readOnly={mode === 'remaining' ? true : false}
+            />
+          }
 
-          {/* Date */}
-          <div 
-            className='aditional-btn'
-            onClick={() => handleDateChange()}
-          >
-            <div>
-              <IonIcon icon={calendarOutline} className='small-icon-btn primary'></IonIcon>
-            </div>
-            <div className='selected-info'>
-              <span className="title">{t('expenses.config_date')}</span>
-              <span className='data'><FormattedDate date={nextDueDate} format="short" /></span> 
-            </div>
-          </div>
-
-          {/* Frecuency */}
-          <div
-            className="aditional-btn disabled"
-            onClick={recurrence.totalOccurrences === null ? () => setShowFrequencyModal(true) : undefined}
-          >
-            <div>
-              <IonIcon icon={syncOutline} className='small-icon-btn primary'></IonIcon>
-            </div>
-            <div className='selected-info'>
-              <span className="title">{t('expenses.config_freq')}</span>
-              {!recurrence.isRecurring ? (
-                <span className='data'>{t('expenses.config_only_once')}</span>
-              ) : (
-                <span className='data'>
-                  {t('expenses.config_every')} {recurrence.interval > 1 ? recurrence.interval : ''} {t(`date.${recurrence.unit}`)}
-                  {recurrence.interval > 1 ? 's' : ''}
-                  {typeof recurrence.totalOccurrences === 'number' && ` x ${recurrence.totalOccurrences}`}
-                  {recurrence.endDate && (
-                    <>
-                      {t('expenses.config_until')}{" "}
-                      {new Date(recurrence.endDate).toLocaleDateString()}
-                    </>
-                  )}
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Currency */}
-          <div 
-            className={`aditional-btn ${recurrence.isRecurring && 'disabled'}`}
-            onClick={recurrence.isRecurring ? undefined : () => setIsAlternativeModalOpen(true)}          
-          >
-            <div>
-              <IonIcon icon={cashOutline} className='small-icon-btn primary' />
-            </div>
+          {/* Additional configuration */}
+          <div className='additional-config'>
             
-            <div className='selected-info'>
-              <span className="title">{t('expenses.config_currency')}</span>
-              <span className='data'>{selectedCurrency?.name}</span>
-            </div>
-          </div>
-
-          {/* Add notification and Log expense */}
-          {recurrence.isRecurring === 1 && (
-            <>
-              {/* Notify */}
+            {/* Categories */}
+            <div className='aditional-btn'>
+              <div>
+                <IonIcon icon={gridOutline} className='small-icon-btn primary'></IonIcon>
+              </div>
               <div 
-                className='aditional-btn disabled'
-                onClick={() => setShowNotifyModal(true)}
+                className='selected-info'
+                onClick={() => setIsOpenCategoryModal(true)}
               >
-                <div>
-                  {notification ? (
-                    <IonIcon icon={notificationsOutline}  className='small-icon-btn primary'/>
+                {subcategoryId ? (
+                  <>
+                    <span className="title">{t('categories.subcategory')}</span>
+                    <span className='data'>{subcategory && subcategory.subcategoryName}</span>
+                  </>
                 ) : (
-                    <IonIcon icon={notificationsOffOutline}  className='small-icon-btn primary'/>
-                  )}
+                  <>
+                    <span className="title">{t('categories.category')}</span>
+                    <span className='data'>{category && category.categoryName}</span>
+                  </>
+                )}
+              </div>
+            </div>
 
-                </div>
-                <div className='selected-info'>
-                  <span className="title">{t('common.notify')}</span>
-                  {notification ? (
-                    <span className='data'>{notification.amount} {notification.unit} at {notification.time}</span>
+            {/* Date */}
+            <div 
+              className='aditional-btn'
+              onClick={() => handleDateChange()}
+            >
+              <div>
+                <IonIcon icon={calendarOutline} className='small-icon-btn primary'></IonIcon>
+              </div>
+              <div className='selected-info'>
+                <span className="title">{t('expenses.config_date')}</span>
+                <span className='data'><FormattedDate date={nextDueDate} format="short" /></span> 
+              </div>
+            </div>
+
+            {/* Frecuency */}
+            <div
+              className="aditional-btn disabled"
+              onClick={recurrence.totalOccurrences === null ? () => setShowFrequencyModal(true) : undefined}
+            >
+              <div>
+                <IonIcon icon={syncOutline} className='small-icon-btn primary'></IonIcon>
+              </div>
+              <div className='selected-info'>
+                <span className="title">{t('expenses.config_freq')}</span>
+                {!recurrence.isRecurring ? (
+                  <span className='data'>{t('expenses.config_only_once')}</span>
+                ) : (
+                  <span className='data'>
+                    {t('expenses.config_every')} {recurrence.interval > 1 ? recurrence.interval : ''} {t(`date.${recurrence.unit}`)}
+                    {recurrence.interval > 1 ? 's' : ''}
+                    {typeof recurrence.totalOccurrences === 'number' && ` x ${recurrence.totalOccurrences}`}
+                    {recurrence.endDate && (
+                      <>
+                        {t('expenses.config_until')}{" "}
+                        {new Date(recurrence.endDate).toLocaleDateString()}
+                      </>
+                    )}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Currency */}
+            <div 
+              className={`aditional-btn ${recurrence.isRecurring && 'disabled'}`}
+              onClick={recurrence.isRecurring ? undefined : () => setIsAlternativeModalOpen(true)}          
+            >
+              <div>
+                <IonIcon icon={cashOutline} className='small-icon-btn primary' />
+              </div>
+              
+              <div className='selected-info'>
+                <span className="title">{t('expenses.config_currency')}</span>
+                <span className='data'>{selectedCurrency?.name}</span>
+              </div>
+            </div>
+
+            {/* Add notification and Log expense */}
+            {recurrence.isRecurring === 1 && (
+              <>
+                {/* Notify */}
+                <div 
+                  className='aditional-btn disabled'
+                  onClick={() => setShowNotifyModal(true)}
+                >
+                  <div>
+                    {notification ? (
+                      <IonIcon icon={notificationsOutline}  className='small-icon-btn primary'/>
                   ) : (
-                    <span className='data'>{t('common.no')}</span>
-                  )}
-                </div>
-              </div>
+                      <IonIcon icon={notificationsOffOutline}  className='small-icon-btn primary'/>
+                    )}
 
-              {/* Log expense automatically / manually */}
-              <div 
-                className='aditional-btn disabled' 
-                onClick={() =>
-                  setRecurrence(prev => ({
-                    ...prev,
-                    logAutomatically: !prev.logAutomatically
-                  }))
-                }
-              >
-                <div>
-                    <IonIcon icon={gitCompareOutline}  className='small-icon-btn primary'/>
+                  </div>
+                  <div className='selected-info'>
+                    <span className="title">{t('common.notify')}</span>
+                    {notification ? (
+                      <span className='data'>{notification.amount} {notification.unit} at {notification.time}</span>
+                    ) : (
+                      <span className='data'>{t('common.no')}</span>
+                    )}
+                  </div>
                 </div>
-                <div className='selected-info'>
-                  <span className="title">{t('expenses.log_exp')}</span>
-                  <span className='data'>{recurrence.logAutomatically ? t('expenses.config_auto') : t('expenses.config_man')}</span>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
 
-        {/* Add note */}
-        <div className="form-item">
-          <div className="parent-input">
-            <div className="input-container">
-              <input
-                type="text"
-                value={note}
-                maxLength={30}
-                placeholder="Note"
-                onChange={(e) => handleNoteChange(e.target.value) }
-                className={`input ${error ? 'invalid' : ''}`}
-                />
-              {error && <p className="error-text">{error}</p>}
+                {/* Log expense automatically / manually */}
+                <div 
+                  className='aditional-btn disabled' 
+                  onClick={() =>
+                    setRecurrence(prev => ({
+                      ...prev,
+                      logAutomatically: !prev.logAutomatically
+                    }))
+                  }
+                >
+                  <div>
+                      <IonIcon icon={gitCompareOutline}  className='small-icon-btn primary'/>
+                  </div>
+                  <div className='selected-info'>
+                    <span className="title">{t('expenses.log_exp')}</span>
+                    <span className='data'>{recurrence.logAutomatically ? t('expenses.config_auto') : t('expenses.config_man')}</span>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Add note */}
+          <div className="form-item">
+            <div className="parent-input">
+              <div className="input-container">
+                <input
+                  type="text"
+                  value={note}
+                  maxLength={30}
+                  placeholder="Note"
+                  onChange={(e) => handleNoteChange(e.target.value) }
+                  className={`input ${error ? 'invalid' : ''}`}
+                  />
+                {error && <p className="error-text">{error}</p>}
+              </div>
             </div>
           </div>
-        </div>
         
+          {/* Save changes button */}
+          <IonButton
+            className="block mb-60"
+            onClick={() => {
+              if (isFormValid) {
+                handleLogExpense();
+              }
+            }}
+            disabled={!isFormValid} // Disable the button if the form is invalid
+          >
+            {t('expenses.log_exp')} {mode === 'remaining' ? ' and End Recurrence' : null}
+          </IonButton>
 
-        {/* Save changes button */}
-        <IonButton
-          className="block mb-60"
-          onClick={() => {
-            if (isFormValid) {
-              handleLogExpense();
-            }
-          }}
-          disabled={!isFormValid} // Disable the button if the form is invalid
-        >
-          {t('expenses.log_exp')} {mode === 'remaining' ? ' and End Recurrence' : null}
-        </IonButton>
+          {/* Category picker modal */}
+          <IonModal isOpen={isOpenCategoryModal}>
+            <IonHeader className="ion-no-border">
+              <IonToolbar>
+                <IonButtons slot="start">
+                  <IonButton onClick={() => setIsOpenCategoryModal(false)}>
+                    <IonIcon aria-hidden="true" icon={arrowBackOutline} className='close-modal'></IonIcon>
+                  </IonButton>
+                </IonButtons>
+                <IonButtons slot="end">
+                  <IonButton onClick={() => setShowFavourites(prevState => !prevState)}>
+                    {showFavourites ? (
+                      <IonChip>
+                        {t('common.view_all')}
+                      </IonChip>
+                    ) : (
+                      <IonChip>
+                        {t('common.view_favs')}
+                      </IonChip>
+                    )}
+                  </IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>  
+            <IonContent className="ion-padding">
+              <CategoryPicker
+                selectedCategory={categoryId}
+                selectedSubcategory={subcategoryId}
+                onCategorySelect={handleCategorySelect} // Updated to use the handler
+                showFavourites={showFavourites}
+              />
+            </IonContent>
+          </IonModal>
 
+          {/* Frequency modal */}
+          <IonModal 
+            isOpen={showFrequencyModal} 
+            onDidDismiss={() => setShowFrequencyModal(false)}
+            className="small-modal"
+          >
+            <div className="small-modal-content">
+              <h3 className="mb-20 centered-container">{t('common.repeat')}</h3>
 
-        {/* Category picker modal */}
-        <IonModal isOpen={isOpenCategoryModal}>
-          <IonHeader className="ion-no-border">
-            <IonToolbar>
-              <IonButtons slot="start">
-                <IonButton onClick={() => setIsOpenCategoryModal(false)}>
-                  <IonIcon aria-hidden="true" icon={arrowBackOutline} className='close-modal'></IonIcon>
-                </IonButton>
-              </IonButtons>
-              <IonButtons slot="end">
-                <IonButton onClick={() => setShowFavourites(prevState => !prevState)}>
-                  {showFavourites ? (
-                    <IonChip>
-                      {t('common.view_all')}
-                    </IonChip>
-                  ) : (
-                    <IonChip>
-                      {t('common.view_favs')}
-                    </IonChip>
-                  )}
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>  
-          <IonContent className="ion-padding">
-            <CategoryPicker
-              selectedCategory={categoryId}
-              selectedSubcategory={subcategoryId}
-              onCategorySelect={handleCategorySelect} // Updated to use the handler
-              showFavourites={showFavourites}
-            />
-          </IonContent>
-        </IonModal>
+              <FrequencyForm  
+                startDate={startDate.toISOString()}
+                onDone={(settings: RecurrenceSettings) => {
+                  setRecurrence(settings);         // Save the recurrence data
+                  setShowFrequencyModal(false);    // Close modal 
+                }}
+                initialSettings={recurrence}
+                editRecurrence={true}
+              />
+            </div>
+          </IonModal>
 
+          {/* Confirmation Modal */}
+          <Modal
+            isOpen={isConfirmationModalOpen}
+            icon={modalConfig.icon}
+            title={modalConfig.title}
+            content={modalConfig.content}
+            closeModal={() => setIsConfirmationModalOpen(false)}
+            actions={modalConfig.actions}
+          />
 
-        {/* Frequency modal */}
-        <IonModal 
-          isOpen={showFrequencyModal} 
-          onDidDismiss={() => setShowFrequencyModal(false)}
-          className="small-modal"
-        >
-          <div className="small-modal-content">
-            <h3 className="mb-20 centered-container">{t('common.repeat')}</h3>
-
-            <FrequencyForm  
-              startDate={startDate.toISOString()}
-              onDone={(settings: RecurrenceSettings) => {
-                setRecurrence(settings);         // Save the recurrence data
-                setShowFrequencyModal(false);    // Close modal 
-              }}
-              initialSettings={recurrence}
-              editRecurrence={true}
-            />
-          </div>
-        </IonModal>
-
-
-        {/* Confirmation Modal */}
-        <Modal
-          isOpen={isConfirmationModalOpen}
-          icon={modalConfig.icon}
-          title={modalConfig.title}
-          content={modalConfig.content}
-          closeModal={() => setIsConfirmationModalOpen(false)}
-          actions={modalConfig.actions}
-        />
-
-
-        {/* Alert when selected ends date is earlier than today */}
-        <IonAlert
-          isOpen={showEndDateAlert}
-          className='custom-alert'
-          header={t('expenses.recurrence_ended')}
-          message={t('expenses.recurrence_ended_message', {
-            date: dayjs(recurrence.endDate).format('LL')
-          })}
-          buttons={[
-            {
-              text: t('common.cancel'),
-              role: "cancel",
-              handler: () => setShowEndDateAlert(false),
-            },
-            {
-              text: t('common.proceed'),
-              handler: async () => {
-                setShowEndDateAlert(false);
-                await logRecurrenceExpense(passedRecurrenceId, true);; // mark isActive = 0
+          {/* Alert when selected ends date is earlier than today */}
+          <IonAlert
+            isOpen={showEndDateAlert}
+            className='custom-alert'
+            header={t('expenses.recurrence_ended')}
+            message={t('expenses.recurrence_ended_message', {
+              date: dayjs(recurrence.endDate).format('LL')
+            })}
+            buttons={[
+              {
+                text: t('common.cancel'),
+                role: "cancel",
+                handler: () => setShowEndDateAlert(false),
               },
-            },
-          ]}
-        />
-
-
+              {
+                text: t('common.proceed'),
+                handler: async () => {
+                  setShowEndDateAlert(false);
+                  await logRecurrenceExpense(passedRecurrenceId, true);; // mark isActive = 0
+                },
+              },
+            ]}
+          />
+        </div>
       </IonContent>
     </IonPage>
   );

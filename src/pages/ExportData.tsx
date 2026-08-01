@@ -39,25 +39,25 @@ const DefaultPage: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding-horizontal"  ref={contentRef}>
-        {/* Screen Header */}
-        <section className='centered-container'>
-          <h2 className='screen-title'>{t('export.screen_title')}</h2>
-          <IonImg
-            src={`assets/images/export/${color}-export.svg`} // Dynamically set the SVG source
-            alt="Theme image"
-            className='screen-narrow-img'
-          ></IonImg>
-        </section>
-        
+        <div className="page-container">
+          {/* Screen Header */}
+          <section className='centered-container'>
+            <h2 className='screen-title'>{t('export.screen_title')}</h2>
+            <IonImg
+              src={`assets/images/export/${color}-export.svg`} // Dynamically set the SVG source
+              alt="Theme image"
+              className='screen-narrow-img'
+            ></IonImg>
+          </section>
 
-        <section>
-          <h6 className="section-title">{t('export.subtitle')}</h6>
-          <p>{t('export.what_to_do')}</p>
+          <section>
+            <h6 className="section-title">{t('export.subtitle')}</h6>
+            <p>{t('export.what_to_do')}</p>
 
 
-          <ExportForm />
-        </section>
-
+            <ExportForm />
+          </section>
+        </div>
       </IonContent>
     </IonPage>
   );

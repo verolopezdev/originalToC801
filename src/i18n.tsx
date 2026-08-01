@@ -1,14 +1,13 @@
-// i18n.ts
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
 import { Device } from "@capacitor/device";
 
-import { db } from './db';
+import { db } from "./db";
 
-import en from './locales/en.json';
-import es from './locales/es.json';
-import fr from './locales/fr.json';
-import pt from './locales/pt.json';
+import en from "./locales/en.json";
+import es from "./locales/es.json";
+import fr from "./locales/fr.json";
+import pt from "./locales/pt.json";
 
 const resources = {
   en: { translation: en },
@@ -29,31 +28,42 @@ const getDeviceLanguage = async () => {
     : "en";
 };
 
-export const initI18n = async () => {
-  let language = "en";
-
-  // Try existing user preference first
-  const settings = await db.userSettings
-    .where("key")
-    .equals("settings")
-    .first();
-
-  if (settings?.language && supportedLngs.includes(settings.language)) {
-    language = settings.language;
-  } else {
-    // First launch: use device language
-    language = await getDeviceLanguage();
-  }
-
-  await i18n
+/**
+ * Fast synchronous initialization.
+ * Call this before rendering React.
+ */
+export const initI18n = () => {
+  return i18n
     .use(initReactI18next)
     .init({
       resources,
-      lng: language,
+      lng: "en",          // temporary language
       fallbackLng: "en",
-      interpolation: { escapeValue: false },
       supportedLngs,
+      interpolation: {
+        escapeValue: false,
+      },
     });
+};
+
+/**
+ * Loads the real language and switches to it.
+ * Call this during StartupRedirect.
+ */
+export const loadUserLanguage = async () => {
+  let language = "en";
+
+  const user = await db.users.toCollection().first();
+
+  if (user?.language && supportedLngs.includes(user.language)) {
+    language = user.language;
+  } else {
+    language = await getDeviceLanguage();
+  }
+
+  if (i18n.language !== language) {
+    await i18n.changeLanguage(language);
+  }
 };
 
 export default i18n;

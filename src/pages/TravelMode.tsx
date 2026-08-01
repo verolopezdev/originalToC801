@@ -38,7 +38,6 @@ import {
 // Ion icon components
 import { 
   add,
-  barChartOutline, 
   layersOutline,
   closeOutline,
   homeOutline,
@@ -137,86 +136,85 @@ const TravelMode: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding-horizontal"  ref={contentRef}>
-        {/* Screen Header */}
-        <section className='centered-container'>
-          <h2 className='screen-title'>{t('common.travel_mode')}</h2>
-          <IonImg
-            src={`assets/images/travel/${color}-travel.svg`} // Dynamically set the SVG source
-            alt="Theme image"
-            className='screen-wide-img'
-          ></IonImg>
-        </section> 
-
+        <div className="page-container">
+          {/* Screen Header */}
+          <section className='centered-container'>
+            <h2 className='screen-title'>{t('common.travel_mode')}</h2>
+            <IonImg
+              src={`assets/images/travel/${color}-travel.svg`} // Dynamically set the SVG source
+              alt="Theme image"
+              className='screen-wide-img'
+            ></IonImg>
+          </section> 
         
-        {/* Travel mode toggle */}
-        <section>
-          <p>{t('currency.travel_mode_prompt')}</p>
-          <IonToggle 
-            labelPlacement="end"
-            checked={activateTravelMode} 
-            disabled={tripCount === 0}
-            onIonChange={toggleTravelModeModal} 
-          >
-            {t('currency.enable_travel_mode')}
-          </IonToggle>
-        </section>
+          {/* Travel mode toggle */}
+          <section>
+            <p>{t('currency.travel_mode_prompt')}</p>
+            <IonToggle 
+              labelPlacement="end"
+              checked={activateTravelMode} 
+              disabled={tripCount === 0}
+              onIonChange={toggleTravelModeModal} 
+            >
+              {t('currency.enable_travel_mode')}
+            </IonToggle>
+          </section>
 
+          {/* My trips */}
+          <section>
+            <div className="section-header">
+              <h6 className="section-title">{t('trip.my_trips')}</h6>
+            </div>
+            <TravelList onTripCountChange={setTripCount} /> 
+          </section>
 
-        {/* My trips */}
-        <section>
-          <div className="section-header">
-            <h6 className="section-title">{t('trip.my_trips')}</h6>
-          </div>
-          <TravelList onTripCountChange={setTripCount} /> 
-        </section>
+          {/* modal for trip selection */}
+          <IonModal isOpen={isTravelModeModalOpen} onDidDismiss={() => setIsTravelModeModalOpen(false)}>
+            <IonHeader className="ion-no-border">
+              <IonToolbar>
+                <IonTitle>{t('trip.select_trip')}</IonTitle>
+                <IonButtons slot="end">
+                  <IonButton onClick={() => setIsTravelModeModalOpen(false)}>
+                    <IonIcon aria-hidden="true" icon={closeOutline} className='close-modal'></IonIcon>
+                  </IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent className="ion-padding">
+              {trips.length > 0 ? (
+                trips.map((trip) => {
+                  const foundCurrency =
+                    allSelectedCurrencies.find((currency) => currency.code === trip.currencyCode) ??
+                    allSelectedCurrencies[0];
 
-
-        {/* modal for trip selection */}
-         <IonModal isOpen={isTravelModeModalOpen} onDidDismiss={() => setIsTravelModeModalOpen(false)}>
-          <IonHeader className="ion-no-border">
-            <IonToolbar>
-              <IonTitle>{t('trip.select_trip')}</IonTitle>
-              <IonButtons slot="end">
-                <IonButton onClick={() => setIsTravelModeModalOpen(false)}>
-                  <IonIcon aria-hidden="true" icon={closeOutline} className='close-modal'></IonIcon>
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding">
-            {trips.length > 0 ? (
-              trips.map((trip) => {
-                const foundCurrency =
-                  allSelectedCurrencies.find((currency) => currency.code === trip.currencyCode) ??
-                  allSelectedCurrencies[0];
-
-                  return(
-                  <IonItem
-                    key={trip.tripId}
-                    button
-                    onClick={() => selectTrip(trip)}
-                  >
-                    <IonLabel>{trip.tripName}</IonLabel>
-                    <span className='note'>
-                      {trip.fromDate && trip.toDate
-                        ? <FormattedDate
-                            from={new Date(trip.fromDate)}
-                            to={new Date(trip.toDate)}
-                            format='dayMonth'
-                          />
-                        : t('date.invalid')}
-                    </span>
-                    
-                  </IonItem>
-                );
-              })
-            ) : (
-              <p>{t('trips.no_trips')}</p>
-            )}
-          </IonContent>
-        </IonModal>
-
-        </IonContent>
+                    return(
+                    <IonItem
+                      key={trip.tripId}
+                      button
+                      onClick={() => selectTrip(trip)}
+                    >
+                      <IonLabel>{trip.tripName}</IonLabel>
+                      <span className='note'>
+                        {trip.fromDate && trip.toDate
+                          ? <FormattedDate
+                              from={new Date(trip.fromDate)}
+                              to={new Date(trip.toDate)}
+                              format='dayMonth'
+                            />
+                          : t('date.invalid')}
+                      </span>
+                      
+                    </IonItem>
+                  );
+                })
+              ) : (
+                <p>{t('trips.no_trips')}</p>
+              )}
+            </IonContent>
+          </IonModal>
+        </div>
+      </IonContent>
+      
       <Footer appPages={translatedMenuItems} />
 
     </IonPage>

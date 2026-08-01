@@ -36,12 +36,6 @@ interface CurrencyContextType {
 
 
 
-/**
- * Temporary fallback used while the settings record is loading.
- *
- * The application should normally replace this immediately with the user's
- * persisted default currency from the database.
- */
 export const DEFAULT_CURRENCY: CurrencyType = {
   name: "US Dollar",
   code: "USD",
@@ -53,22 +47,7 @@ export const DEFAULT_CURRENCY: CurrencyType = {
 
 
 
-/**
- * Returns the single user settings record.
- *
- * IMPORTANT:
- * Dexie Cloud uses UUIDs as primary keys, so we cannot use:
- *
- *   db.userSettings.get("settings")
- *
- * because "settings" is the value of the `key` field, not the primary key.
- * Instead we query by the indexed `key` property.
- */
-const getSettings = () =>
-  db.userSettings
-    .where("key")
-    .equals("settings")
-    .first();
+const getUser = () => db.users.toCollection().first();
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
@@ -76,13 +55,7 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   const defaultLocaleRef = useRef("en-US");
 
-  /**
-   * Live subscription to the user settings.
-   *
-   * Whenever the settings record changes, Dexie automatically re-runs
-   * getSettings() and React re-renders this provider.
-   */
-  const settings = useLiveQuery(getSettings, []);
+  const user = useLiveQuery(getUser, []);
 
   const alternativeCurrencies = useLiveQuery(
     () => db.alternativeCurrencies.toArray(),
@@ -90,24 +63,15 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
   );
 
 
-  /**
-   * Builds the currency object exposed by the context.
-   *
-   * This object is derived from the database settings plus the list of
-   * alternative currencies.
-   *
-   * A fallback currency is provided only while the settings record is still
-   * loading during app startup.
-   */
   const currency = useMemo<Currency>(() => {
     const defaultCurrency =
-      settings?.defaultCurrency ?? DEFAULT_CURRENCY;
+      user?.defaultCurrency ?? DEFAULT_CURRENCY;
   
     const travelCurrency =
-      settings?.travelCurrency ?? null;
+      user?.travelCurrency ?? null;
   
     const isTravelMode =
-      settings?.isTravelMode ?? false;
+      user?.isTravelMode ?? false;
   
     return {
       defaultCurrency,
@@ -115,22 +79,14 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
       isTravelMode,
       alternativeCurrencies: alternativeCurrencies ?? [],
       actualCurrency:
-        isTravelMode && travelCurrency
+        user?.actualCurrency ??
+        (isTravelMode && travelCurrency
           ? travelCurrency
-          : defaultCurrency,
+          : defaultCurrency),
     };
-  }, [settings, alternativeCurrencies]);
+  }, [user, alternativeCurrencies]);
 
 
-  /**
-   * Convenience list used throughout the app.
-   *
-   * Combines:
-   *   - the default currency
-   *   - all alternative currencies
-   *
-   * and sorts them alphabetically by currency code.
-   */
   const allSelectedCurrencies = useMemo(() => {
 
     const list = [
@@ -144,117 +100,77 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
 
 
 
-  /**
-   * Stores the current default locale in a mutable ref.
-   *
-   * Using a ref allows non-React code to read the latest locale without
-   * triggering React re-renders.
-   */
   useEffect(() => {
     defaultLocaleRef.current = currency.defaultCurrency.locale;
   }, [currency.defaultCurrency]);
 
 
   
-  /**
-   * Generic helper that updates one or more user settings.
-   *
-   * Only the properties present in `updates` are written.
-   * The existing record is preserved by spreading the current settings first.
-   */
   const updateCurrency = async (updates: Partial<Currency>) => {
-    const settings = await getSettings();
-
-    if (!settings) {
-      console.error("User settings not found.");
+    const user = await getUser();
+  
+    if (!user) {
+      console.error("User not found.");
       return;
     }
-
-    await db.userSettings.put({
-      ...settings,
+  
+    await db.users.put({
+      ...user,
       ...(updates.defaultCurrency && {
         defaultCurrency: updates.defaultCurrency,
       }),
-
       ...(updates.travelCurrency !== undefined && {
         travelCurrency: updates.travelCurrency,
       }),
-
       ...(updates.isTravelMode !== undefined && {
         isTravelMode: updates.isTravelMode,
       }),
     });
-
   };
 
 
-
-  /**
-   * Changes the application's default currency.
-   *
-   * If Travel Mode is disabled, the actual currency also becomes the new
-   * default currency.
-   *
-   * If Travel Mode is enabled, the actual currency remains unchanged because
-   * it is controlled by the selected travel currency.
-   */
   const setDefaultCurrency = async (newCurrency: CurrencyType) => {
-    const settings = await getSettings();
+    const user = await getUser();
   
-    if (!settings) {
-      throw new Error("Settings record not found.");
+    if (!user) {
+      throw new Error("User not found.");
     }
   
-    await db.userSettings.put({
-      ...settings,
+    await db.users.put({
+      ...user,
       defaultCurrency: newCurrency,
-      actualCurrency: settings.isTravelMode
-        ? settings.actualCurrency
+      actualCurrency: user.isTravelMode
+        ? user.actualCurrency
         : newCurrency,
     });
   };
-
   
 
-  /**
-   * Updates only the current working currency.
-   *
-   * This is the currency used when creating new expenses and may differ from
-   * the default currency while Travel Mode is active.
-   */
   const updateActualCurrency = async (newCurrency: CurrencyType) => {
-    const settings = await getSettings();
+    const user = await getUser();
   
-    if (!settings) {
-      console.error("User settings not found.");
+    if (!user) {
+      console.error("User not found.");
       return;
     }
   
-    await db.userSettings.put({
-      ...settings,
+    await db.users.put({
+      ...user,
       actualCurrency: newCurrency,
     });
   };
 
 
-
-  /**
-   * Enables Travel Mode.
-   *
-   * The selected travel currency becomes both:
-   *   - the stored travel currency
-   *   - the current working currency
-   */
   const updateTravelCurrency = async (newCurrency: CurrencyType) => {
-    const settings = await getSettings();
+    const user = await getUser();
   
-    if (!settings) {
-      console.error("User settings not found.");
+    if (!user) {
+      console.error("User not found.");
       return;
     }
   
-    await db.userSettings.put({
-      ...settings,
+    await db.users.put({
+      ...user,
       travelCurrency: newCurrency,
       actualCurrency: newCurrency,
       isTravelMode: true,
@@ -262,43 +178,26 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
 
 
-
-  /**
-   * Disables Travel Mode.
-   *
-   * The travel currency is cleared and the working currency returns to the
-   * default currency.
-   */
   const clearTravelCurrency = async () => {
-    const settings = await getSettings();
+    const user = await getUser();
   
-    if (!settings) return;
+    if (!user) return;
   
-    await db.userSettings.put({
-      ...settings,
+    await db.users.put({
+      ...user,
       travelCurrency: null,
-      actualCurrency: settings.defaultCurrency,
+      actualCurrency: user.defaultCurrency,
       isTravelMode: false,
     });
   };
 
 
-
-  /**
-   * Adds a selectable alternative currency.
-   *
-   * The currency is stored in its own table because multiple records can
-   * exist for a user.
-   */
   const addAlternativeCurrency = async (currency: CurrencyType) => {
     await db.alternativeCurrencies.put(currency);
   };
 
 
 
-  /**
-   * Removes an alternative currency by its primary key (currency code).
-   */
   const removeAlternativeCurrency = async (code: string) => {
     await db.alternativeCurrencies.delete(code);
   };

@@ -164,49 +164,51 @@ const Categories: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
-        <div className="centered-container mb-30">
-          <h2 className='screen-title'>{t('categories.categories')}</h2>
-        </div>
-
-        <div className="section-header">
-          <div className="flex-top ml-20">  
-            <h6 className='section-title'>{t('categories.manage_categories')}</h6>   
-            <IonIcon 
-              icon={informationCircleOutline} 
-              className="info-icon"
-              onClick={() => setShowInfo(true)}
-            />
+        <div className="page-container">
+          <div className="centered-container mb-30">
+            <h2 className='screen-title'>{t('categories.categories')}</h2>
           </div>
-        </div>
-        
-        {/* Category grid */}
-        <section className='centered-container'>
-          <div className="categories-grid"> 
-            {filteredCategories?.map((category) => (
-              <CategoryOption       
-                key={category.categoryId}
-                categoryId={category.categoryId}  
-                categoryName={
-                  category.systemCategory
-                    ? t(`categories.${category.categoryName}`)
-                    : category.categoryName
-                } 
-                categoryColor={category.activeCategory ? category.categoryColor : "neutral"} 
-                iconName={category.categoryIcon} 
-                isFavourite={category.favouriteCategory}
+
+          <div className="section-header">
+            <div className="flex-top ml-20">  
+              <h6 className='section-title'>{t('categories.manage_categories')}</h6>   
+              <IonIcon 
+                icon={informationCircleOutline} 
+                className="info-icon"
+                onClick={() => setShowInfo(true)}
               />
-            ))}
+            </div>
           </div>
-        </section>
+        
+          {/* Category grid */}
+          <section className='centered-container'>
+            <div className="categories-grid"> 
+              {filteredCategories?.map((category) => (
+                <CategoryOption       
+                  key={category.categoryId}
+                  categoryId={category.categoryId}  
+                  categoryName={
+                    category.systemCategory
+                      ? t(`categories.${category.categoryName}`)
+                      : category.categoryName
+                  } 
+                  categoryColor={category.activeCategory ? category.categoryColor : "neutral"} 
+                  iconName={category.categoryIcon} 
+                  isFavourite={category.favouriteCategory}
+                />
+              ))}
+            </div>
+          </section>
 
-        <IonAlert
-          isOpen={showInfo}
-          className='custom-alert'
-          onDidDismiss={() => setShowInfo(false)}
-          header={t('categories.about_categories')}
-          message={t('categories.about_categories_message')}
-          buttons={['OK']}
-        />
+          <IonAlert
+            isOpen={showInfo}
+            className='custom-alert'
+            onDidDismiss={() => setShowInfo(false)}
+            header={t('categories.about_categories')}
+            message={t('categories.about_categories_message')}
+            buttons={['OK']}
+          />
+        </div>
       </IonContent>
 
       <Footer appPages={translatedMenuItems} />

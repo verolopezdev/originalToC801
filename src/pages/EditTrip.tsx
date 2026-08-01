@@ -352,209 +352,206 @@ const EditTrip: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
-        {/* Screen Header and Category Design */}
-        <section>
-          <div 
-            className="centered-container" 
-            onClick={() => { setIsOpenCategoryModal(true); }}
-          >
-            <h2 className='screen-title'>{t('trip.edit_title')}</h2>
-            <div className='mt-20'>
-              <CategoryPreview
-                categoryColor= 'neutral'
-                categoryIcon={tripIcon}
-              />
-            </div>
-            
-          </div>
-        </section>
-
-
-        {/* Trip name */}
-        <section>
-          <div className="parent-input">
-            <div className="input-container">
-              <input
-                type="text"
-                value={tripName}
-                maxLength={20}
-                onChange={(e) => handleInputChange(e.target.value) }
-                placeholder="Trip Name or destination"
-                className={`input capitalize ${error ? 'invalid' : ''}`}
-              />
-              {error && <p className="error-text">{error}</p>}
-            </div>
-          </div>
-        </section>
-
-        {/* Date range */}
-        <section>
-          <h6 className="section-title">{t('date.select_dates')}</h6>
-          <div className='additional-config'>
-            <div className='aditional-btn'>
-              <div>
-                <IonIcon icon={calendarOutline}></IonIcon>
+        <div className="page-container">
+          {/* Screen Header and Category Design */}
+          <section>
+            <div 
+              className="centered-container" 
+              onClick={() => { setIsOpenCategoryModal(true); }}
+            >
+              <h2 className='screen-title'>{t('trip.edit_title')}</h2>
+              <div className='mt-20'>
+                <CategoryPreview
+                  categoryColor= 'neutral'
+                  categoryIcon={tripIcon}
+                />
               </div>
-              <div className='selected-info' onClick={() => {
-                setEditingDateType('from');
-                setFromDateIsOpen(true);
-              }}>                
-                <span className="title">{t('date.from')}</span>
-                <span className='data'>{formatDate(fromDate, currency.actualCurrency.locale, 'short')}</span>
+              
+            </div>
+          </section>
+
+          {/* Trip name */}
+          <section>
+            <div className="parent-input">
+              <div className="input-container">
+                <input
+                  type="text"
+                  value={tripName}
+                  maxLength={20}
+                  onChange={(e) => handleInputChange(e.target.value) }
+                  placeholder="Trip Name or destination"
+                  className={`input capitalize ${error ? 'invalid' : ''}`}
+                />
+                {error && <p className="error-text">{error}</p>}
               </div>
             </div>
+          </section>
 
-            <div className='aditional-btn'>
-              <div>
-                <IonIcon icon={calendarOutline}></IonIcon>
+          {/* Date range */}
+          <section>
+            <h6 className="section-title">{t('date.select_dates')}</h6>
+            <div className='additional-config'>
+              <div className='aditional-btn'>
+                <div>
+                  <IonIcon icon={calendarOutline}></IonIcon>
+                </div>
+                <div className='selected-info' onClick={() => {
+                  setEditingDateType('from');
+                  setFromDateIsOpen(true);
+                }}>                
+                  <span className="title">{t('date.from')}</span>
+                  <span className='data'>{formatDate(fromDate, currency.actualCurrency.locale, 'short')}</span>
+                </div>
               </div>
-              <div className='selected-info' onClick={() => {
-                setEditingDateType('to');
-                setToDateIsOpen(true);
-              }}>
-                <span className="title">{t('date.to')}</span>
-                <span className='data'>{formatDate(toDate, currency.actualCurrency.locale, 'short')}</span>
+
+              <div className='aditional-btn'>
+                <div>
+                  <IonIcon icon={calendarOutline}></IonIcon>
+                </div>
+                <div className='selected-info' onClick={() => {
+                  setEditingDateType('to');
+                  setToDateIsOpen(true);
+                }}>
+                  <span className="title">{t('date.to')}</span>
+                  <span className='data'>{formatDate(toDate, currency.actualCurrency.locale, 'short')}</span>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* Travel currency */}
-        <section>
-          <h6 className="section-title">{t('trip.travel_curr')}</h6>
-          <IonItem button onClick={() => setIsTravelModeModalOpen(true)} disabled={hasExpenses}>
-            <div className='list-item-select'>
-              <span>
-                {selectedCurrency && selectedCurrency.name && selectedCurrency.symbol
-                  ? `${selectedCurrency.name} (${selectedCurrency.symbol})`
-                  : 'Make a Selection'}
-              </span>
-              <IonIcon aria-hidden="true" icon={caretDownOutline}></IonIcon>  
-            </div>
-          </IonItem>  
-        </section>
-        
-
-        {/* Icon picker */}
-        <section>
-          <h6 className="section-title">{t('categories.choose_icon')}</h6>
-          <IonItem button onClick={() => {
-            setIsOpenCategoryModal(true);  
-          }}>
-            <div className='list-item-select'>
-              <span>{t('categories.selected_icon')}</span>
-              <div>
+          {/* Travel currency */}
+          <section>
+            <h6 className="section-title">{t('trip.travel_curr')}</h6>
+            <IonItem button onClick={() => setIsTravelModeModalOpen(true)} disabled={hasExpenses}>
+              <div className='list-item-select'>
                 <span>
-                  {tripIcon
-                    ? <i className={`fas ${tripIcon} icon`}></i>
-                    : t('categories.make_a_selection')}
+                  {selectedCurrency && selectedCurrency.name && selectedCurrency.symbol
+                    ? `${selectedCurrency.name} (${selectedCurrency.symbol})`
+                    : 'Make a Selection'}
                 </span>
-                <IonIcon icon={chevronForwardOutline}></IonIcon>
+                <IonIcon aria-hidden="true" icon={caretDownOutline}></IonIcon>  
               </div>
-            </div>
-          </IonItem>
-        </section>
+            </IonItem>  
+          </section>
 
-        {/* Add new trip button */}
-        <IonButton
-          className="block mb-20"
-          onClick={() => {
-            if (isFormValid) {
-              updateTrip(passedTripId);
-            }
-          }}
-          disabled={!isFormValid || !hasChanges} // Disable the button if the form is invalid or didn't have changes
-        >
-          {t('trip.update_trip')}
-        </IonButton>
+          {/* Icon picker */}
+          <section>
+            <h6 className="section-title">{t('categories.choose_icon')}</h6>
+            <IonItem button onClick={() => {
+              setIsOpenCategoryModal(true);  
+            }}>
+              <div className='list-item-select'>
+                <span>{t('categories.selected_icon')}</span>
+                <div>
+                  <span>
+                    {tripIcon
+                      ? <i className={`fas ${tripIcon} icon`}></i>
+                      : t('categories.make_a_selection')}
+                  </span>
+                  <IonIcon icon={chevronForwardOutline}></IonIcon>
+                </div>
+              </div>
+            </IonItem>
+          </section>
 
-        {/* Confirmation Modal */}
-        <Modal
-          isOpen={isConfirmationModalOpen}
-          icon={modalConfig.icon}
-          title={modalConfig.title}
-          content={modalConfig.content}
-          closeModal={() => setIsConfirmationModalOpen(false)}
-          actions={modalConfig.actions}
-          destination={modalConfig.destination}
-        />
-
-        {/* Modal containing DatePicker "from" date */}
-        <IonModal 
-          isOpen={fromDateIsOpen} 
-          onDidDismiss={() => setFromDateIsOpen(false)} 
-          backdropDismiss={true}
-        >
-          <div className="centered-modal-content">
-            <DatePicker prevDate={fromDate} onDateChange={handleDateSelect} />
-          </div>
-        </IonModal>
-
-        {/* Modal containing DatePicker "to" date*/}
-        <IonModal 
-          isOpen={toDateIsOpen} 
-          onDidDismiss={() => setToDateIsOpen(false)} 
-          backdropDismiss={true}
-        >
-          <div className="centered-modal-content">
-            <DatePicker prevDate={toDate} onDateChange={handleDateSelect} disableUpTo={fromDate} />
-          </div>
-        </IonModal>
-
-
-        
-        {/* modal for travel currency selection */}
-        <IonModal isOpen={isTravelModeModalOpen} onDidDismiss={() => setIsTravelModeModalOpen(false)}>
-          <IonHeader className="ion-no-border">
-            <IonToolbar>
-              <IonTitle>{t('currency.select_travel_currency')}</IonTitle>
-              <IonButtons slot="end">
-                <IonButton onClick={() => setIsTravelModeModalOpen(false)}>
-                  <IonIcon aria-hidden="true" icon={closeOutline} className='close-modal'></IonIcon>
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding">
-            {travelCurrencies.length > 0 ? (
-              travelCurrencies.map((currencyItem) => (
-                <IonItem
-                  key={currencyItem.code}
-                  button
-                  onClick={() => selectTravelCurrency(currencyItem)}
-                >
-                  <IonLabel>{`${currencyItem.name} (${currencyItem.symbol})`}</IonLabel>
-                </IonItem>
-              ))
-            ) : (
-              <p>{t('currency.no_alt_curr_add')}</p>
-            )}
-          </IonContent>
-        </IonModal>
-
-        {/* Icon picker modal */}
-        <IonModal isOpen={isOpenCategoryModal}>
-          <IonHeader>
-            <IonToolbar>
-              <IonTitle>{t('categories.select_an_icon')}</IonTitle>
-              <IonButtons slot="end">
-                <IonButton onClick={() => setIsOpenCategoryModal(false)}>
-                  <IonIcon aria-hidden="true" icon={closeOutline} className='close-modal'></IonIcon>
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding">
-          <IconPicker
-            selectedIcon={tripIcon}
-            onIconSelect={(icon) => {
-              setTripIcon(icon); // Update the selected icon for trip
-              setIsOpenCategoryModal(false); // Close the modal
+          {/* Add new trip button */}
+          <IonButton
+            className="block mb-20"
+            onClick={() => {
+              if (isFormValid) {
+                updateTrip(passedTripId);
+              }
             }}
-          />
-          </IonContent>
-        </IonModal>
+            disabled={!isFormValid || !hasChanges} // Disable the button if the form is invalid or didn't have changes
+          >
+            {t('trip.update_trip')}
+          </IonButton>
 
+          {/* Confirmation Modal */}
+          <Modal
+            isOpen={isConfirmationModalOpen}
+            icon={modalConfig.icon}
+            title={modalConfig.title}
+            content={modalConfig.content}
+            closeModal={() => setIsConfirmationModalOpen(false)}
+            actions={modalConfig.actions}
+            destination={modalConfig.destination}
+          />
+
+          {/* Modal containing DatePicker "from" date */}
+          <IonModal 
+            isOpen={fromDateIsOpen} 
+            onDidDismiss={() => setFromDateIsOpen(false)} 
+            backdropDismiss={true}
+          >
+            <div className="centered-modal-content">
+              <DatePicker prevDate={fromDate} onDateChange={handleDateSelect} />
+            </div>
+          </IonModal>
+
+          {/* Modal containing DatePicker "to" date*/}
+          <IonModal 
+            isOpen={toDateIsOpen} 
+            onDidDismiss={() => setToDateIsOpen(false)} 
+            backdropDismiss={true}
+          >
+            <div className="centered-modal-content">
+              <DatePicker prevDate={toDate} onDateChange={handleDateSelect} disableUpTo={fromDate} />
+            </div>
+          </IonModal>
+        
+          {/* modal for travel currency selection */}
+          <IonModal isOpen={isTravelModeModalOpen} onDidDismiss={() => setIsTravelModeModalOpen(false)}>
+            <IonHeader className="ion-no-border">
+              <IonToolbar>
+                <IonTitle>{t('currency.select_travel_currency')}</IonTitle>
+                <IonButtons slot="end">
+                  <IonButton onClick={() => setIsTravelModeModalOpen(false)}>
+                    <IonIcon aria-hidden="true" icon={closeOutline} className='close-modal'></IonIcon>
+                  </IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent className="ion-padding">
+              {travelCurrencies.length > 0 ? (
+                travelCurrencies.map((currencyItem) => (
+                  <IonItem
+                    key={currencyItem.code}
+                    button
+                    onClick={() => selectTravelCurrency(currencyItem)}
+                  >
+                    <IonLabel>{`${currencyItem.name} (${currencyItem.symbol})`}</IonLabel>
+                  </IonItem>
+                ))
+              ) : (
+                <p>{t('currency.no_alt_curr_add')}</p>
+              )}
+            </IonContent>
+          </IonModal>
+
+          {/* Icon picker modal */}
+          <IonModal isOpen={isOpenCategoryModal}>
+            <IonHeader>
+              <IonToolbar>
+                <IonTitle>{t('categories.select_an_icon')}</IonTitle>
+                <IonButtons slot="end">
+                  <IonButton onClick={() => setIsOpenCategoryModal(false)}>
+                    <IonIcon aria-hidden="true" icon={closeOutline} className='close-modal'></IonIcon>
+                  </IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent className="ion-padding">
+            <IconPicker
+              selectedIcon={tripIcon}
+              onIconSelect={(icon) => {
+                setTripIcon(icon); // Update the selected icon for trip
+                setIsOpenCategoryModal(false); // Close the modal
+              }}
+            />
+            </IonContent>
+          </IonModal>
+        </div>
         
       </IonContent>
     </IonPage>

@@ -33,7 +33,9 @@ const HelpPage: React.FC = () => {
 
 
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
-        <h2>Welcome to the HelpPage Page!</h2>
+        <div className="page-container">
+          <h2>Welcome to the HelpPage Page!</h2>
+        </div>
       </IonContent>
     </IonPage>
   );

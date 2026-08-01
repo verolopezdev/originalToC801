@@ -1,7 +1,6 @@
 import Dexie, { type EntityTable } from 'dexie';
 import dexieCloud from 'dexie-cloud-addon';
 import { incrementChangeCount } from './services/BackupService';
-import { CurrencyType } from './context/CurrencyContext';
 
 
 // GLOBAL FLAGS
@@ -197,6 +196,17 @@ interface Trip {
   toDate: Date;
   currencyCode: string;
 }
+
+// Define currency data type
+export interface CurrencyType {
+  code: string;
+  name: string;
+  symbol: string;
+  locale: string;
+  thousandSeparator: string;
+  decimalSeparator: string;
+}
+
 
 interface HistoricCurrencyList {
   id: string;

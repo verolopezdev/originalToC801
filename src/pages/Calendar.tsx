@@ -102,7 +102,6 @@ const Calendar: React.FC = () => {
       </IonHeader>
 
       <IonContent className="calendar-page-content">
-        <div className="page-container">
           {/* Screen Header */}
           <div className='centered-container mt--20'> 
             <h2 className='screen-title-0'>{viewMode === 'calendar' ? t('calendar.calendar') : t('calendar.forecast')}</h2>
@@ -145,7 +144,6 @@ const Calendar: React.FC = () => {
               />
             </div>
           )}
-        </div>
       </IonContent>
     </IonPage>
   );

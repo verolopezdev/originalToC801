@@ -1,16 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, ReactNode } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../db';
+import { db, CurrencyType } from '../db';
 
-// Define currency data type
-export interface CurrencyType {
-  code: string;
-  name: string;
-  symbol: string;
-  locale: string;
-  thousandSeparator: string;
-  decimalSeparator: string;
-}
 
 interface Currency {
   isTravelMode: boolean;

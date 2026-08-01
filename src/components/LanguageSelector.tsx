@@ -1,42 +1,26 @@
-import React from 'react';
-import { IonSelect, IonSelectOption } from '@ionic/react';
-import { useTranslation } from 'react-i18next';
-import { useLiveQuery } from 'dexie-react-hooks';
+import React from "react";
+import { IonSelect, IonSelectOption } from "@ionic/react";
+import { useTranslation } from "react-i18next";
+import { useUser } from '../context/UserContext'; 
 
-import { db } from '../db';
 
 const LanguageSelector: React.FC = () => {
   const { i18n, t } = useTranslation();
-
-  // Reactively load settings from the database
-  const settings = useLiveQuery(() =>
-    db.userSettings
-      .where("key")
-      .equals("settings")
-      .first()
-  );
+  const { user, updateUser } = useUser();
+  // Assuming there is only one user in the local database
 
   const changeLanguage = async (value: string) => {
-    const settings = await db.userSettings
-      .where("key")
-      .equals("settings")
-      .first();
+    if (!user) return;
   
-    if (!settings) return;
-  
-    await db.userSettings.put({
-      ...settings,
+    await updateUser({
       language: value,
     });
-  
-    await i18n.changeLanguage(value);
   };
 
-  
   return (
     <IonSelect
-      label={t('settings.language')}
-      value={settings?.language ?? 'en'}
+      label={t("settings.language")}
+      value={user.language}
       onIonChange={(e) => changeLanguage(e.detail.value)}
       className="language-select"
       interface="popover"

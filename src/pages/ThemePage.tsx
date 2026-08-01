@@ -37,7 +37,7 @@ const ThemePage: React.FC = () => {
   // Update cardColor whenever selectedColor changes
   useEffect(() => {
     if (selectedColor) {
-      setThemeColor(selectedColor);
+      setThemeColor(selectedColor); 
     }
   }, [selectedColor]);
 

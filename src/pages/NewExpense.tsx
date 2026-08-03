@@ -267,11 +267,15 @@ const NewExpense: React.FC = () => {
   // Initialize state from currency context
   useIonViewWillEnter(() => {
     const initDefaultCategory = async () => {
-      // Fetches the very first record in the categories table
-      const defaultCategory = await db.categories.toCollection().first();
-      
-      if (defaultCategory?.categoryId) {
-        setCategoryId(defaultCategory.categoryId);
+      const categoryless = await db.categories
+        .filter(category =>
+          category.systemCategory &&
+          category.categoryName === "Categoryless"
+        )
+        .first();
+    
+      if (categoryless) {
+        setCategoryId(categoryless.categoryId);
       }
     };
 
@@ -587,7 +591,12 @@ const NewExpense: React.FC = () => {
                 ) : (
                   <>
                     <span className="title">{t('expenses.config_cat')}</span>
-                    <span className='data'>{category && category.categoryName}</span>
+                    <span className="data">
+                      {category &&
+                        (category.systemCategory
+                          ? t(`categories.${category.categoryName}`)
+                          : category.categoryName)}
+                    </span>
                   </>
                 )}
               </div>

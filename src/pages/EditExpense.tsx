@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db, Expense, Account } from '../db';
+import { db, Expense, Account, CurrencyType } from '../db';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 // Custom hooks
 import useBackButtonModalReset from "../hooks/useBackButtonModalReset";
-import { useCurrency, CurrencyType } from '../context/CurrencyContext';
+import { useCurrency } from '../context/CurrencyContext';
 import { useUser } from '../context/UserContext'; // Import the useUser hook
 import { useExpense } from '../context/ExpenseContext';
 import { useTrip } from '../context/TripContext';
@@ -946,7 +946,12 @@ const EditExpense: React.FC = () => {
                 ) : (
                   <>
                     <span className="title">{t('expenses.config_cat')}</span>
-                    <span className='data'>{category && category.categoryName}</span>
+                    <span className='data'>
+                      {category &&
+                        (category.systemCategory
+                          ? t(`categories.${category.categoryName}`)
+                          : category.categoryName)}
+                    </span> 
                   </>
                 )}
               </div>

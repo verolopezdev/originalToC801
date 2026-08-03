@@ -66,7 +66,7 @@ const appPages: AppPage[] = [
 const Categories: React.FC = () => { 
   const contentRef = useScrollToTop(); // use the custom hook 
   const { t } = useTranslation();
-  const { user, updateUser } = useUser(); // Access user context
+  const { user, updateUser, categorylessId } = useUser(); // Access user context
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [popoverEvent, setPopoverEvent] = useState<MouseEvent | null>(null);
@@ -89,8 +89,25 @@ const Categories: React.FC = () => {
 
   // Filter and sort categories based on local state
   const filteredCategories = categories
-    ?.filter(category => showInactive || category.activeCategory)
-    .sort((a, b) => (showInactive ? Number(b.activeCategory) - Number(a.activeCategory) : 0));
+  ?.filter(category => showInactive || category.activeCategory)
+  .sort((a, b) => {
+    if (showInactive && a.activeCategory !== b.activeCategory) {
+      return Number(b.activeCategory) - Number(a.activeCategory);
+    }
+
+    if (a.categoryId === categorylessId) return -1;
+    if (b.categoryId === categorylessId) return 1;
+
+    const nameA = a.systemCategory
+      ? t(`categories.${a.categoryName}`)
+      : a.categoryName;
+
+    const nameB = b.systemCategory
+      ? t(`categories.${b.categoryName}`)
+      : b.categoryName;
+
+    return nameA.localeCompare(nameB);
+  });
 
 
   // Translate footer menu items

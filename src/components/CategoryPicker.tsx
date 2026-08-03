@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { db } from "../db";
+import { useUser } from '../context/UserContext'; // Import the useUser hook
 
 
 // App components
@@ -70,6 +71,7 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
   currentSubcategoryId 
 }) => {
   const { t } = useTranslation();
+  const { user, categorylessId } = useUser(); // Access user context
   
   const [activeCategories, setActiveCategories] = useState<Category[]>([]);
   const [activeSubcategories, setActiveSubcategories] = useState<Subcategory[]>([]);
@@ -86,19 +88,57 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
   useEffect(() => {
     const fetchCategories = async () => {
       const allCategories = await db.categories.toArray();
-      setActiveCategories(allCategories.filter(cat => cat.activeCategory));
+    
+      const sortedCategories = allCategories
+        ?.filter(category => user.showDisabledCategories || category.activeCategory)
+        .sort((a, b) => {
+          if (user.showDisabledCategories && a.activeCategory !== b.activeCategory) {
+            return Number(b.activeCategory) - Number(a.activeCategory);
+          }
+      
+          if (a.categoryId === categorylessId) return -1;
+          if (b.categoryId === categorylessId) return 1;
+      
+          const nameA = a.systemCategory
+            ? t(`categories.${a.categoryName}`)
+            : a.categoryName;
+      
+          const nameB = b.systemCategory
+            ? t(`categories.${b.categoryName}`)
+            : b.categoryName;
+      
+          return nameA.localeCompare(nameB);
+        });
+    
+      setActiveCategories(sortedCategories);
     };
 
     const fetchSubcategories = async () => {
       const allSubcategories = await db.subcategories.toArray();
-      setActiveSubcategories(allSubcategories.filter(cat => cat.activeSubcategory));
-
+    
+      const sortedSubcategories = allSubcategories
+        .filter(sub => sub.activeSubcategory)
+        .sort((a, b) => {
+          const nameA = a.subcategoryName;
+    
+          const nameB = b.subcategoryName;
+    
+          return nameA.localeCompare(nameB);
+        });
+    
+      setActiveSubcategories(sortedSubcategories);
+    
       // This opens subcategory modal if selectedSubcategory has content
-      if (selectedSubcategory && selectedSubcategory !== '' && allSubcategories.length > 0) {
-        const subcategory = allSubcategories.find(sub => sub.subcategoryId === selectedSubcategory);
+      if (
+        selectedSubcategory &&
+        selectedSubcategory !== "" &&
+        allSubcategories.length > 0
+      ) {
+        const subcategory = allSubcategories.find(
+          sub => sub.subcategoryId === selectedSubcategory
+        );
     
         if (subcategory) {
-          // Set the parent ID to open the subcategory modal
           setSelectedCategoryForSub(subcategory.parentCategoryId);
         }
       }
@@ -229,8 +269,8 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
     subcategoriesToRender = filteredSubcategories;
   }
   
-  
 
+  
   return (
     <>
       {/* Show favourite categories and subcategories as default */}
@@ -253,7 +293,9 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
                 >
                   <CategoryIcon categoryColor={category.color} iconName={category.icon} />
                   <div className="category-name">
-                    <span>{category.name}</span>
+                    <span>
+                      {t(`categories.${category.name}`)} 
+                    </span>
                   </div>
                   {category.fav && <IonIcon icon={heart} className="favorite-icon" />}
                 </div>
@@ -288,7 +330,12 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
               >
                 <CategoryIcon categoryColor={category.categoryColor} iconName={category.categoryIcon} />
                 <div className="category-name">
-                  <span>{category.categoryName}</span>
+                  <span>
+                  {category.systemCategory
+                        ? t(`categories.${category.categoryName}`)
+                        : category.categoryName
+                      } 
+                  </span>
                 </div>
                 {category.favouriteCategory && <IonIcon icon={heart} className="favorite-icon" />}
               </div>

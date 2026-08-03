@@ -216,12 +216,18 @@ const PlannerList: React.FC<Props> = ({
                         autoLogged = series.logAutomatically; 
                     }
 
+                    const categoryDisplayName = category
+                      ? category.systemCategory
+                        ? t(`categories.${category.categoryName}`)
+                        : category.categoryName
+                      : "";
+
 										return (
 											<TransactionItem		
 												key={`${exp.expenseId}-${idx}`}
 												categoryIcon={subcategory?.subcategoryIcon || category?.categoryIcon || ""}
 												categoryColor={subcategory?.subcategoryColor || category?.categoryColor || ""}  
-												categoryName={subcategory?.subcategoryName || category?.categoryName || "Unknown"}
+												categoryName={subcategory?.subcategoryName || categoryDisplayName || "Unknown"}
 												accountName={accountName}
 												expenseNote={exp.expenseNote}
 												expenseId={exp.expenseId}

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../db'; 
+import { db, CurrencyType } from '../db'; 
 import { useTranslation } from 'react-i18next';
 import dayjs from "dayjs";
 
@@ -10,7 +10,7 @@ import dayjs from "dayjs";
 import useScrollToTop from '../hooks/useScrollToTop';
 import { useUser } from '../context/UserContext'; // Import the useUser hook
 import { RecurrenceSettings } from '../hooks/useRecurringExpense';
-import { useCurrency, CurrencyType } from '../context/CurrencyContext';
+import { useCurrency } from '../context/CurrencyContext';
 import { useExpense } from '../context/ExpenseContext';
 import { useRecurringExpense } from '../hooks/useRecurringExpense';
 import { useDatePicker } from '../context/DatePickerContext'; 
@@ -520,6 +520,8 @@ const LogRecurrenceExpense: React.FC = () => {
             onAccountSelect={handleAccountSelect} // Pass the callback to SliderComponent
           />
 
+          {/* Amount input */}
+          <div className='amount'>
           {selectedCurrency && 
             <AmountInput
               key={`amount-input-${resetTrigger}`}
@@ -533,6 +535,7 @@ const LogRecurrenceExpense: React.FC = () => {
               readOnly={mode === 'remaining' ? true : false}
             />
           }
+          </div>
 
           {/* Additional configuration */}
           <div className='additional-config'>
@@ -554,7 +557,12 @@ const LogRecurrenceExpense: React.FC = () => {
                 ) : (
                   <>
                     <span className="title">{t('categories.category')}</span>
-                    <span className='data'>{category && category.categoryName}</span>
+                    <span className="data">
+                      {category &&
+                        (category.systemCategory
+                          ? t(`categories.${category.categoryName}`)
+                          : category.categoryName)}
+                    </span>
                   </>
                 )}
               </div>

@@ -3,7 +3,6 @@
   margin-right: -16px;
   width: calc(100% + 32px); /* Ensures full width after removing padding */
   height: 170px;
-  margin-bottom: 20px;
 }
 
 .swiper {

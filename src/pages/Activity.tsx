@@ -78,7 +78,6 @@ const Activity: React.FC = () => {
   const [currentDate, setCurrentDate] = useState<Dayjs>(() =>
       dayjs().locale(i18n.language)
     ); // Store selected date
-  const accounts = useLiveQuery(() => db.accounts.toArray());
 
   const allAccounts = useLiveQuery(() => db.accounts.toArray());
   const [selectedCardId, setSelectedCardId] = useState<string>('');
@@ -163,21 +162,6 @@ const Activity: React.FC = () => {
   }, [allAccounts, usedAccountIdsInPeriod, t]);
 
 
-  useEffect(() => {
-    if (accountsToShow.length === 0) {
-      setSelectedCardId('');
-      return;
-    }
-  
-    const selectedStillExists = accountsToShow.some(
-      account => account.accountId === selectedCardId
-    );
-  
-    if (!selectedStillExists) {
-      setSelectedCardId(accountsToShow[0].accountId!);
-    }
-  }, [accountsToShow, selectedCardId]);
-
 
   // Load general interval state (weekly, monthly, yearly)
   useEffect(() => {
@@ -187,34 +171,6 @@ const Activity: React.FC = () => {
   }, [interval]);
   
 
-/*   const sortedAccounts = useMemo(() => {
-    if (!accounts) return [];
-  
-    // Sort all accounts based on three criteria:
-    // 1. Active status (Active accounts first, Disabled accounts last)
-    // 2. Default account status (Within active accounts, Default comes first)
-    // 3. sortOrder (For accounts that share the same Active/Default status)
-    return accounts.sort((a, b) => {
-      // --- 1. Primary Sort: Active Status (a.activeAccount: true/false) ---
-      // If 'a' is active and 'b' is disabled, 'a' comes first (-1)
-      if (a.activeAccount && !b.activeAccount) return -1;
-      // If 'a' is disabled and 'b' is active, 'b' comes first (1)
-      if (!a.activeAccount && b.activeAccount) return 1;
-  
-      // --- At this point, both are ACTIVE OR both are DISABLED ---
-      
-      // If both are DISABLED, their relative order doesn't matter much 
-      // for display at the end, but we can still sort them by sortOrder 
-      // or keep them as is. Let's sort them by sortOrder for consistency.
-      if (!a.activeAccount && !b.activeAccount) {
-        return a.sortOrder - b.sortOrder;
-      }
-    
-      // 3. Tertiary Sort: sortOrder
-      return a.sortOrder - b.sortOrder;
-    });
-  }, [accounts]);   
- */
 
   // Handle selected card id change from SliderComponent
   const handleAccountSelect = (accountId: string) => {
@@ -235,6 +191,7 @@ const Activity: React.FC = () => {
     setViewMode((prev) => (prev === 'date' ? 'category' : 'date'));
   };
 
+
   
   return (
     <IonPage>
@@ -245,7 +202,6 @@ const Activity: React.FC = () => {
 
 
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
-        <div className="page-container">
           {/* Screen Header */}
           <div className='centered-container mb-20'>
             <h2 className='screen-title'>{t('common.activity')}</h2>
@@ -255,7 +211,7 @@ const Activity: React.FC = () => {
             <>
               {/* Card slider */}
               <AccountTotalSlider        
-                accounts={accountsToShow}
+                accounts={accountsToShow} 
                 onAccountSelect={handleAccountSelect} // Pass the callback to SliderComponent
                 currentDate={currentDate} 
                 selectedInterval={selectedInterval} 
@@ -293,7 +249,7 @@ const Activity: React.FC = () => {
 
               <div className='mb-60'>
               {viewMode === "date" ? (
-                <TransactionList         
+                <TransactionList           
                   selectedInterval={selectedInterval}   
                   start={start}
                   end={end}
@@ -312,7 +268,6 @@ const Activity: React.FC = () => {
               </div>
             </>
           )}
-        </div>
       </IonContent>
       <Footer appPages={translatedMenuItems} />
     </IonPage>

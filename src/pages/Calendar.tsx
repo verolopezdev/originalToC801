@@ -113,7 +113,7 @@ const Calendar: React.FC = () => {
             />
           )}
 
-          <IntervalToolbar  
+          <IntervalToolbar    
             selectedInterval='monthly'
             currentDate={currentDate}
             setCurrentDate={handleDateChange} // Update date from IntervalToolbar 

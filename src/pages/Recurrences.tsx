@@ -330,13 +330,19 @@ const Reccurrences: React.FC = () => {
 
               const dueDate = overdueExpense?.dueDate ?? rec.nextDueDate;
 
+              const categoryDisplayName = category
+                ? category.systemCategory
+                  ? t(`categories.${category.categoryName}`)
+                  : category.categoryName
+                : "";
+
               return (
                 <ReccurrenceItem      
                   key={rec.seriesId}
                   seriesId={rec.seriesId}
                   categoryIcon={subcategory?.subcategoryIcon || category?.categoryIcon || ""}
                   categoryColor={subcategory?.subcategoryColor || category?.categoryColor || ""}
-                  categoryName={subcategory?.subcategoryName || category?.categoryName || t('common.unkonwn')}
+                  categoryName={subcategory?.subcategoryName || categoryDisplayName || t('common.unkonwn')}
                   accountName={accountName}
                   expenseNote={rec.note}
                   expenseAmount={expenseAmount}

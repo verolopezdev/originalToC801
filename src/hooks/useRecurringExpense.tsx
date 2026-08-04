@@ -286,6 +286,7 @@ export const useRecurringExpense = () => {
         await tx.expenses.add({
           // Pull from series by default, then override with passed baseOverride
           userId: series.userId,
+          expenseId: crypto.randomUUID(),
           dueDate: originalDueDate.toISOString(),
           expenseDate: dueDateIso,
           expenseNote: series.note,
@@ -410,6 +411,7 @@ export const useRecurringExpense = () => {
     
           await tx.expenses.add({
             userId: series.userId,
+            expenseId: crypto.randomUUID(),
             dueDate: today.toISOString(),
             expenseDate: today.toISOString(),
             expenseNote: `${series.note || ""} (payoff for ${remainingCount} remaining installments)`,
@@ -445,6 +447,7 @@ export const useRecurringExpense = () => {
     
           await tx.expenses.add({
             userId: series.userId,
+            expenseId: crypto.randomUUID(),
             dueDate: dueDate.toISOString(),
             expenseDate: today.toISOString(),
             expenseNote: `${series.note || ""} (cancelled installment ${installmentIndex})`,

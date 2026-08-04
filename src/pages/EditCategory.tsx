@@ -64,6 +64,7 @@ import Modal from '../components/Modal';
 // Styles
 import '../Main.css';
 import './Categories.css';
+import { SystemBarType } from '@capacitor/core';
 
 
 const EditCategory: React.FC = () => {
@@ -345,24 +346,33 @@ const EditCategory: React.FC = () => {
   };
 
 
-const handleTargetCategorySelect = (selection: { categoryId: string; categoryName: string; subcategoryId: string; subcategoryName: string; }) => {
-  // We only care about the categoryId for the merge operation
-  setTargetCategoryId(selection.categoryId); 
+  const handleTargetCategorySelect = (
+    selection: {
+      categoryId: string;
+      categoryName: string;
+      systemCategory: boolean;
+      subcategoryId: string;
+      subcategoryName: string;
+    }
+  ) => {
+    setTargetCategoryId(selection.categoryId);
   
-  if (selection.subcategoryId !== '') {
-    // Case: User selected a SUBcategory
-    setTargetSubcategoryId(selection.subcategoryId);
-    // Display name includes the parent category for context
-    setTargetName(`${selection.categoryName} / ${selection.subcategoryName}`); 
-  } else {
-    // Case: User selected a main CATEGORY
-    setTargetSubcategoryId(''); 
-    setTargetName(selection.categoryName); 
-  }  
-
-  setIsOpenCategoryMergeModal(false);
-};
-
+    const categoryName = selection.systemCategory
+      ? t(`categories.${selection.categoryName}`)
+      : selection.categoryName;
+  
+    if (selection.subcategoryId !== '') {
+      // Subcategory: only translate the parent category if it's a system category
+      setTargetSubcategoryId(selection.subcategoryId);
+      setTargetName(`${categoryName} / ${selection.subcategoryName}`);
+    } else {
+      // Category only
+      setTargetSubcategoryId('');
+      setTargetName(categoryName);
+    }
+  
+    setIsOpenCategoryMergeModal(false);
+  };
 
 
 // Function to handle the actual merge
@@ -1000,7 +1010,7 @@ const key =
                 </h2>
               </div>
 
-              <CategoryPicker
+              <CategoryPicker 
                 selectedCategory={targetCategoryId ?? undefined} // Use the new target state
                 selectedSubcategory={undefined} // Not relevant for this context
                 onCategorySelect={handleTargetCategorySelect} // Use the new handler

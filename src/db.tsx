@@ -334,7 +334,7 @@ export const seedInitialData = async (
   console.log("🌱 Seeding initial database...");
 
   try {
-    const installationId = crypto.randomUUID();
+    const installationId = crypto.randomUUID(); 
 
     await db.transaction(
       "rw",

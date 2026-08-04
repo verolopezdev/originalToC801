@@ -113,7 +113,7 @@ const ReccurrenceItem: React.FC<ReccurrenceItemProps> = ({
 
 					<ul className='reccurrence-list-data'>  
 						<li>{categoryName}</li>
-						<li>{accountName}</li>
+						<li>{accountName === "Cash" ? t('accounts.default_account_name') : accountName}</li>
             <li>
               {t(`date.frequency.${unit}`, { count: interval })}
               {typeof totalInstallments === 'number' && ` x ${totalInstallments}`}

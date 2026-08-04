@@ -120,6 +120,7 @@ export const logAutoExpenses = async (): Promise<boolean> => {
           // Use the 'shouldLogAutomatically' variable to set autoLogged and isActive
           await tx.expenses.add({
             userId: series.userId,
+            expenseId: crypto.randomUUID(),
             dueDate: dueDateIso,
             expenseDate: dueDateIso, 
             expenseNote: series.note,

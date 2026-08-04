@@ -228,7 +228,7 @@ const ExpenseItem: React.FC<TransactionItemProps> = ({
                   icon={receiptOutline}
                   className='icon-btn icon-btn-success mr-5' 
                   onClick={() => {
-                    router.push(`/editexpense/${expenseId}`, 'forward');      
+                    router.push(`/app/editexpense/${expenseId}`, 'forward');      
                   }} 
                 />
                 <IonIcon // Delete expense icon

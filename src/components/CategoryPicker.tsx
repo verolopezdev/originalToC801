@@ -51,7 +51,7 @@ type Category = {
 interface CategoryPickerProps {
   selectedCategory?:  string;
   selectedSubcategory?: string;
-  onCategorySelect: (selection: { categoryId: string; categoryName: string; subcategoryId: string, subcategoryName: string }) => void;
+  onCategorySelect: (selection: { categoryId: string; categoryName: string; systemCategory: boolean; subcategoryId: string, subcategoryName: string }) => void;
   excludeFirst?: boolean; // Optionally exclude the first category
   showFavourites?: boolean; // Show only favourite categories & subcategories 
   onlyCategories?: boolean; // ✅ New prop
@@ -232,7 +232,7 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
   }, [excludeFirst]);
 
 
-  const handleClick = async (categoryId: string, categoryName: string, subcategoryId: string, subcategoryName: string, hasSubcategories: boolean) => {
+  const handleClick = async (categoryId: string, categoryName: string, systemCategory: boolean, subcategoryId: string, subcategoryName: string, hasSubcategories: boolean) => {
     if (!onlyCategories && hasSubcategories) {
       setSelectedCategoryForSub(categoryId);
     } else {
@@ -242,11 +242,11 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
   
         // Wait for the subcategory modal to close before triggering selection
         setTimeout(() => {
-          onCategorySelect({ categoryId, categoryName, subcategoryId, subcategoryName });
+          onCategorySelect({ categoryId, categoryName, systemCategory, subcategoryId, subcategoryName });
         }, 300); // Wait a bit for animation to complete
       } else {
         // Just close the main modal
-        onCategorySelect({ categoryId, categoryName, subcategoryId, subcategoryName });
+        onCategorySelect({ categoryId, categoryName, systemCategory, subcategoryId, subcategoryName });
       }
     }
   };
@@ -289,7 +289,7 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
                 <div
                   key={category.categoryId} 
                   className={`category-container centered-container ${category.categoryId === selectedCategory && !selectedSubcategory ? "selected-category" : ""}`} // ✅ Check for selectedSubcategory
-                  onClick={() => handleClick(category.categoryId, category.categoryName, '', '', category.subcategories)}  
+                  onClick={() => handleClick(category.categoryId, category.categoryName, category.systemCategory, '', '', category.subcategories)}  
                 >
                   <CategoryIcon categoryColor={category.color} iconName={category.icon} />
                   <div className="category-name">
@@ -306,7 +306,7 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
                 <div
                   key={subcategory.subcategoryId} 
                   className={`category-container centered-container ${subcategory.subcategoryId === selectedSubcategory ? "selected-category" : ""}`}
-                  onClick={() => handleClick(subcategory.categoryId, subcategory.subcategoryName, subcategory.subcategoryId, subcategory.subcategoryName, false)}
+                  onClick={() => handleClick(subcategory.categoryId, subcategory.subcategoryName, false, subcategory.subcategoryId, subcategory.subcategoryName, false)}
                 >
                   <CategoryIcon categoryColor={subcategory.color} iconName={subcategory.icon} />
                   <div className="category-name">
@@ -326,7 +326,7 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
               <div
                 key={category.categoryId} 
                 className={`category-container centered-container ${category.categoryId === selectedCategory && !selectedSubcategory ? "selected-category" : ""}`} // ✅ Check for selectedSubcategory
-                onClick={() => handleClick(category.categoryId, category.categoryName, '', '', category.subcategories)}
+                onClick={() => handleClick(category.categoryId, category.categoryName, category.systemCategory, '', '', category.subcategories)}
               >
                 <CategoryIcon categoryColor={category.categoryColor} iconName={category.categoryIcon} />
                 <div className="category-name">
@@ -350,7 +350,7 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
                 <div className="centered-container">
                   <div
                     className={`category-container ${parentCategory.categoryId === selectedCategory && !selectedSubcategory ? "selected-category" : ""}`} // ✅ Check for selectedSubcategory
-                    onClick={() => handleClick(parentCategory.categoryId, parentCategory.categoryName, '', '', false)}
+                    onClick={() => handleClick(parentCategory.categoryId, parentCategory.categoryName, parentCategory.systemCategory, '', '', false)}
                   >
                     <CategoryIcon categoryColor={parentCategory.color} iconName={parentCategory.icon} />
                     <div className="category-name">
@@ -368,7 +368,7 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
                   <div
                     key={subcategory.subcategoryId} 
                     className={`category-container-modal centered-container ${subcategory.subcategoryId === selectedSubcategory ? "selected-category" : ""}`}
-                    onClick={() => handleClick(subcategory.parentCategoryId, parentCategory.categoryName, subcategory.subcategoryId, subcategory.subcategoryName, false)}
+                    onClick={() => handleClick(subcategory.parentCategoryId, parentCategory.categoryName, false, subcategory.subcategoryId, subcategory.subcategoryName, false)}
                   >
                     <CategoryIcon categoryColor={subcategory.subcategoryColor} iconName={subcategory.subcategoryIcon} />
                     <div className="category-name">

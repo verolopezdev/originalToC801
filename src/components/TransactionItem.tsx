@@ -94,7 +94,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
         <div className='center-col'>
           <div className="center-col-wrapper category-wrapper">
             {categoryName}  
-            <span className="card-label">{accountName === "Cash" ? t('accounts.default_account_name') : accountName}</span>
+            <span className="card-label">{accountName === "Cash" ? t('accounts.default_account_name') : accountName}</span> 
           </div>  
           <div className="flex-ellipsis">    
             {expenseNote ? (

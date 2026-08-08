@@ -713,7 +713,7 @@ const ViewRecurrence: React.FC = () => {
                 text: t('expenses.pay_all_stop'),
                 handler: () => {
                   setShowStopInstallmentRecAlert(false);
-                  router.push(`/app/logrecurrenceexpense/${seriesId}?mode=remaining`, 'forward');
+                  router.push(`/app/logrecurrenceexpense/${seriesId}?mode=remaining`, 'forward'); 
                 },
               },
               {

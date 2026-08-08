@@ -222,6 +222,8 @@ export interface AlternativeCurrency {
   locale: string;
   decimalSeparator: string;
   thousandSeparator: string;
+  exchangeRate?: number;
+  timestamp?: number;
 }
 
 // 1. Initialize Dexie with the addon attached so schema annotations (@) remain valid

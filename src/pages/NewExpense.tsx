@@ -47,7 +47,7 @@ import {
   IonLabel,
   IonModal,
   IonPage,
-  IonTitle, 
+  IonTextarea, 
   IonToolbar,
   useIonViewWillEnter
 } from '@ionic/react';
@@ -381,7 +381,7 @@ const NewExpense: React.FC = () => {
     if (!selectedTripId) return;
   
     if (tripId) {
-      setTripId('0');
+      setTripId('');
       showToast(t('expenses.save_as_regular_exp'), 'info');
 
     } else {
@@ -522,6 +522,8 @@ const NewExpense: React.FC = () => {
       openFailureModal();
     }
   }
+
+  console.log("Trip id: ", selectedTripId);
 
 
   return (
@@ -717,18 +719,18 @@ const NewExpense: React.FC = () => {
           </div>
 
           {/* Add note */}
-          <div className="form-item">
+          <div className="form-item"> 
             <div className="parent-input">  
-              <div className="input-container">
-              <textarea
-                  value={note}
-                  maxLength={120}
-                  placeholder={t('expenses.config_note')}
-                  onChange={(e) => handleNoteChange(e.target.value)}
-                  className={`textarea ${error ? 'invalid' : ''}`}
-                  rows={3} // Optional: Sets the initial visible height (defaults to 2)
-                />
-                {error && <p className="error-text">{error}</p>}
+              <div className="textarea-container">
+              <IonTextarea
+                value={note}
+                maxlength={120}
+                placeholder={t("expenses.config_note")}
+                onIonInput={(e) => handleNoteChange(e.detail.value ?? "")}
+                autoGrow={true}
+                counter={true}
+              />
+              {error && <p className="textarea-error-text">{error}</p>}
               </div>
               {isTravelMode && (
                 <button 
@@ -740,6 +742,9 @@ const NewExpense: React.FC = () => {
               )}
             </div>
           </div>
+
+          
+
 
           {/* Save changes button */}
           <IonButton

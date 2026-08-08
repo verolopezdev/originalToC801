@@ -86,6 +86,11 @@ h4.app-type {
   margin-bottom: 10px;
 }
 
+.country-item .currency-lock-icon {
+  font-size: 18px;
+  color: var(--ion-color-note);
+}
+
 .country-item-selected {
   border-radius: 14px;
   border: 1px solid var(--ion-color-primary);

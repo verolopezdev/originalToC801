@@ -1,5 +1,5 @@
 import { Preferences } from '@capacitor/preferences';
-import { CurrencyType } from "../context/CurrencyContext"; // adjust import
+import { db, CurrencyType } from "../db"; // adjust import
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 
 import { saveAppMetadata } from './appMetadata';
@@ -121,7 +121,7 @@ export const downloadAndSaveExchangeRates = async (
   // Create the exchange rates object that will be persisted locally.
   const exchangeRates: ExchangeRates = {
     baseCurrency: baseUpper,
-    timestamp: Date.now(),
+    timestamp: new Date().setHours(0, 0, 0, 0),
     currencies: parsedRates,
   };
 
@@ -266,12 +266,15 @@ export const updateSavedExchangeRates = async (
     currencies: parsedRates,
   };
 
-  // Save the filtered rates to preferences for quick access.
-  await Preferences.set({
-    key: EXCHANGE_KEY,
-    value: JSON.stringify(newRates),
-  });
-  await saveAppMetadata(EXCHANGE_KEY, JSON.stringify(newRates));
+  const alternatives = await db.alternativeCurrencies.toArray();
+
+  const updated = alternatives.map(currency => ({
+    ...currency,
+    exchangeRate: parsedRates[currency.code],
+    timestamp: fullRates.timestamp
+  }));
+
+  await db.alternativeCurrencies.bulkPut(updated);
 
   return newRates;
 };

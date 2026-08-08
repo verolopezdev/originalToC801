@@ -79,7 +79,6 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
 
 
   const allSelectedCurrencies = useMemo(() => {
-
     const list = [
       ...(currency.defaultCurrency ? [currency.defaultCurrency] : []),
       ...(currency.alternativeCurrencies ?? []),
@@ -88,7 +87,6 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
     return list.sort((a, b) => a.code.localeCompare(b.code));
 
   }, [currency]);
-
 
 
   useEffect(() => {
@@ -190,9 +188,15 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
 
 
   const removeAlternativeCurrency = async (code: string) => {
-    await db.alternativeCurrencies.delete(code);
+    const currency = await db.alternativeCurrencies
+      .where("code")
+      .equals(code)
+      .first();
+  
+    if (!currency) return;
+  
+    await db.alternativeCurrencies.delete(currency.id);
   };
-
 
 
   return (

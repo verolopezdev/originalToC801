@@ -15,6 +15,7 @@ import {
   getExchangeRatesTimestamp,
 } from "../utils/getExchangeRates";
 import { useCurrency } from "./CurrencyContext"; // Adjust path as needed
+import { getAppMetadata } from "../utils/appMetadata";
 
 type ExchangeRates = {
   baseCurrency: string;
@@ -63,14 +64,18 @@ const ExchangeRateContext = createContext<ExchangeRateContextType | undefined>(u
 // One day constant Equals:86400000. Used to determine whether rates are stale.
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
-
 // Global variables for access outside React
 let latestExchangeRates: ExchangeRates | null = null;
 let refreshRatesFn: ((force?: boolean) => Promise<void>) | null = null;
 
+
+
+
 // Provider component: This wraps your application.
 export const ExchangeRateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+
   const { currency } = useCurrency();
+
   // Contains the currently loaded rates.
   const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -93,10 +98,9 @@ export const ExchangeRateProvider: React.FC<{ children: React.ReactNode }> = ({ 
   // The listener is removed during cleanup to prevent duplicate listeners from
   // accumulating if the effect runs again or the provider unmounts.
   useEffect(() => {
-    if (!currency.defaultCurrency) return;
-  
-    refreshRates(true);
-  
+    if (!currency.defaultCurrency.code) return;
+    refreshRates();
+
     let resumeListener: PluginListenerHandle | null = null;
   
     const setupListener = async () => {
@@ -110,23 +114,26 @@ export const ExchangeRateProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return () => {
       resumeListener?.remove();
     };
-  }, [currency.defaultCurrency]);
+  }, [currency.defaultCurrency.code]);
+
+
+
 
   // Keep the stored exchange rates file synchronized with the currently
   // selected alternative currencies.
   //
-  // This runs whenever the list of alternative currency codes changes
+  // This runs when the provider mounts and whenever the list of alternative currency codes changes
   // (currency added, removed, or replaced). The existing rates file is
   // updated to include newly selected currencies and remove currencies
   // that are no longer needed.
   useEffect(() => {
     if (!currency.defaultCurrency) return;
-  
+
     updateSavedExchangeRates(
       currency.defaultCurrency,
       currency.alternativeCurrencies ?? []
     );
-  }, [currency.defaultCurrency, altCodes]);
+  }, [altCodes]);
 
 
 
@@ -136,7 +143,7 @@ export const ExchangeRateProvider: React.FC<{ children: React.ReactNode }> = ({ 
   
 
   /**
- * Refreshes exchange rates from local storage and downloads a new rates file
+ * Refreshes exchange rates from db and downloads a new rates file
  * when the current data is missing, older than 24 hours, or when forced.
  *
  * Flow:
@@ -159,9 +166,6 @@ export const ExchangeRateProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (!currency.defaultCurrency) return;
 
     try {
-      // Generate a short random id to make concurrent refresh logs easier to track.
-      const id = Math.random().toString(36).slice(2, 7);
-
       // Read the timestamp from the last downloaded exchange-rates.json file.
       const timestamp = await getExchangeRatesTimestamp();
 
@@ -184,9 +188,9 @@ export const ExchangeRateProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }
 
   
-      // Load the latest exchange rates from storage.
+      // Load the latest general exchange rates from file.
       const stored = await loadExchangeRates();
-  
+
       setExchangeRates(stored);
       // Update module-level cache for non-React consumers.
       latestExchangeRates = stored;
@@ -270,6 +274,8 @@ export const ExchangeRateProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
   
 
+  
+
 
   // Makes all these available to React components.
   return (
@@ -295,7 +301,7 @@ export const useExchangeRates = () => {
 };
 
 
-// 🟢 NEW: safe to use anywhere (with auto-refresh)
+// 🟢 Safe to use anywhere (with auto-refresh)
 /*
   This defines a function called getExchangeRateDirect.
   It is async because it might wait for refreshRatesFn() to finish fetching rates.

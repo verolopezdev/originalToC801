@@ -49,6 +49,7 @@ import {
   IonLabel,
   IonModal,
   IonPage,
+  IonTextarea,
   IonTitle, 
   IonToolbar,
   useIonViewWillEnter
@@ -1073,14 +1074,14 @@ const EditExpense: React.FC = () => {
           {/* Add note */}
           <div className="form-item">
             <div className="parent-input">
-              <div className="input-container">
-                <textarea
+              <div className="textarea-container">
+                <IonTextarea
                   value={note}
-                  maxLength={120}
-                  placeholder={t('expenses.config_note')}
-                  onChange={(e) => handleNoteChange(e.target.value)}
-                  className={`textarea ${error ? 'invalid' : ''}`}
-                  rows={3} // Optional: Sets the initial visible height (defaults to 2)
+                  maxlength={120}
+                  placeholder={t("expenses.config_note")}
+                  onIonInput={(e) => handleNoteChange(e.detail.value ?? "")}
+                  autoGrow={true}
+                  counter={true}
                 />
                 {error && <p className="error-text">{error}</p>}
               </div>

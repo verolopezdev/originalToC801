@@ -14,6 +14,7 @@ import { useCurrency } from '../context/CurrencyContext';
 import { useExpense } from '../context/ExpenseContext';
 import { useRecurringExpense } from '../hooks/useRecurringExpense';
 import { useDatePicker } from '../context/DatePickerContext'; 
+import { useExchangeRates } from '../context/ExchangeRateContext';
 
 
 // Utility functions
@@ -44,6 +45,7 @@ import {
   IonIcon,
   IonModal,
   IonPage,
+  IonTextarea,
   IonToolbar,
   useIonViewWillEnter
 } from '@ionic/react';
@@ -109,10 +111,11 @@ const LogRecurrenceExpense: React.FC = () => {
   const { checkExpense, checkRecurrence } = useExpense();
   const { logExpenseForSeries, finalizeRemainingInstallments } = useRecurringExpense();
   const { openDatePicker } = useDatePicker(); // 👈 access the date picker
+  const { currency, allSelectedCurrencies } = useCurrency(); 
+  const { convertCurrency, getExchangeRate } = useExchangeRates();
   
   const contentRef = useScrollToTop(); // use the custom hook 
   const { userId } = useUser(); 
-	const { allSelectedCurrencies } = useCurrency(); 
   const { seriesId } = useParams<{ seriesId: string }>(); // passed series id to fill the form, always a string
 	const [passedRecurrenceId, setPassedRecurrenceId] = useState<string>(seriesId);
   const location = useLocation();
@@ -137,7 +140,7 @@ const LogRecurrenceExpense: React.FC = () => {
   const accounts = useLiveQuery(() => db.accounts.toArray());
 
   const [resetTrigger, setResetTrigger] = useState<number>(0);
-	const [error, setError] = useState<string | null >(null);
+	const [error, setError] = useState<string | undefined >(undefined);
 
 	const [recurrence, setRecurrence] = useState<RecurrenceSettings>(defaultRecurrence);
 	const [isFormValid, setIsFormValid] = useState<boolean>(true); // Change to false when validating form
@@ -163,7 +166,7 @@ const LogRecurrenceExpense: React.FC = () => {
 
 	// Initialize state from currency context
 	useIonViewWillEnter(() => {
-		setError(null);
+		setError(undefined);
 		setResetTrigger(prev => prev + 1);
 	});
 
@@ -242,7 +245,7 @@ const LogRecurrenceExpense: React.FC = () => {
 
 
 	// Function to check if form is valid
-	const validateForm = (amount: number, error: string | null) => {
+	const validateForm = (amount: number, error: string | undefined) => {
 		return amount > 0 && error === null;
 	};
 
@@ -285,10 +288,10 @@ const LogRecurrenceExpense: React.FC = () => {
   const handleNoteChange = async (value: string) => {
     setNote(value); // Always update the input state first
 
-    let newError: string | null = null;
+    let newError: string | undefined = undefined;
 
     if (!value.trim()) { 
-      newError = null; // Clear error when empty
+      newError = undefined; // Clear error when empty
     } else if (!validateName(value)) {
       newError = t('common.invalid_name');
     }
@@ -382,12 +385,19 @@ const LogRecurrenceExpense: React.FC = () => {
     try {
       let assignAmountAlt = 0;
       let assignAmountDef = 0;
-      amountAlt > 0 ? assignAmountAlt = amountInCents :
-      assignAmountDef = amountInCents;
+
+      if (selectedCurrency.code !== currency.defaultCurrency.code) { // Case 2: regular expense in alternative currency
+        assignAmountAlt = amountInCents;
+        const rate = getExchangeRate(selectedCurrency.code);
+    
+        if (rate) {
+          assignAmountDef = Math.round(amountInCents / rate);
+        }
+      }
 
       // Log payment of remaining installments in recurrence AND FINALIZE IT
       if(mode === "remaining") {
-        await finalizeRemainingInstallments(passedRecurrenceId, {
+        await finalizeRemainingInstallments(passedRecurrenceId, { 
           payoff: true,
           baseOverride: {
           userId,
@@ -408,7 +418,7 @@ const LogRecurrenceExpense: React.FC = () => {
       } else {
         // Log next due expense
         if(isBeforeOrToday(nextDueDate.toISOString())) {
-          console.log("is before or today");
+
           await logExpenseForSeries(passedRecurrenceId, {
             userId,
             expenseNote: note,
@@ -489,6 +499,35 @@ const LogRecurrenceExpense: React.FC = () => {
   }
 
 
+    const convertedAmountText = useMemo(() => {
+      if (
+        selectedCurrency.code === currency.defaultCurrency.code
+      ) {
+        return '';
+      }
+    
+      const rate = getExchangeRate(selectedCurrency.code);
+    
+      if (!rate) return '';
+    
+      const converted = Math.round(amountInCents / rate);
+    
+      return new Intl.NumberFormat(
+        currency.defaultCurrency.locale,
+        {
+          style: 'currency',
+          currency: currency.defaultCurrency.code,
+        }
+      ).format(converted / 100);
+    }, [
+      amountInCents,
+      selectedCurrency.code,
+      currency.defaultCurrency.code,
+      currency.defaultCurrency.locale,
+    ]);
+  
+
+
   
 
   return (
@@ -522,7 +561,7 @@ const LogRecurrenceExpense: React.FC = () => {
 
           {/* Amount input */}
           <div className='amount'>
-          {selectedCurrency && 
+          {selectedCurrency &&  
             <AmountInput
               key={`amount-input-${resetTrigger}`}
               locale={selectedCurrency.locale}
@@ -535,6 +574,13 @@ const LogRecurrenceExpense: React.FC = () => {
               readOnly={mode === 'remaining' ? true : false}
             />
           }
+
+            {selectedCurrency.code !== currency.defaultCurrency.code && (
+              <div className="converted-amount">
+                ≈ <span className='converted-amount-code'>{currency.defaultCurrency.code}</span>
+                {convertedAmountText}
+              </div>
+            )}
           </div>
 
           {/* Additional configuration */}
@@ -674,22 +720,22 @@ const LogRecurrenceExpense: React.FC = () => {
           </div>
 
           {/* Add note */}
-          <div className="form-item">
-            <div className="parent-input">
-              <div className="input-container">
-                <input
-                  type="text"
-                  value={note}
-                  maxLength={30}
-                  placeholder="Note"
-                  onChange={(e) => handleNoteChange(e.target.value) }
-                  className={`input ${error ? 'invalid' : ''}`}
-                  />
-                {error && <p className="error-text">{error}</p>}
-              </div>
+          <div className="form-item"> 
+            <div className="parent-input">  
+              <div className="textarea-container">
+            <IonTextarea
+              value={note}
+              maxlength={120}
+              placeholder={t("expenses.config_note")}
+              onIonInput={(e) => handleNoteChange(e.detail.value ?? "")}
+              autoGrow={true}
+              counter={true}
+            />
+            {error && <p className="textarea-error-text">{error}</p>}
+            </div>
             </div>
           </div>
-        
+          
           {/* Save changes button */}
           <IonButton
             className="block mb-60"

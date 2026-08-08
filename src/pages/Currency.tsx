@@ -268,7 +268,6 @@ useEffect(() => {
   if (error) return <div>Error loading data: {error}</div>;
   if (jsonCurrencies.length === 0) return <div>Loading...</div>;
 
-
   
   return (
     <IonPage>
@@ -366,18 +365,20 @@ useEffect(() => {
                       </IonNote>
                     </IonLabel>
 
-                    <IonIcon 
-                      slot="end"
-                      aria-hidden="true" 
-                      icon={trashOutline} 
-                      style={{ color: isUsed ? 'var(--ion-color-note)' : 'var(--ion-color-danger)' }}
-                      className='delete-currency-icon'
-                      onClick={() => {
-                        if (!isUsed) {
+                    {isUsed ? (
+                      <IonIcon aria-hidden="true" className='currency-lock-icon' icon={lockClosedOutline}></IonIcon>
+                    ) : (
+                      <IonIcon 
+                        slot="end"
+                        aria-hidden="true" 
+                        icon={trashOutline} 
+                        style={{ color: 'var(--ion-color-danger)' }}
+                        className='delete-currency-icon'
+                        onClick={() => {
                           deleteAlternativeCurrency(currencyItem.code);
-                        }
-                      }}
-                    />
+                        }}
+                      />
+                    )}
                   </IonItem>
                 )})}
               {/* Call ExchangeRateDisplay with USD because it will only show last updated date */}

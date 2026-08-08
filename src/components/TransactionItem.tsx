@@ -94,21 +94,29 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
         <div className='center-col'>
           <div className="center-col-wrapper category-wrapper">
             {categoryName}  
-            <span className="card-label">{accountName === "Cash" ? t('accounts.default_account_name') : accountName}</span> 
+            <span className="card-label">
+              {accountName === "Cash" ? t('accounts.default_account_name') : accountName}
+            </span>
           </div>  
           <div className="flex-ellipsis">    
             {expenseNote ? (
               <div className="transaction-note">
+                {/* Append (1/6) if both values are present */}
+                {installmentIndex && totalInstallments && (
+                  <span className="installment-label">({installmentIndex}/{totalInstallments}) </span>
+                )}
                 {expenseNote}
               </div>
             ) : (
-              <IonNote className="transaction-note">{t('common.no_description')}</IonNote>    
+              <IonNote className="transaction-note">
+                {installmentIndex && totalInstallments && (
+                  <span className="installment-label">({installmentIndex}/{totalInstallments}) </span>
+                )}
+                {t('common.no_description')}
+              </IonNote>    
             )}
 
-            {/* Append (1/6) if both values are present */}
-            {installmentIndex && totalInstallments && (
-              <span className="installment-label"> ({installmentIndex}/{totalInstallments})</span>
-            )}
+            
           </div>
         </div>
         <div className='right-col'>

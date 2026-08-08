@@ -36,6 +36,8 @@ export interface ExpenseBase {
   installmentIndex?: number;
 }
 
+const today = dayjs();
+
 
 // Compare two date-like values by local calendar day (YYYY-MM-DD), ignoring time.
 function sameDay(a: string | Date, b: string | Date): boolean {
@@ -242,7 +244,6 @@ export const useRecurringExpense = () => {
           return false;
         }
 
-        const today = dayjs().startOf('day');
 
         // Get last logged expense for series
         const lastExpense = await tx.expenses
@@ -281,7 +282,7 @@ export const useRecurringExpense = () => {
             seriesAmountDefault = Math.round(series.amountAlt / rate);
           }
         }
-
+console.log("Due date iso: ", dueDateIso);
         // ✅ Add expense
         await tx.expenses.add({
           // Pull from series by default, then override with passed baseOverride
@@ -358,7 +359,7 @@ export const useRecurringExpense = () => {
 
 
   // Pay off OR just stop remaining installments
-  const finalizeRemainingInstallments = useCallback(
+  const finalizeRemainingInstallments = useCallback(  
     async (
       seriesId: string,
       options?: {
@@ -374,9 +375,8 @@ export const useRecurringExpense = () => {
           console.warn("Series not found", seriesId);
           return false;
         }
-    
-        const today = dayjs().startOf('day');
-    
+        const nextDueDate = series?.nextDueDate;
+   
         // Get last logged expense for series
         const lastExpense = await tx.expenses
           .where('seriesId')
@@ -412,7 +412,7 @@ export const useRecurringExpense = () => {
           await tx.expenses.add({
             userId: series.userId,
             expenseId: crypto.randomUUID(),
-            dueDate: today.toISOString(),
+            dueDate: nextDueDate ?? undefined, 
             expenseDate: today.toISOString(),
             expenseNote: `${series.note || ""} (payoff for ${remainingCount} remaining installments)`,
             accountId: series.accountId,

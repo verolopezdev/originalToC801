@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../db'; 
+import { db, CurrencyType } from '../db'; 
 import { useTranslation } from 'react-i18next';
 import dayjs from "dayjs";
 
@@ -10,7 +10,7 @@ import dayjs from "dayjs";
 import useScrollToTop from '../hooks/useScrollToTop';
 import { useUser } from '../context/UserContext'; // Import the useUser hook
 import { RecurrenceSettings } from '../hooks/useRecurringExpense';
-import { useCurrency, CurrencyType } from '../context/CurrencyContext';
+import { useCurrency } from '../context/CurrencyContext';
 import { useExpense } from '../context/ExpenseContext';
 import { useDatePicker } from '../context/DatePickerContext'; 
 
@@ -45,6 +45,7 @@ import {
   IonIcon,
   IonModal,
   IonPage,
+  IonTextarea,
   IonToolbar,
   useIonViewWillEnter
 } from '@ionic/react';
@@ -54,7 +55,6 @@ import {
 import { 
   arrowBackOutline,
   calendarOutline,
-  cashOutline,
   gitCompareOutline,
   gridOutline,
   notificationsOffOutline,
@@ -702,19 +702,19 @@ const EditRecurrence: React.FC = () => {
           </div>
 
           {/* Add note */}
-          <div className="form-item">
-            <div className="parent-input">
-              <div className="input-container">
-                <textarea
-                  value={note}
-                  maxLength={120}
-                  placeholder={t('expenses.config_note')}
-                  onChange={(e) => handleNoteChange(e.target.value)}
-                  className={`textarea ${error ? 'invalid' : ''}`}
-                  rows={3} // Optional: Sets the initial visible height (defaults to 2)
-                />
-                {error && <p className="error-text">{error}</p>}
-              </div>
+          <div className="form-item"> 
+            <div className="parent-input">  
+              <div className="textarea-container">
+            <IonTextarea
+              value={note}
+              maxlength={120}
+              placeholder={t("expenses.config_note")}
+              onIonInput={(e) => handleNoteChange(e.detail.value ?? "")}
+              autoGrow={true}
+              counter={true}
+            />
+            {error && <p className="textarea-error-text">{error}</p>}
+            </div>
             </div>
           </div>
 

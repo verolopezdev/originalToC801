@@ -95,7 +95,7 @@ const TransactionList: React.FC<Props> = ({
       .between(start.toISOString(), end.toISOString(), true, false) 
       .and(exp => exp.isActive === 1)
       .sortBy("expenseDate");
-
+    
     const filtered = accountId
       ? allResults.filter(exp => exp.accountId === accountId)
       : allResults;

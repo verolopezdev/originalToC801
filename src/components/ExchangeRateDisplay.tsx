@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
+import { CurrencyType } from '../db';
 // Custom hooks
-import { CurrencyType, useCurrency } from '../context/CurrencyContext';
+import { useCurrency } from '../context/CurrencyContext';
 import { useExchangeRates } from '../context/ExchangeRateContext';
 
 // App components

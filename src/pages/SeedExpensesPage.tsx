@@ -86,12 +86,19 @@ const getSeedContext = async (): Promise<SeedContext | null> => {
     return null;
   }
 
+  console.log("Categories: ", categories);
+
   // 3. Category ID mapping helper
-  const findCatId = (name: string): any => {
+  const findCatId = (name: string): string => {
     const found = categories.find(
       (c) => c.categoryName?.toLowerCase() === name.toLowerCase()
     );
-    return found ? found.categoryId : categories[0].categoryId;
+  
+    if (!found) {
+      throw new Error(`Seed category not found: "${name}"`);
+    }
+  
+    return found.categoryId;
   };
 
   return { accountId, findCatId };
@@ -103,7 +110,6 @@ const getSeedContext = async (): Promise<SeedContext | null> => {
 const SeedExpensesPage: React.FC = () => {
   const { currency } = useCurrency();
   const { t } = useTranslation();
-  const { userId } = useUser();
   const [years, setYears] = React.useState<number>(1);
   const [showToast, setShowToast] = React.useState(false);
 
@@ -306,7 +312,7 @@ const SeedExpensesPage: React.FC = () => {
 
         const categoryDefinitions = [
           {
-            categoryId: findCatId("Rent"),
+            categoryId: findCatId("Housing"),
             weight: 1,
             amounts: [base.rent],
             note: () => randomMerchant("rent"),
@@ -315,34 +321,39 @@ const SeedExpensesPage: React.FC = () => {
             categoryId: findCatId("Utilities"),
             weight: 3,
             amounts: base.utilities,
-            note: () => `${randomMerchant("utilities")} – ${translations[language].monthlyBill}`,
+            note: () =>
+              `${randomMerchant("utilities")} – ${translations[language].monthlyBill}`,
           },
           {
             categoryId: findCatId("Groceries"),
             weight: 25,
             amounts: base.groceries,
-            note: () => `${randomMerchant("groceries")} – ${translations[language].groceries}`,
+            note: () =>
+              `${randomMerchant("groceries")} – ${translations[language].groceries}`,
           },
           {
-            categoryId: findCatId("Transport"),
+            categoryId: findCatId("Transportation"),
             weight: 20,
             amounts: base.transport,
-            note: () => `${randomMerchant("transport")} – ${translations[language].transport}`,
+            note: () =>
+              `${randomMerchant("transport")} – ${translations[language].transport}`,
           },
           {
             categoryId: findCatId("Healthcare"),
             weight: 5,
             amounts: base.healthcare,
-            note: () => `${randomMerchant("healthcare")} – ${translations[language].healthcare}`,
+            note: () =>
+              `${randomMerchant("healthcare")} – ${translations[language].healthcare}`,
           },
           {
-            categoryId: findCatId("Phone"),
+            categoryId: findCatId("Communications"),
             weight: 2,
             amounts: [base.phone],
-            note: () => `${randomMerchant("phone")} – ${translations[language].monthlyBill}`,
+            note: () =>
+              `${randomMerchant("phone")} – ${translations[language].monthlyBill}`,
           },
           {
-            categoryId: findCatId("Dining"),
+            categoryId: findCatId("Dining & Takeout"),
             weight: 18,
             amounts: base.dining,
             note: () => randomMerchant("dining"),
@@ -351,25 +362,29 @@ const SeedExpensesPage: React.FC = () => {
             categoryId: findCatId("Entertainment"),
             weight: 2,
             amounts: base.entertainment,
-            note: () => `${randomMerchant("entertainment")} – ${translations[language].subscription}`,
+            note: () =>
+              `${randomMerchant("entertainment")} – ${translations[language].subscription}`,
           },
           {
             categoryId: findCatId("Shopping"),
             weight: 8,
             amounts: base.shopping,
-            note: () => `${randomMerchant("shopping")} – ${translations[language].shopping}`,
+            note: () =>
+              `${randomMerchant("shopping")} – ${translations[language].shopping}`,
           },
           {
             categoryId: findCatId("Fitness"),
             weight: 1,
             amounts: [base.fitness],
-            note: () => `${randomMerchant("fitness")} – ${translations[language].membership}`,
+            note: () =>
+              `${randomMerchant("fitness")} – ${translations[language].membership}`,
           },
           {
             categoryId: findCatId("Personal Care"),
             weight: 3,
             amounts: base.personalCare,
-            note: () => `${randomMerchant("personalCare")} – ${translations[language].personalCare}`,
+            note: () =>
+              `${randomMerchant("personalCare")} – ${translations[language].personalCare}`,
           },
           {
             categoryId: findCatId("Travel"),
@@ -378,7 +393,6 @@ const SeedExpensesPage: React.FC = () => {
             note: () => randomMerchant("travel"),
           },
         ];
-
         for (let m = 0; m < totalMonths; m++) {
           const monthDate = new Date(
             now.getFullYear(),

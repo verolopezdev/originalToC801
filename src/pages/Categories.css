@@ -1,17 +1,17 @@
 .categories-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px 10px; /* Vertical 30px, Horizontal 10px */
+  gap: 30px 10px; /* Vertical 30px, Horizontal 10px */
   place-items: start; /* Aligns items at the start of their grid cell */
   max-width: 400px; /* Prevents full width stretching */
   width: 360px;
+  padding-top: 10px;
 }
 
 /* Used to position category icon in grid in Categories page */
 .category-container {
   position: relative; /* Ensures absolute positioning works */
   width: 80px;
-  padding: 10px;
 }
 
 
@@ -34,6 +34,8 @@
   background: var(--selected-bg);
   border-radius: 8px;
   padding: 10px;
+  top: -10px;
+  overflow: visible;
 }
 
 .parent-input {

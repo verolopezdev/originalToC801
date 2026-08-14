@@ -199,7 +199,7 @@ const Categories: React.FC = () => {
         
           {/* Category grid */}
           <section className='centered-container'>
-            <div className="categories-grid"> 
+            <div className="categories-grid">   
               {filteredCategories?.map((category) => (
                 <CategoryOption       
                   key={category.categoryId}

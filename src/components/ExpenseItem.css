@@ -79,7 +79,7 @@
   }
   
   .installment-label {
-    padding-left: 5px;
+    font-size: 14px;
     font-style: italic;
     color: var(--ion-color-note);
   }

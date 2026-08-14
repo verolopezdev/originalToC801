@@ -178,7 +178,7 @@ const ExpenseItem: React.FC<TransactionItemProps> = ({
                 <FormattedDate date={expenseDate} format="compact" />
                 {/* Append (1/6) if both values are present */}
                 {installmentIndex && totalInstallments && (
-                  <span className="installment-label"> ({installmentIndex}/{totalInstallments})*</span>
+                  <span className="installment-label ml-5"> ({installmentIndex}/{totalInstallments})</span>
                 )}
               </>
             ) : paymentStatus === 2 && deletionDate !== null ? ( // deleted expense

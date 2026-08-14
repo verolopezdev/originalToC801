@@ -168,7 +168,11 @@ const TwelveMonthChart: React.FC<TwelveMonthChartProps> = React.memo(({
             {/* Chart */}
             <div style={{ width: "100%", height: 500 }}>
               <ResponsiveContainer>
-                <LineChart data={chartData} margin={{ top: 10, right: 20, left: -10, bottom: 0 }} onClick={handleClick}>
+                <LineChart 
+                  data={chartData} 
+                  margin={{ top: 10, right: 20, left: -10, bottom: 0 }} 
+                  onClick={handleClick}
+                >
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--ion-color-medium)" />
                   <XAxis
                     dataKey="month"

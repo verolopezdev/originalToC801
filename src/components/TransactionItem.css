@@ -84,13 +84,6 @@
   padding-right: 5px;
 }
 
-.installment-label {
-  font-size: 0.9rem;
-  font-style: italic;
-  color: var(--ion-color-note);
-  background-color: purple;
-}
-
 .card-label {
   font-style: italic;
   color: var(--ion-color-note);

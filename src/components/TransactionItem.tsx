@@ -103,14 +103,14 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
               <div className="transaction-note">
                 {/* Append (1/6) if both values are present */}
                 {installmentIndex && totalInstallments && (
-                  <span className="installment-label">({installmentIndex}/{totalInstallments}) </span>
+                  <span className="installment-label mr-5">({installmentIndex}/{totalInstallments}) </span>
                 )}
                 {expenseNote}
               </div>
             ) : (
               <IonNote className="transaction-note">
                 {installmentIndex && totalInstallments && (
-                  <span className="installment-label">({installmentIndex}/{totalInstallments}) </span>
+                  <span className="installment-label mr-5">({installmentIndex}/{totalInstallments}) </span>
                 )}
                 {t('common.no_description')}
               </IonNote>    

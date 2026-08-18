@@ -180,6 +180,7 @@ const LogRecurrenceExpense: React.FC = () => {
 			setPassedRecurrenceId(series.seriesId);
 			const recurrenceStartDate = new Date(series.startDate);
       setStartDate(recurrenceStartDate);
+
       if(series.originalNextDueDate)
         setOriginalDueDate(new Date(series.originalNextDueDate));	
       //setNextDueDate(new Date(series.nextDueDate ?? new Date().toISOString()));
@@ -246,7 +247,7 @@ const LogRecurrenceExpense: React.FC = () => {
 
 	// Function to check if form is valid
 	const validateForm = (amount: number, error: string | undefined) => {
-		return amount > 0 && error === null;
+		return amount > 0 && error === undefined;
 	};
 
 
@@ -305,9 +306,10 @@ const LogRecurrenceExpense: React.FC = () => {
   const handleDateChange = async () => {
     // Log expense deals with dates in the past or present, that's why
     // min date is one day after the previuos due date, and max is today
-    const { min, max } = getDateRange(originalDueDate, recurrence.unit, 1);
+    // const { min, max } = getDateRange(originalDueDate, recurrence.unit, 1);
+
     const pickedDateISO = await openDatePicker(new Date(), {
-      minDate: min,
+      minDate: startDate,
       maxDate: today,
     });
   
@@ -393,6 +395,8 @@ const LogRecurrenceExpense: React.FC = () => {
         if (rate) {
           assignAmountDef = Math.round(amountInCents / rate);
         }
+      } else {
+        assignAmountDef = amountInCents;
       }
 
       // Log payment of remaining installments in recurrence AND FINALIZE IT
@@ -617,7 +621,7 @@ const LogRecurrenceExpense: React.FC = () => {
             {/* Date */}
             <div 
               className='aditional-btn'
-              onClick={() => handleDateChange()}
+              onClick={handleDateChange}
             >
               <div>
                 <IonIcon icon={calendarOutline} className='small-icon-btn primary'></IonIcon>

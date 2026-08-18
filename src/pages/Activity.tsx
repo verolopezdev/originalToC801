@@ -61,7 +61,7 @@ interface AppPage {
 const appPages: AppPage[] = [
   { title: 'dashboard', url: '/app/dashboard', icon: homeOutline },
   { title: 'accounts', url: '/app/accounts', icon: layersOutline },
-  { title: 'Add', url: '/app/newexpense/0', icon: add },  
+  { title: 'Add', url: '/app/newexpense/0', icon: add },   
   { title: 'activity', url: '/app/activity', icon: cash }
 ];
 
@@ -179,18 +179,18 @@ const Activity: React.FC = () => {
 
 
   // Translate titles
-  const translatedMenuItems = appPages.map((item) => ({
-    ...item,
-    title: t(`common.${item.title}`, { defaultValue: item.title }),
-    url: item.title === 'Add' ? `/app/newexpense/${selectedCardId}` : item.url, 
-  }));
+    // Translate footer menu item titles
+    const translatedMenuItems = appPages.map((item) => ({
+      ...item,
+      title: t(`common.${item.title}`, { defaultValue: item.title }),
+    }));
+  
 
 
   // Show expenses by date or category
   const toggleViewMode = () => {
     setViewMode((prev) => (prev === 'date' ? 'category' : 'date'));
   };
-
 
   
   return (

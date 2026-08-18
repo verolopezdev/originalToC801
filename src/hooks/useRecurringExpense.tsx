@@ -282,7 +282,8 @@ export const useRecurringExpense = () => {
             seriesAmountDefault = Math.round(series.amountAlt / rate);
           }
         }
-console.log("Due date iso: ", dueDateIso);
+
+        console.log("******************* Due date iso: ", dueDateIso);
         // ✅ Add expense
         await tx.expenses.add({
           // Pull from series by default, then override with passed baseOverride

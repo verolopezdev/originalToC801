@@ -58,7 +58,6 @@ import {
   airplaneOutline,
   arrowBackOutline,
   calendarOutline,
-  cashOutline,
   closeOutline,
   gitCompareOutline,
   gridOutline,
@@ -523,7 +522,6 @@ const NewExpense: React.FC = () => {
     }
   }
 
-  console.log("Trip id: ", selectedTripId);
 
 
   return (

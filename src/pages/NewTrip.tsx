@@ -398,7 +398,7 @@ const NewTrip: React.FC = () => {
           {/* Travel currency */}
           <section>
             <h6 className="section-title">{t('trip.trip_curr')}</h6>
-            <IonItem button onClick={() => setIsTravelModeModalOpen(true)}>
+            <IonItem onClick={() => setIsTravelModeModalOpen(true)}> 
               <div className='list-item-select'>
                 <span>
                   {selectedCurrency && selectedCurrency.name && selectedCurrency.symbol
@@ -413,7 +413,7 @@ const NewTrip: React.FC = () => {
           {/* Icon picker */}
           <section>
             <h6 className="section-title">{t('common.choose_icon')}</h6>
-            <IonItem button onClick={() => {
+            <IonItem onClick={() => {
               setIsOpenCategoryModal(true);  
             }}>
               <div className='list-item-select'>

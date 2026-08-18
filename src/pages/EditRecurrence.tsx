@@ -342,8 +342,8 @@ const EditRecurrence: React.FC = () => {
 
     // ✅ Safely parse endDate (only if defined)
     const endDateObj = recurrence?.endDate
-    ? new Date(recurrence.endDate)
-    : null;
+      ? new Date(recurrence.endDate)
+      : null;
 
 
     if (endDateObj && endDateObj < max) {

@@ -21,7 +21,7 @@ export function getDateRange(
   const base = dayjs(baseDate);
 
   const min = base.subtract(interval, unit).add(1, "day").startOf("day").toDate();
-  const max = base.add(interval, unit).subtract(1, "day").startOf("day").toDate();
+  const max = base.add(interval, unit).subtract(1, "day").endOf("day").toDate();
 
   return { min, max };
 }

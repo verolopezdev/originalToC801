@@ -40,10 +40,14 @@ export const DatePickerProvider = ({ children }: { children: React.ReactNode }) 
   const [resolver, setResolver] =
     useState<(date: string | null) => void>(() => () => {});
 
+
   const openDatePicker = (
     date: Date, 
     options?: DatePickerOptions
   ): Promise<string | null> => {
+    console.log("Min date: ", minDate);
+    console.log("Max date: ", maxDate);
+  
     setInitialDate(date);
     setMinDate(options?.minDate ?? getDefaultMinDate());
     setMaxDate(options?.maxDate ?? getDefaultMaxDate());
@@ -64,6 +68,9 @@ export const DatePickerProvider = ({ children }: { children: React.ReactNode }) 
     resolver(date.toISOString());
     setIsOpen(false);
   };
+
+  console.log("---- NEW DATE CONTEXT ----");
+  console.log("Initial date: ", initialDate);
 
   return (
     <DatePickerContext.Provider value={{ openDatePicker }}>

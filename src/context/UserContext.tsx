@@ -23,6 +23,7 @@ const usd: CurrencyType = {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
+
 const defaultUser: Omit<User, "userId"> = {
   // Identity
   name: "",
@@ -66,20 +67,41 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
   const { i18n } = useTranslation();
   const [databaseReady, setDatabaseReady] = React.useState(false);
 
+  const currentUserId = db.cloud.currentUser.value?.userId;
+  const isDexieCloudAuthenticated =
+    !!currentUserId && currentUserId !== "unauthorized";
+
+  
   React.useEffect(() => {
     dbReady()
       .then(() => setDatabaseReady(true))
       .catch(console.error);
   }, []);
 
+
+
   const user = useLiveQuery(
     async () => {
       if (!databaseReady) return undefined;
+  
+      // Authenticated Dexie Cloud user
+      if (isDexieCloudAuthenticated) {
+        console.log("---> Dexie Cloud user");
+      
+        return db.users
+          .where("owner")
+          .equals(currentUserId!)
+          .first();
+      }
 
+      console.log("---> Free user");
+      // Free / unauthenticated user
       return db.users.toCollection().first();
     },
-    [databaseReady]
+    [databaseReady, currentUserId]
   );
+
+
 
   const categorylessId = useLiveQuery(
     async () => {
@@ -130,6 +152,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       </div>
     );
   }
+
+  console.log("User: ", user);
 
   return (
     <UserContext.Provider

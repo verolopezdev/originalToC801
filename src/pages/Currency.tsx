@@ -291,7 +291,7 @@ useEffect(() => {
           </section>
 
           {/* Primary currency */}
-          <section>
+          <section> 
             <h6 className="section-title">{t('currency.primary_currency')}</h6>
             <p>{t('currency.primary_currency_prompt')}</p>
             <IonItem

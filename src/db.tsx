@@ -97,6 +97,10 @@ export interface User {
   theme?: string;
   mode?: string;
   isTravelMode: boolean;
+  // Dexie Cloud
+  realmId?: string;
+  owner?: string;
+  sharedRealmId?: string;
 }
 
 
@@ -109,6 +113,10 @@ interface Account {
   activeAccount: boolean;
   userId: string;
   sortOrder: number;
+
+  // Dexie Cloud
+  realmId?: string;
+  owner?: string;
 }
 
 interface Category {
@@ -120,6 +128,10 @@ interface Category {
   favouriteCategory: boolean;
   systemCategory: boolean;
   subcategories: boolean;
+
+  // Dexie Cloud
+  realmId?: string;
+  owner?: string;
 }
 
 interface Subcategory {
@@ -130,6 +142,10 @@ interface Subcategory {
   activeSubcategory: boolean;
   favouriteSubcategory: boolean;
   parentCategoryId: string;
+
+  // Dexie Cloud
+  realmId?: string;
+  owner?: string;
 }
 
 export interface Expense {
@@ -153,6 +169,10 @@ export interface Expense {
   totalInstallments?: number;
   autoLogged?: boolean;
   isActive: number;
+
+  // Dexie Cloud
+  realmId?: string;
+  owner?: string;
 }
 
 export type FrequencyUnit = 'week' | 'month' | 'year';
@@ -181,6 +201,10 @@ export interface RecurringSeries {
   originalNextDueDate: string | null;
   nextDueDate: string | null;
   moved?: Record<number, string>;
+
+  // Dexie Cloud
+  realmId?: string;
+  owner?: string;
 }
 
 export interface ParsedExpense extends Omit<Expense, 'expenseDate'> {
@@ -195,6 +219,10 @@ interface Trip {
   fromDate: Date;
   toDate: Date;
   currencyCode: string;
+
+  // Dexie Cloud
+  realmId?: string;
+  owner?: string;
 }
 
 // Define currency data type
@@ -212,6 +240,9 @@ interface HistoricCurrencyList {
   id: string;
   currencies: string[];
   updatedAt: number;
+  // Dexie Cloud
+  realmId?: string;
+  owner?: string;
 }
 
 export interface AlternativeCurrency {
@@ -224,6 +255,9 @@ export interface AlternativeCurrency {
   thousandSeparator: string;
   exchangeRate?: number;
   timestamp?: number;
+  // Dexie Cloud
+  realmId?: string;
+  owner?: string;
 }
 
 // 1. Initialize Dexie with the addon attached so schema annotations (@) remain valid
@@ -262,7 +296,7 @@ export async function initializeDatabase() {
 
 db.version(1).stores({
   appmetadata: 'id, key',
-  users: 'userId, email',
+  users: 'userId, email, realmId, owner',
   accounts: 'accountId, userId, sortOrder',
   categories: 'categoryId, categoryName',
   subcategories: 'subcategoryId, subcategoryName, parentCategoryId',
@@ -271,6 +305,11 @@ db.version(1).stores({
   historicCurrencyList: 'id',
   alternativeCurrencies: 'id, code',
   recurringSeries: 'seriesId, userId, startDate, interval, unit, totalOccurrences, isActive, lastLoggedDate, moved, categoryId, subcategoryId, accountId',
+
+  // Dexie Cloud access control
+  realms: '@realmId',
+  members: '@id,[email+realmId]',
+  roles: '[realmId+name]',
 });
 
 
@@ -337,6 +376,7 @@ export const seedInitialData = async (
 
   try {
     const installationId = crypto.randomUUID(); 
+    const userId = crypto.randomUUID();
 
     await db.transaction(
       "rw",
@@ -359,7 +399,7 @@ export const seedInitialData = async (
         });
 
         await db.users.add({
-          userId: crypto.randomUUID(),
+          userId: userId,
           // Identity
           name: "",
           lastName: "",
@@ -390,6 +430,7 @@ export const seedInitialData = async (
 
         await db.accounts.add({
           accountId:crypto.randomUUID(),
+          userId: userId,
           accountName: "Cash",
           accountIdentifier: "",
           accountColor: "cyan",

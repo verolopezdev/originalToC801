@@ -36,7 +36,7 @@ const Plans: React.FC = () => {
 
 
     const simulatePremiumPurchase = async () => {
-      await activatePremium(
+      await activatePremium(  
         user.userId,
         "monthly",
         new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
@@ -49,7 +49,9 @@ const Plans: React.FC = () => {
   
   
   return(
-    <>
+    <section> 
+      <h6 className="section-title"> {t('plans.choose_plan')} </h6>
+      
       {/* Monthly */}
       <div 
         className={`plan-item ${selectedPlan === 'monthly' ? 'selected-plan' : ''}`}
@@ -106,18 +108,21 @@ const Plans: React.FC = () => {
         buttons={['OK']}
       />
 
-        <IonButton
-          expand="block"
-          color="danger"
-          onClick={simulatePremiumPurchase}
-        >
-          Simulate Premium
-        </IonButton>
+      <IonButton
+        expand="block"
+        color="danger"
+        onClick={simulatePremiumPurchase}
+      >
+        Simulate Premium
+      </IonButton>
       
-{/*       <IonButton expand="block" onClick={handleSubscribe}>
+      {/*       
+      <IonButton expand="block" onClick={handleSubscribe}>
         {user.subscriptionPlan !== 'free' && user.isPremium === false ? ('Renew Subscription') : ('Subscribe Now')}
       </IonButton>
- */}    </>
+      */}  
+        
+    </section>
   )
 }
 

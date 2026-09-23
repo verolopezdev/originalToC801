@@ -468,6 +468,9 @@
     "reason_3": "Here goes reason 3",
     "choose_plan": "Choose a plan"
   },
+  "premium": {
+    "type_email": "Type guest email here"
+  },
   "profile": {
     "profile_title": "Profile",
     "user_info": "User information",

@@ -465,6 +465,9 @@
     "reason_3": "Aquí va la razón 3",
     "choose_plan": "Elige un plan"
   },
+  "premium": {
+    "type_email": "Escribe aquí el correo electrónico del invitado"
+  },
   "profile": {
     "profile_title": "Perfil",
     "user_info": "Información del usuario",

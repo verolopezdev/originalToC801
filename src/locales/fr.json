@@ -466,6 +466,9 @@
     "choose_plan": "Choisir un forfait"
 
   },
+  "premium": {
+    "type_email": "Saisissez ici l’adresse e-mail de l’invité"
+  },
   "profile": {
     "profile_title": "Profil",
     "user_info": "Informations utilisateur",

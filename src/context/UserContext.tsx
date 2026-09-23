@@ -3,6 +3,8 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db, User, dbReady, CurrencyType, SubscriptionPlan } from "../db";
 import { useTranslation } from "react-i18next";
 
+import { loadCountries, getCountryWithSeparators, detectDeviceCountry } from "../utils/countryUtils";
+
 interface UserContextType {
   user: User;
   userId: string;
@@ -100,6 +102,89 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     },
     [databaseReady, currentUserId]
   );
+
+
+  useEffect(() => {
+    if (!databaseReady) return;
+    if (!isDexieCloudAuthenticated) return;
+    if (!currentUserId) return;
+    if (user !== undefined) return;
+  
+    const createAuthenticatedUser = async () => {
+      // Make sure another invocation hasn't created it already.
+      const existingUser = await db.users
+        .where("owner")
+        .equals(currentUserId)
+        .first();
+  
+      if (existingUser) return;
+  
+      console.log("---> Creating authenticated user");
+
+      // Check whether this authenticated user is a member
+      // of a shared Expense Tracker realm.
+      const member = await db.members
+        .where("userId")
+        .equals(currentUserId)
+        .first();
+
+      const sharedRealmId = member?.realmId;
+      console.log("---> Shared realm:", sharedRealmId);
+
+      const countries = await loadCountries();
+
+      const country = await detectDeviceCountry(countries);
+
+      if (!country) {
+        throw new Error("Could not determine user's country.");
+      }
+
+      const countryToSave = getCountryWithSeparators(country);
+  
+      const newUser: User = {
+        userId: crypto.randomUUID(),
+        // Identity
+        name: "",
+        lastName: "",
+        email: "",
+        avatar: "",
+        // Language
+        language: countryToSave.locale.split("-")[0],
+        selectedCountry: countryToSave.country,
+        // Currency
+        defaultCurrency: countryToSave,
+        actualCurrency: countryToSave,
+        travelCurrency: null,
+        // Subscription
+        isPremium: false,
+        subscriptionPlan: "free",
+        subscriptionExpirationDate: null,
+        // Settings
+        interval: "monthly",
+        localInterval: "monthly",
+        showDisabledAccounts: true,
+        showDisabledCategories: true,
+        favourites: 0,
+        weekStartDay: "sunday",
+        theme: 'theme-cyan',
+        mode: "system",
+        isTravelMode: false,
+        
+        // Dexie Cloud
+        owner: currentUserId,
+        sharedRealmId,
+      };
+  
+      await db.users.add(newUser);
+    };
+  
+    createAuthenticatedUser().catch(console.error);
+  }, [
+    databaseReady,
+    isDexieCloudAuthenticated,
+    currentUserId,
+    user,
+  ]);
 
 
 

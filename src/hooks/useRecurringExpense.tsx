@@ -79,7 +79,7 @@ export const useRecurringExpense = () => {
       selectedDate: Date,
       recurrence: RecurrenceSettings  
     ) => {
-      // 🚨 FIX HERE: Wrap the entire operation in a transaction that includes all touched tables 🚨
+      // Wrap the entire operation in a transaction that includes all touched tables 🚨
       return await db.transaction('rw', db.expenses, db.recurringSeries, async (tx) => {
         const expensesTable = tx.table('expenses');
         const recurringSeriesTable = tx.table('recurringSeries');

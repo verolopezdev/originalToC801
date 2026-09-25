@@ -9,6 +9,7 @@ import PremiumHeader from '../components/PremiumHeader';
 import SubscriptionDetails from '../components/SubscriptionDetails';
 import Members from '../components/Members';
 import ShareAccount from '../components/ShareAccount';
+import { useHasGuest } from '../services/SharingService';
 
 // Ionic components
 import { 
@@ -35,10 +36,10 @@ const GetPremium: React.FC = () => {
   const contentRef = useScrollToTop(); // use the custom hook 
   const { t } = useTranslation();
   const { user } = useUser();
+  const hasGuest = useHasGuest(user.sharedRealmId);
   const isPremium = user.isPremium;
 
   const hasExpiredSubscription = user.subscriptionPlan !== 'free' && !user.isPremium;
-
   
   
   return (
@@ -64,7 +65,7 @@ const GetPremium: React.FC = () => {
 
               <SubscriptionDetails />
               <Members />
-              <ShareAccount />
+              {!hasGuest && <ShareAccount />}
 
             </>
           ) : (

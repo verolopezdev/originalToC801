@@ -1,6 +1,6 @@
 import { db } from "../db";
 import type { User } from '../db';
-
+import { useLiveQuery } from 'dexie-react-hooks';
 
 /* TEST AREA */
 
@@ -36,44 +36,12 @@ export const shareAccountWithGuest = async (
     // Update the user record in Dexie.
     await db.users.update(user.userId, {
       sharedRealmId,
+      sharingRole: "admin",
     });
   }
 
   await inviteGuest(sharedRealmId, email);
 };
-
-
-
-
-/* TESTING FX
-export const moveOneAccountToSharedRealm = async (
-  sharedRealmId: string
-) => {
-  const account = await db.accounts.toCollection().first();
-
-  if (!account) {
-    throw new Error("No account found.");
-  }
-
-  console.log("BEFORE:", {
-    accountId: account.accountId,
-    realmId: account.realmId,
-    owner: account.owner,
-  });
-
-  await db.accounts.update(account.accountId, {
-    realmId: sharedRealmId,
-  });
-
-  const updated = await db.accounts.get(account.accountId);
-
-  console.log("AFTER:", {
-    accountId: updated?.accountId,
-    realmId: updated?.realmId,
-    owner: updated?.owner,
-  });
-};
-*/
 
 
 
@@ -248,4 +216,26 @@ export const inviteGuest = async (
       },
     },
   });
+};
+
+
+
+export const useHasGuest = (sharedRealmId?: string) => {
+  const hasGuest = useLiveQuery(
+    async () => {
+      if (!sharedRealmId) {
+        return false;
+      }
+
+      const members = await db.members
+        .where('realmId')
+        .equals(sharedRealmId)
+        .toArray();
+
+      return members.some(member => member.email);
+    },
+    [sharedRealmId]
+  );
+
+  return hasGuest ?? false;
 };

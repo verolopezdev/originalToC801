@@ -433,6 +433,12 @@
     "subtitle": "Export Your Expense Data",
     "what_to_do": "Select a time range and format to generate your expense report with charts and tables."
   },
+  "members": {
+    "title": "Members",
+    "administrator": "Administrator",
+    "guest": "Guest",
+    "invitation_pending": "Invitation pending"
+  },
   "modal": {
     "attention": "⚠ Attention!",
     "delete_warning": "Deleted expenses cannot be recovered!",

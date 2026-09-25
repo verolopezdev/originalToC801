@@ -101,6 +101,7 @@ export interface User {
   realmId?: string;
   owner?: string;
   sharedRealmId?: string;
+  sharingRole?: string;
 }
 
 
@@ -296,7 +297,7 @@ export async function initializeDatabase() {
 
 db.version(1).stores({
   appmetadata: 'id, key',
-  users: 'userId, email, realmId, owner',
+  users: 'userId, email, realmId, sharedRealmId, owner',
   accounts: 'accountId, userId, sortOrder',
   categories: 'categoryId, categoryName',
   subcategories: 'subcategoryId, subcategoryName, parentCategoryId',
@@ -308,7 +309,7 @@ db.version(1).stores({
 
   // Dexie Cloud access control
   realms: '@realmId',
-  members: '@id,[email+realmId]',
+  members: '@id, realmId, [email+realmId]',
   roles: '[realmId+name]',
 });
 
@@ -426,6 +427,7 @@ export const seedInitialData = async (
           theme: 'theme-cyan',
           mode: "system",
           isTravelMode: false,
+          sharingRole: undefined,
         } as User);
 
         await db.accounts.add({

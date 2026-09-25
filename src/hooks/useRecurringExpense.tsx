@@ -7,6 +7,9 @@ import { useExpense } from '../context/ExpenseContext';
 import { getExchangeRateDirect } from '../context/ExchangeRateContext';
 import { getOldestOverdueExpenseForSeries } from '../utils/recurrenceFunctions';
 
+import { useUser } from '../context/UserContext';
+
+
 
 export interface RecurrenceSettings {
   isRecurring: number;
@@ -71,6 +74,8 @@ function computeScheduledDate(series: RecurringSeries, installmentIndex: number)
 
 
 export const useRecurringExpense = () => {
+  const { user } = useUser();
+  
   const { checkExpense, checkRecurrence } = useExpense(); 
   
   const addExpenseWithRecurrence = useCallback(
@@ -79,6 +84,23 @@ export const useRecurringExpense = () => {
       selectedDate: Date,
       recurrence: RecurrenceSettings  
     ) => {
+      const isGuest = user.sharingRole === "guest";
+
+      // Guests can add normal expenses,
+      // but they cannot create recurring expenses.
+      if (isGuest && recurrence.isRecurring) {
+        throw new Error("Guests cannot create recurring expenses.");
+      }
+
+      // If the user belongs to a shared realm, explicitly assign
+      // new records to that realm.
+      //
+      // For standalone users, realmId is omitted so Dexie Cloud
+      // continues to use the user's private realm automatically.
+      const realmData = user.sharedRealmId
+        ? { realmId: user.sharedRealmId }
+        : {};
+
       // Wrap the entire operation in a transaction that includes all touched tables 🚨
       return await db.transaction('rw', db.expenses, db.recurringSeries, async (tx) => {
         const expensesTable = tx.table('expenses');
@@ -86,9 +108,13 @@ export const useRecurringExpense = () => {
 
         const { isRecurring } = recurrence;
 
+        // ---------------------------------------------------------
+        // NORMAL EXPENSE
+        // ---------------------------------------------------------
         if (!isRecurring) {
           await expensesTable.add({
             ...base,
+            ...realmData,
             expenseId: crypto.randomUUID(),
             expenseDate: selectedDate.toISOString(),
             isActive: 1,
@@ -98,12 +124,17 @@ export const useRecurringExpense = () => {
           return;
         }
 
-        //const seriesId = `rcr_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+        // ---------------------------------------------------------
+        // RECURRING EXPENSE
+        // ---------------------------------------------------------
         const seriesId = crypto.randomUUID();
         const isFutureExpense = dayjs(selectedDate).isAfter(dayjs());
 
         // Save recurring series metadata regardless of endCondition
-        const newSeries: RecurringSeries & { nextDueDate?: string | null } = {
+        const newSeries: RecurringSeries & {
+          nextDueDate?: string | null;
+        } = {
+          ...realmData,
           seriesId,
           userId: base.userId,
           unit: recurrence.unit,
@@ -133,38 +164,46 @@ export const useRecurringExpense = () => {
           const newDate = getNextDueDate(newSeries);
           newSeries.originalNextDueDate = newSeries.nextDueDate = newDate;
         }
-      
-        // Add the first expense **only if selectedDate is today or before**
-        const isTodayOrPast = dayjs(selectedDate).isSameOrBefore(dayjs(), 'day');
+
+        // Add the first expense only if selectedDate is today or before
+        const isTodayOrPast = dayjs(selectedDate).isSameOrBefore(
+          dayjs(),
+          "day"
+        );
 
         if (isTodayOrPast) {
-          
           await expensesTable.add({
             ...base,
+            ...realmData,
             expenseId: crypto.randomUUID(),
             dueDate: selectedDate.toISOString(),
             expenseDate: selectedDate.toISOString(),
             seriesId,
             installmentIndex: 1,
-            totalInstallments: recurrence.totalOccurrences ?? undefined,
+            totalInstallments:
+              recurrence.totalOccurrences ?? undefined,
             autoLogged: recurrence.logAutomatically,
             isActive: 1,
           });
-    
 
-          if(recurrence.amountVaries) {
+          if (recurrence.amountVaries) {
             newSeries.amountDefault = 0;
-            newSeries.amountAlt = 0;  
+            newSeries.amountAlt = 0;
           }
+
           checkExpense();
         }
 
         await recurringSeriesTable.add(newSeries);
-      checkRecurrence();
-    }); 
-    // 🚨 END FIX 🚨
+        checkRecurrence();
+      }); 
     },
-    [checkExpense, checkRecurrence]
+    [
+      user.sharingRole,
+      user.sharedRealmId,
+      checkExpense,
+      checkRecurrence,
+    ]
   );
 
 

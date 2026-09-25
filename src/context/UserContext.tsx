@@ -116,10 +116,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         .where("owner")
         .equals(currentUserId)
         .first();
+
+      console.log("🤓 Existing user: ", existingUser);
   
       if (existingUser) return;
   
-      console.log("---> Creating authenticated user");
+      console.log("😎 Creating authenticated user");
 
       // Check whether this authenticated user is a member
       // of a shared Expense Tracker realm.
@@ -128,8 +130,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         .equals(currentUserId)
         .first();
 
+      console.log("Member: ", member);
+
       const sharedRealmId = member?.realmId;
-      console.log("---> Shared realm:", sharedRealmId);
+      console.log("👑 Shared realm:", sharedRealmId);
 
       const countries = await loadCountries();
 

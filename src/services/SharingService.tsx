@@ -81,6 +81,7 @@ export const moveAllDataToSharedRealm = async (
   await db.transaction(
     "rw",
     [
+      db.users,
       db.accounts,
       db.categories,
       db.subcategories,
@@ -90,6 +91,9 @@ export const moveAllDataToSharedRealm = async (
       db.alternativeCurrencies,
     ],
     async () => {
+      await db.users.toCollection().modify({
+        realmId: sharedRealmId,
+      });
 
       await db.accounts.toCollection().modify({
         realmId: sharedRealmId,
@@ -211,9 +215,7 @@ export const inviteGuest = async (
 
     permissions: {
       add: ['expenses'],
-      update: {
-        expenses: '*',
-      },
+      update: {},
     },
   });
 };

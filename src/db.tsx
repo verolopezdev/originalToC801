@@ -102,6 +102,7 @@ export interface User {
   owner?: string;
   sharedRealmId?: string;
   sharingRole?: string;
+  guestInitializedFromAdmin?: boolean;
 }
 
 

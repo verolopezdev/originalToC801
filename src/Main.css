@@ -605,6 +605,9 @@ body {
 }
 
 .flex-ellipsis {
+  display: flex;
+  align-items: center;
+  min-width: 0;
   width: 100%;
 }
 
@@ -1382,7 +1385,6 @@ ion-item {
   --border-radius: 8px;
   padding: 5px 0;
   --border-style: none;
-
 }
 
 ion-item.item-transparent {
@@ -1416,11 +1418,13 @@ ion-item-sliding.card-item {
 ion-list {
   border-radius: 18px;
   border: 1px solid var(--ion-item-border);
+  
 }
 
 ion-list:last-child ion-item {
   border: none;
 }
+
 
 ion-menu-button {
   z-index: 10000;

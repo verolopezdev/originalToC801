@@ -104,6 +104,99 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
   );
 
 
+  const adminUser = useLiveQuery(
+    async () => {
+      if (!databaseReady) return undefined;
+      if (!user?.sharedRealmId) return undefined;
+      if (user.sharingRole !== "guest") return undefined;
+  
+      const sharedUsers = await db.users
+        .where("sharedRealmId")
+        .equals(user.sharedRealmId)
+        .toArray();
+  
+      console.log("👥 Users in shared realm:", sharedUsers);
+  
+      const admin = sharedUsers.find(
+        sharedUser => sharedUser.sharingRole === "admin"
+      );
+  
+      console.log("😈 Admin user:", admin);
+  
+      return admin;
+    },
+    [
+      databaseReady,
+      user?.sharedRealmId,
+      user?.sharingRole,
+    ]
+  );
+
+
+
+  useEffect(() => {
+    if (!user) return;
+  
+    // Only guests are initialized from the admin.
+    if (user.sharingRole !== "guest") return;
+  
+    // Already initialized -> never copy again.
+    if (user.guestInitializedFromAdmin) return;
+  
+    // Admin hasn't synchronized yet.
+    if (!adminUser) {
+      console.log("⏳ Waiting for admin User to synchronize...");
+      return;
+    }
+  
+    // Safety check.
+    if (adminUser.userId === user.userId) return;
+  
+    const initializeGuestFromAdmin = async () => {
+      console.log("👑 Initializing guest from admin:", adminUser);
+  
+      await db.users.update(user.userId, {
+        language: adminUser.language,
+        selectedCountry: adminUser.selectedCountry,
+  
+        defaultCurrency: adminUser.defaultCurrency,
+        actualCurrency: adminUser.actualCurrency,
+        travelCurrency: adminUser.travelCurrency,
+  
+        isPremium: adminUser.isPremium,
+        subscriptionPlan: adminUser.subscriptionPlan,
+        subscriptionExpirationDate:
+          adminUser.subscriptionExpirationDate,
+  
+        interval: adminUser.interval,
+        localInterval: adminUser.localInterval,
+  
+        showDisabledAccounts:
+          adminUser.showDisabledAccounts,
+  
+        showDisabledCategories:
+          adminUser.showDisabledCategories,
+  
+        weekStartDay: adminUser.weekStartDay,
+  
+        theme: adminUser.theme,
+        mode: adminUser.mode,
+  
+        guestInitializedFromAdmin: true,
+      });
+  
+      console.log("✅ Guest initialized from admin");
+    };
+  
+    initializeGuestFromAdmin().catch(console.error);
+  }, [
+    user?.userId,
+    user?.sharingRole,
+    user?.guestInitializedFromAdmin,
+    adminUser?.userId,
+  ]);
+
+
   useEffect(() => {
     if (!databaseReady) return;
     if (!isDexieCloudAuthenticated) return;
@@ -111,58 +204,66 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     if (user !== undefined) return;
   
     const createAuthenticatedUser = async () => {
+
       // Make sure another invocation hasn't created it already.
       const existingUser = await db.users
         .where("owner")
         .equals(currentUserId)
         .first();
-
+  
       console.log("🤓 Existing user: ", existingUser);
   
       if (existingUser) return;
   
       console.log("😎 Creating authenticated user");
-
+  
       // Check whether this authenticated user is a member
       // of a shared Expense Tracker realm.
       const member = await db.members
         .where("userId")
         .equals(currentUserId)
         .first();
-
+  
       console.log("Member: ", member);
-
+  
       const sharedRealmId = member?.realmId;
+  
       console.log("👑 Shared realm:", sharedRealmId);
-
+  
       const countries = await loadCountries();
-
       const country = await detectDeviceCountry(countries);
-
+  
       if (!country) {
         throw new Error("Could not determine user's country.");
       }
-
+  
       const countryToSave = getCountryWithSeparators(country);
   
       const newUser: User = {
         userId: crypto.randomUUID(),
+  
         // Identity
         name: "",
         lastName: "",
-        email: "",
+        email:
+          db.cloud.currentUser.value?.email ??
+          currentUserId,
         avatar: "",
+  
         // Language
         language: countryToSave.locale.split("-")[0],
         selectedCountry: countryToSave.country,
+  
         // Currency
         defaultCurrency: countryToSave,
         actualCurrency: countryToSave,
         travelCurrency: null,
+  
         // Subscription
         isPremium: false,
         subscriptionPlan: "free",
         subscriptionExpirationDate: null,
+  
         // Settings
         interval: "monthly",
         localInterval: "monthly",
@@ -170,16 +271,22 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         showDisabledCategories: true,
         favourites: 0,
         weekStartDay: "sunday",
-        theme: 'theme-cyan',
+        theme: "theme-cyan",
         mode: "system",
         isTravelMode: false,
-        
+  
         // Dexie Cloud
         owner: currentUserId,
         sharedRealmId,
+  
+        // Sharing
+        sharingRole: member ? "guest" : undefined,
+        guestInitializedFromAdmin: member ? false : undefined,
       };
   
       await db.users.add(newUser);
+  
+      console.log("😎 Authenticated user created:", newUser);
     };
   
     createAuthenticatedUser().catch(console.error);
@@ -189,7 +296,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     currentUserId,
     user,
   ]);
-
 
 
   const categorylessId = useLiveQuery(

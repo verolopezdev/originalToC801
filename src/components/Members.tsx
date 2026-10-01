@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  IonIcon,
   IonItem,
   IonLabel,
   IonList,
@@ -11,10 +12,12 @@ import { useLiveQuery } from 'dexie-react-hooks';
 
 import { db } from '../db';
 import { useUser } from '../context/UserContext';
+import { ellipse } from 'ionicons/icons';
 
 const Members: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useUser();
+console.log("❤️ User: ", user);
 
   // Get all members belonging to the shared Expense Tracker realm.
   const members = useLiveQuery(
@@ -29,6 +32,8 @@ const Members: React.FC = () => {
     [user?.sharedRealmId],
     []
   );
+
+  console.log("💚 Members: ", members);
 
   // Get the User records belonging to the same shared realm.
   // These records contain profile information such as name,
@@ -68,7 +73,7 @@ const Members: React.FC = () => {
         {t('members.title')}
       </h6>
 
-      <IonList lines="inset" className="no-padding">
+      <div>
         {members.map((member) => {
           // Find the application's User record corresponding
           // to this Dexie Cloud member.
@@ -76,9 +81,17 @@ const Members: React.FC = () => {
             (item) => item.userId === member.userId
           );
 
+
           // The owner member represents the administrator.
           const isAdministrator =
             member.userId === member.owner;
+
+          // Dot color based on role
+          const isCurrentUser = member.userId === user.email;
+
+          const dotColor = isCurrentUser
+            ? 'var(--ion-color-primary)'
+            : 'var(--ion-color-medium)';
 
           // Prefer profile information from the User record.
           // Fall back to information available on the member record.
@@ -137,10 +150,18 @@ const Members: React.FC = () => {
                         {email}
                       </p>
                     )}
-
-                    <IonNote>
-                      {role}
-                    </IonNote>
+                    <div className='flex'>
+                      <IonIcon
+                        icon={ellipse}
+                        style={{
+                          color: dotColor,
+                          marginRight: '5px',
+                        }}
+                      />
+                      <IonNote>
+                        {role}
+                      </IonNote>
+                    </div>
                   </div>
 
                 </div>
@@ -148,7 +169,7 @@ const Members: React.FC = () => {
             </IonItem>
           );
         })}
-      </IonList>
+      </div>
     </section>
   );
 };

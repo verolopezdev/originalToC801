@@ -64,7 +64,7 @@ const GetPremium: React.FC = () => {
               </section>
 
               <SubscriptionDetails />
-              <Members />
+              {hasGuest && <Members />}
               {!hasGuest && <ShareAccount />}
 
             </>

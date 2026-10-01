@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-
+import { useUser } from '../context/UserContext';
 
 // App components
 import CategoryIcon from './CategoryIcon';
@@ -10,6 +10,7 @@ import FormattedDate from './FormattedDate';
 
 // Ionic components
 import { 
+  IonIcon,
   IonNote, 
   IonRouterLink 
 } from '@ionic/react';
@@ -18,6 +19,7 @@ import {
 // Styles
 import '../Main.css';
 import './TransactionItem.css';
+import { ellipse } from 'ionicons/icons';
 
 
 interface TransactionItemProps {  
@@ -38,6 +40,7 @@ interface TransactionItemProps {
   isActive?: number; 
   seriesId?: string; 
   estimatedAmount?: number;
+  owner?: string;
 }
 
 const TransactionItem: React.FC<TransactionItemProps> = ({
@@ -57,9 +60,18 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
   autoLogged,
   isActive,
   seriesId,
-  estimatedAmount
+  estimatedAmount,
+  owner,
 }) => {  
   const { t } = useTranslation();
+  const { user } = useUser();
+
+  console.log("👀 User: ", user.owner);
+
+  const borderColor =
+    user?.owner === owner
+      ? 'var(--ion-color-primary)'
+      : 'var(--ion-color-medium)';
 
   let color = 'neutral';
   const expense = new Date(expenseDate);
@@ -87,7 +99,10 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
       }
       routerDirection="forward"
     >      
-      <div className='transaction'> 
+      <div 
+        className="transaction"
+        style={{ '--right-border-color': borderColor } as React.CSSProperties}
+      >        
         <div className='left-col'>
           <CategoryIcon iconName={categoryIcon} categoryColor={color} tripId={tripId} autoLogged={autoLogged} isTransaction={true} />
         </div>
@@ -98,7 +113,9 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
               {accountName === "Cash" ? t('accounts.default_account_name') : accountName}
             </span>
           </div>  
-          <div className="flex-ellipsis">    
+          <div className="flex-ellipsis">  
+            
+            
             {expenseNote ? (
               <div className="transaction-note">
                 {/* Append (1/6) if both values are present */}

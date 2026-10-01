@@ -152,6 +152,7 @@ const TransactionList: React.FC<Props> = ({
                 tripId={exp.tripId}
                 installmentIndex={exp.installmentIndex}
                 totalInstallments={exp.totalInstallments}
+                owner={exp.owner}
                 {...(exp.seriesId ? { autoLogged: exp.autoLogged } : {})}
               />
             );

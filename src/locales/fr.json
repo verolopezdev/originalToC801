@@ -433,7 +433,18 @@
     "subtitle": "Exportez vos données de dépenses",
     "what_to_do": "Sélectionnez une période et un format pour générer votre rapport de dépenses avec graphiques et tableaux."
   },
+  "members": {
+    "title": "Membres",
+    "administrator": "Administrateur",
+    "guest": "Invité",
+    "invitation_pending": "Invitation en attente",
+    "previous_guests": "Anciens invités",
+    "inactive": "Inactif",
+    "reinvite": "Réinviter"
+  },
   "modal": {
+    "access_revoked_title": "Accès à l'abonnement révoqué",
+    "access_revoked_msg": "Vous avez été retiré de l'abonnement partagé par l'administrateur. Votre compte est repassé au forfait gratuit.",
     "attention": "⚠ Attention !",
     "delete_warning": "Les dépenses supprimées ne peuvent pas être récupérées !",
     "delete_msg": "Cette dépense fait partie d'une série récurrente. Comment la suppression doit-elle être appliquée ?",

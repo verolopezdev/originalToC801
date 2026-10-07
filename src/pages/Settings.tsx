@@ -24,7 +24,8 @@ import {
 // App components
 import LanguageSelector from '../components/LanguageSelector';
 import ModePreferenceSelector from '../components/ModePreferenceSelector';
-import Footer from '../components/Footer'
+import Footer from '../components/Footer';
+import ProfileBar from '../components/ProfileBar';
 
 
 // Ion icon components
@@ -149,36 +150,12 @@ const Settings: React.FC = () => {
           </div>
         
           {/* Profile Bar */}
-          <IonList className='profile-settings'>
-            <IonItem detail={true} routerLink='/app/profile' lines="none" className='no-padding'>
-              <IonLabel>
-                <div className='profile-avatar-bar'>
-                  {avatar ? (
-                    // Display the avatar image if it exists
-                    <img
-                      src={avatar}
-                      alt={`${name}'s Avatar`}
-                      className="profile-avatar-image"
-                    />
-                  ) : (
-                    // Display initials if no avatar is set
-                    <div className="profile-avatar">
-                      {name.charAt(0)}
-                      {lastName.charAt(0)}
-                    </div>
-                  )}
-                  <div className='profile-name'>
-                    <p>{name} {lastName}</p>
-                    {email ? (
-                      <IonNote>{email}</IonNote>
-                    ) : (
-                      <IonNote>{t('settings.add_email')}</IonNote>
-                    )}
-                  </div>
-                </div>
-              </IonLabel>
-            </IonItem>
-          </IonList>
+          <ProfileBar
+            name={name}
+            lastName={lastName}
+            email={email}
+            avatar={avatar}
+          />
 
           {/* General settings */}
           <section>
@@ -187,13 +164,13 @@ const Settings: React.FC = () => {
             </div>
             <IonList> 
               {/* Language */}
-              <IonItem>
+              <IonItem className='settings-item'>
                 <IonIcon aria-hidden="true" icon={languageOutline} slot="start"></IonIcon>
                 <LanguageSelector />
               </IonItem>
 
               {/* Week starting day */}
-              <IonItem>
+              <IonItem className='settings-item'>
                 <IonIcon aria-hidden="true" icon={calendarOutline} slot="start"></IonIcon>
                 <IonSelect 
                   label={t('date.week-start')}
@@ -208,7 +185,7 @@ const Settings: React.FC = () => {
               </IonItem>
 
               {/* Data Frecuendy */}
-              <IonItem>
+              <IonItem className='settings-item'>
                 <IonIcon aria-hidden="true" icon={timeOutline} slot="start"></IonIcon>
                 <IonSelect 
                   label={t('common.frecuency')}
@@ -224,7 +201,7 @@ const Settings: React.FC = () => {
               </IonItem>
 
               {/* Currency */}
-              <IonItem detail={true} lines="none" routerLink="/app/currency">
+              <IonItem className='settings-item' detail={true} lines="none" routerLink="/app/currency">
                 <IonIcon aria-hidden="true" icon={cashOutline} slot="start"></IonIcon>
                 <IonLabel>{t('settings.currency')}</IonLabel>
               </IonItem>
@@ -239,13 +216,13 @@ const Settings: React.FC = () => {
             </div>
             <IonList>
               {/* Mode preferences */}
-              <IonItem>
+              <IonItem className='settings-item'>
                 <IonIcon aria-hidden="true" icon={moonOutline} slot="start"></IonIcon>
                 <ModePreferenceSelector />
               </IonItem>
 
               {/* Themes */}
-              <IonItem lines="none" detail={true} routerLink="/app/themes">
+              <IonItem className='settings-item' lines="none" detail={true} routerLink="/app/themes">
                 <IonIcon aria-hidden="true" icon={colorPaletteOutline} slot="start"></IonIcon>
                 <IonLabel>{t('settings.themes')}</IonLabel>
               </IonItem>
@@ -259,7 +236,7 @@ const Settings: React.FC = () => {
             </div>
             <IonList>
               {/* Configure Back Up */}
-              <IonItem detail={true} routerLink="/app/backup">
+              <IonItem className='settings-item' detail={true} routerLink="/app/backup">
                 <IonIcon aria-hidden="true" icon={arrowDownCircleOutline} slot="start"></IonIcon>
                 <IonLabel>{t('settings.back_up')}</IonLabel>
               </IonItem>
@@ -273,25 +250,25 @@ const Settings: React.FC = () => {
             </div>
             <IonList>
               {/* Edit Profile */}
-              <IonItem detail={true} routerLink="/app/profile">
+              <IonItem className='settings-item' detail={true} routerLink="/app/profile">
                 <IonIcon aria-hidden="true" icon={personOutline} slot="start"></IonIcon>
                 <IonLabel>{t('common.edit_profile')}</IonLabel>
               </IonItem>
 
               {/* Change Password */}
-              <IonItem detail={true} routerLink="/app/default">
+              <IonItem className='settings-item' detail={true} routerLink="/app/default">
                 <IonIcon aria-hidden="true" icon={lockClosedOutline} slot="start"></IonIcon>
                 <IonLabel>{t('settings.change_pass')}</IonLabel>
               </IonItem>
 
               {/* Reset Account */}
-              <IonItem detail={true} routerLink="/app/default">
+              <IonItem className='settings-item' detail={true} routerLink="/app/default">
                 <IonIcon aria-hidden="true" icon={refreshOutline} slot="start"></IonIcon>
                 <IonLabel>{t('settings.reset_account')}</IonLabel>
               </IonItem>
 
               {/* Billing ans Subscription */}
-              <IonItem lines='none' detail={true} routerLink="/app/billing">
+              <IonItem className='settings-item' lines='none' detail={true} routerLink="/app/billing">
                 <IonIcon aria-hidden="true" icon={cardOutline} slot="start"></IonIcon>
                 <IonLabel>{t('settings.billing_subs')}</IonLabel>
               </IonItem>

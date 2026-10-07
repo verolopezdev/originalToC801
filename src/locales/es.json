@@ -433,7 +433,18 @@
     "subtitle": "Exporta tus datos de gastos",
     " what_to_do": "Selecciona un rango de tiempo y formato para generar tu informe de gastos con gráficos y tablas."
   },
+  "members": {
+    "title": "Miembros",
+    "administrator": "Administrador",
+    "guest": "Invitado",
+    "invitation_pending": "Invitación Pendiente",
+    "previous_guests": "Invitados Anteriores",
+    "inactive": "Inactivo",
+    "reinvite": "Volver a invitar"
+  },
   "modal": {
+    "access_revoked_title": "Acceso a la suscripción revocado",
+    "access_revoked_msg": "El administrador te ha eliminado de la suscripción compartida. Tu cuenta ha vuelto al plan gratuito.",
     "attention": "⚠ ¡Atención!",
     "delete_warning": "¡Los gastos eliminados no se pueden recuperar!",
     "delete_msg": "Este gasto es parte de una serie recurrente. ¿Cómo debería aplicarse la eliminación?",

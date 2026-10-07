@@ -101,7 +101,8 @@ export interface User {
   realmId?: string;
   owner?: string;
   sharedRealmId?: string;
-  sharingRole?: string;
+  sharingRole?: "admin" | "guest";
+  sharingStatus?: "active" | "pending" | "inactive";
   guestInitializedFromAdmin?: boolean;
 }
 

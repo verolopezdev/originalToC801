@@ -53,6 +53,7 @@
     "no": "No",
     "notify": "Notify",
     "no_description": "No description",
+    "ok": "Ok",
     "on_date_end": "On",
     "paid": "Paid ",
     "payments": "payments",
@@ -437,9 +438,14 @@
     "title": "Members",
     "administrator": "Administrator",
     "guest": "Guest",
-    "invitation_pending": "Invitation pending"
+    "invitation_pending": "Invitation pending",
+    "previous_guests": "Previous Guests",
+    "inactive": "Inactive",
+    "reinvite": "Reinvite"
   },
   "modal": {
+    "access_revoked_title": "Subscription Access Revoked",
+    "access_revoked_msg": "You have been removed from the shared subscription by the admin. Your account has been switched back to a free plan.",
     "attention": "⚠ Attention!",
     "delete_warning": "Deleted expenses cannot be recovered!",
     "delete_msg": "This expense is part of a recurring series. How should the deletion be applied?",

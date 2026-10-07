@@ -2,7 +2,7 @@
   margin-bottom: 36px;
 }
 
-.profile-avatar-bar {
+.profile-avatar-bar { 
   display: flex;
   align-items: end;
 }
@@ -42,4 +42,8 @@
 
 .profile-name p {
   font-size: 1.1em;
+}
+
+.settings-item ion-icon {
+  margin-right: 15px;
 }

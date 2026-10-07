@@ -54,6 +54,9 @@ export const detectDeviceCountry = async (
   return matched ?? countries[0];
 };
 
+
+
+
 export const loadCountries = async (): Promise<CountryData[]> => {
   const response = await fetch("/assets/countries.json");
 

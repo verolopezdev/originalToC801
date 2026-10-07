@@ -66,7 +66,6 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
   const { t } = useTranslation();
   const { user } = useUser();
 
-  console.log("👀 User: ", user.owner);
 
   const borderColor =
     user?.owner === owner

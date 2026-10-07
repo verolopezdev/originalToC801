@@ -24,7 +24,6 @@ export const shareAccountWithGuest = async (
   user: User,
   email: string
 ): Promise<void> => {
-  console.log("** 1 ** Sharing account with guest...");
 
   let sharedRealmId = user.sharedRealmId;
 
@@ -35,8 +34,10 @@ export const shareAccountWithGuest = async (
 
     // Update the user record in Dexie.
     await db.users.update(user.userId, {
+      realmId: sharedRealmId,
       sharedRealmId,
       sharingRole: "admin",
+      sharingStatus: "active",
     });
   }
 
@@ -50,14 +51,11 @@ export const shareAccountWithGuest = async (
  * Creates a new shared realm for the expense tracker.
  */
 export const createSharedRealm = async (): Promise<string> => {
-  console.log("** 2 ** Creating shared realm id...");
 
   const realmId = await db.realms.add({
     name: "Expense Tracker",
     represents: "a shared expense tracker",
   });
-
-  console.log("✅ Shared realm created:", realmId);
 
   return realmId;
 };
@@ -76,7 +74,6 @@ export const createSharedRealm = async (): Promise<string> => {
 export const moveAllDataToSharedRealm = async (
   sharedRealmId: string
 ): Promise<void> => {
-  console.log("** 3 ** Moving all data to shared realm...");
 
   await db.transaction(
     "rw",
@@ -125,44 +122,8 @@ export const moveAllDataToSharedRealm = async (
     }
   );
 
-  console.log("✅ All shared data moved to:", sharedRealmId);
 };
 
-
-
-
-
-/**
- * Complete sharing flow:
- *
- * 1. Create shared realm
- * 2. Move shared data into that realm
- * 3. Invite guest
- 
-export const shareExpenseTracker = async (
-  guestEmail: string
-): Promise<string> => {
-
-  const normalizedEmail = guestEmail.trim().toLowerCase();
-
-  if (!normalizedEmail) {
-    throw new Error("Guest email is required.");
-  }
-
-  // 1. Create the shared realm.
-  const sharedRealmId = await createSharedRealm();
-
-  // 2. Move the existing admin data into the shared realm.
-  await moveAllDataToSharedRealm(sharedRealmId);
-
-  // 3. Invite the guest.
-  await inviteGuest(sharedRealmId, normalizedEmail);
-
-  console.log("✅ Expense tracker shared successfully.");
-
-  return sharedRealmId;
-};
-*/
 
 
 
@@ -189,7 +150,6 @@ export const inviteGuest = async (
   sharedRealmId: string,
   guestEmail: string
 ): Promise<void> => {
-  console.log("** 4 ** Inviting guest...");
   const email = guestEmail.trim().toLowerCase();
 
   if (!email) {
@@ -214,7 +174,7 @@ export const inviteGuest = async (
     invite: true,
 
     permissions: {
-      add: ['expenses'],
+      add: ['expenses', 'users'],
       update: {},
     },
   });
@@ -241,3 +201,85 @@ export const useHasGuest = (sharedRealmId?: string) => {
 
   return hasGuest ?? false;
 };
+
+
+
+
+export async function deactivateGuest(
+  sharedRealmId: string,
+  memberUserId: string
+) {
+  try {
+    console.log("🧨 memberUserId: ", memberUserId);
+    console.log("🧨 sharedRealmId: ", sharedRealmId);
+    
+    // 1. Find the guest's application User record.
+    const guest = await db.users
+      .where("realmId")
+      .equals(sharedRealmId)
+      .filter(
+        (item) =>
+          item.email === memberUserId &&
+          item.sharingRole === "guest"
+      )
+      .first();
+
+    if (!guest) {
+      throw new Error(
+        `Guest User record not found: ${memberUserId}`
+      );
+    }
+
+    // 2. Mark the guest as inactive.
+    // Keep the User record because it contains
+    // the guest's identity and historical relationship
+    // with the shared account.
+    await db.users.update(guest.userId, {
+      sharingStatus: "inactive",
+    });
+
+    // 3. Find the guest's active Dexie Cloud membership.
+    const member = await db.members
+      .where("realmId")
+      .equals(sharedRealmId)
+      .filter(
+        (item) =>
+          item.userId === memberUserId &&
+          item.userId !== item.owner
+      )
+      .first();
+
+    // 4. Remove the active membership.
+    // This removes the guest's access to the shared realm,
+    // but does NOT delete their expenses.
+    if (member?.id) {
+      await db.members.delete(member.id);
+    }
+
+    console.log(
+      "🚫 Guest deactivated:",
+      memberUserId
+    );
+  } catch (error) {
+    console.error(
+      "❌ Failed to deactivate guest:",
+      error
+    );
+
+    throw error;
+  }
+}
+
+
+
+
+export async function checkGuestMembership(
+  userId: string
+): Promise<boolean> {
+  const member = await db.members
+    .where("userId")
+    .equals(userId)
+    .first();
+
+  return !!member && member.userId !== member.owner;
+}

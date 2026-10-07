@@ -433,7 +433,18 @@
     "subtitle": "Exporte os seus dados de despesas",
     "what_to_do": "Selecione um intervalo de tempo e formato para gerar o seu relatório de despesas com gráficos e tabelas."
   },
+  "members": {
+    "title": "Membros",
+    "administrator": "Administrador",
+    "guest": "Convidado",
+    "invitation_pending": "Convite pendente",
+    "previous_guests": "Convidados anteriores",
+    "inactive": "Inativo",
+    "reinvite": "Reconvidar"
+  },
   "modal": {
+    "access_revoked_title": "Acesso à assinatura revogado",
+    "access_revoked_msg": "Você foi removido da assinatura compartilhada pelo administrador. Sua conta foi alterada de volta para o plano gratuito.",
     "attention": "⚠ Atenção!",
     "delete_warning": "As despesas eliminadas não podem ser recuperadas!",
     "delete_msg": "Esta despesa faz parte de uma série recorrente. Como deve ser aplicada a eliminação?",

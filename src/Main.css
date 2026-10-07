@@ -731,6 +731,10 @@ ion-content::part(scroll) {
   font-size: 1.3em;
 }
 
+.m-0 {
+  margin: 0;
+}
+
 .mb-0 {
   margin-bottom: 0;
 }
@@ -1399,7 +1403,6 @@ ion-item.system-danger::part(native) {
 
 ion-item ion-icon {
   color: var(--ion-text-color);
-  margin-right: 15px;
 }
 
 ion-item-option {

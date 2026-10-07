@@ -21,7 +21,7 @@
   
   height: 50%; /* Sets border length to 50% of div height */
   width: 2px;  /* Controls border thickness */
-  background-color: var(--right-border-color); /* Sets border color */
+  background-color: var(--right-border-color); /* Sets border color */  
 }
 
 .transaction.active {

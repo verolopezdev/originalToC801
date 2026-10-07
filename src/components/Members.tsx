@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  IonButtons,
   IonIcon,
   IonItem,
   IonLabel,
@@ -12,14 +13,14 @@ import { useLiveQuery } from 'dexie-react-hooks';
 
 import { db } from '../db';
 import { useUser } from '../context/UserContext';
-import { ellipse } from 'ionicons/icons';
+import { deactivateGuest } from '../services/SharingService';
+
+import { closeCircleOutline, ellipse } from 'ionicons/icons';
 
 const Members: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useUser();
-console.log("❤️ User: ", user);
 
-  // Get all members belonging to the shared Expense Tracker realm.
   const members = useLiveQuery(
     async () => {
       if (!user?.sharedRealmId) return [];
@@ -33,11 +34,6 @@ console.log("❤️ User: ", user);
     []
   );
 
-  console.log("💚 Members: ", members);
-
-  // Get the User records belonging to the same shared realm.
-  // These records contain profile information such as name,
-  // last name, email and avatar.
   const users = useLiveQuery(
     async () => {
       if (!user?.sharedRealmId) return [];
@@ -51,13 +47,11 @@ console.log("❤️ User: ", user);
     []
   );
 
+
   if (members === undefined || users === undefined) {
     return (
       <section>
-        <h6 className="section-title">
-          {t('members.title')}
-        </h6>
-
+        <h6 className="section-title">{t('members.title')}</h6>
         <IonList lines="inset" className="no-padding">
           <IonItem>
             <IonSpinner />
@@ -67,34 +61,37 @@ console.log("❤️ User: ", user);
     );
   }
 
+  const handleDeactivateGuest = async (memberUserId: string) => {
+    if (!user?.sharedRealmId) return;
+
+    try {
+      await deactivateGuest(user.sharedRealmId, memberUserId);
+      console.log('🚫 Guest deactivated:', memberUserId);
+    } catch (error) {
+      console.error('❌ Error deactivating guest:', error);
+    }
+  };
+
   return (
     <section>
-      <h6 className="section-title">
-        {t('members.title')}
-      </h6>
+      <h6 className="section-title">{t('members.title')}</h6>
 
       <div>
         {members.map((member) => {
-          // Find the application's User record corresponding
-          // to this Dexie Cloud member.
           const memberUser = users.find(
             (item) => item.userId === member.userId
           );
 
+          const memberUserId = member.userId || member.email;
+          if (!memberUserId) return null;
 
-          // The owner member represents the administrator.
-          const isAdministrator =
-            member.userId === member.owner;
-
-          // Dot color based on role
+          const isAdministrator = member.userId === member.owner;
           const isCurrentUser = member.userId === user.email;
 
           const dotColor = isCurrentUser
             ? 'var(--ion-color-primary)'
             : 'var(--ion-color-medium)';
 
-          // Prefer profile information from the User record.
-          // Fall back to information available on the member record.
           const name =
             memberUser?.name ||
             member.name ||
@@ -102,31 +99,23 @@ console.log("❤️ User: ", user);
             member.userId ||
             t('common.default_user_name');
 
-          const lastName =
-            memberUser?.lastName || '';
-
+          const lastName = memberUser?.lastName || '';
           const email =
-            memberUser?.email ||
-            member.email ||
-            member.userId ||
-            '';
-
+            memberUser?.email || member.email || member.userId || '';
           const avatar = memberUser?.avatar;
 
-          // Determine the role/status from the member record.
           const role = isAdministrator
             ? t('members.administrator')
             : member.invite
-              ? member.accepted
-                ? t('members.guest')
-                : t('members.invitation_pending')
-              : t('members.guest');
+            ? member.accepted
+              ? t('members.guest')
+              : t('members.invitation_pending')
+            : t('members.guest');
 
           return (
             <IonItem key={member.id}>
               <IonLabel>
                 <div className="profile-avatar-bar">
-
                   {avatar ? (
                     <img
                       src={avatar}
@@ -145,12 +134,9 @@ console.log("❤️ User: ", user);
                       {name} {lastName}
                     </p>
 
-                    {email && email !== name && (
-                      <p>
-                        {email}
-                      </p>
-                    )}
-                    <div className='flex'>
+                    {email && email !== name && <p>{email}</p>}
+
+                    <div className="flex">
                       <IonIcon
                         icon={ellipse}
                         style={{
@@ -158,14 +144,22 @@ console.log("❤️ User: ", user);
                           marginRight: '5px',
                         }}
                       />
-                      <IonNote>
-                        {role}
-                      </IonNote>
+
+                      <IonNote>{role}</IonNote>
                     </div>
                   </div>
-
                 </div>
               </IonLabel>
+
+              {!isAdministrator && user.sharingRole === 'admin' && (
+                <IonButtons slot="end">
+                  <IonIcon
+                    className="medium-icon-btn danger"
+                    icon={closeCircleOutline}
+                    onClick={() => handleDeactivateGuest(memberUserId)}
+                  />
+                </IonButtons>
+              )}
             </IonItem>
           );
         })}

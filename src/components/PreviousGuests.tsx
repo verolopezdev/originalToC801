@@ -67,7 +67,6 @@ const PreviousGuests: React.FC<PreviousGuestsProps> = ({
           sharingRole: 'guest',
           guestInitializedFromAdmin: false,
         });
-        console.log('🔄 Existing guest status updated to pending:', existingGuest.userId);
       }
   
       onReinvite?.(userId);

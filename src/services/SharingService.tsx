@@ -204,14 +204,12 @@ export const useHasGuest = (sharedRealmId?: string) => {
 
 
 
-
+//  THIS WORKS BUT DOESN'T EXPULSE GUEST FROM SEAT
 export async function deactivateGuest(
   sharedRealmId: string,
   memberUserId: string
 ) {
   try {
-    console.log("🧨 memberUserId: ", memberUserId);
-    console.log("🧨 sharedRealmId: ", sharedRealmId);
     
     // 1. Find the guest's application User record.
     const guest = await db.users
@@ -271,6 +269,82 @@ export async function deactivateGuest(
 }
 
 
+/*
+export async function deactivateGuest(
+  sharedRealmId: string,
+  memberUserId: string
+) {
+  try {
+    console.log("🧨 memberUserId: ", memberUserId);
+    console.log("🧨 sharedRealmId: ", sharedRealmId);
+
+    // 1. Mark application-level status in local db.users
+    const guest = await db.users
+      .where("realmId")
+      .equals(sharedRealmId)
+      .filter(
+        (item) => item.email === memberUserId && item.sharingRole === "guest"
+      )
+      .first();
+
+    if (guest) {
+      await db.users.update(guest.userId, { sharingStatus: "inactive" });
+    }
+
+    // 2. Delete local app membership record
+    const member = await db.members
+      .where("realmId")
+      .equals(sharedRealmId)
+      .filter(
+        (item) => item.userId === memberUserId && item.userId !== item.owner
+      )
+      .first();
+
+    if (member?.id) {
+      await db.members.delete(member.id);
+    }
+
+    // 3. Notify your secure backend to free the seat
+    await notifyBackendToFreeSeat(memberUserId, sharedRealmId);
+
+    // 4. Force immediate synchronization
+    await db.cloud.sync();
+
+    console.log("🚫 Guest deactivated and expulsed:", memberUserId);
+  } catch (error) {
+    console.error("❌ Failed to deactivate guest:", error);
+    throw error;
+  }
+}
+
+
+// 1. La función que actúa como puente hacia tu backend seguro
+export async function notifyBackendToFreeSeat(memberUserId: string, sharedRealmId: string) {
+  // URL de tu servidor / función serverless (Node.js, Firebase, Vercel, etc.)
+  const BACKEND_URL = "https://tu-api.com/api/deactivate-user"; 
+
+  const response = await fetch(BACKEND_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      // Si tu backend requiere que el admin esté autenticado con tu propia app, 
+      // puedes pasar un token de sesión tuyo aquí:
+      // 'Authorization': `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ 
+      userId: memberUserId, 
+      realmId: sharedRealmId 
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || 'Error al comunicarse con el servidor seguro.');
+  }
+
+  return await response.json();
+}
+
 
 
 export async function checkGuestMembership(
@@ -283,3 +357,4 @@ export async function checkGuestMembership(
 
   return !!member && member.userId !== member.owner;
 }
+  */

@@ -122,7 +122,7 @@ const defaultCurrency: CurrencyType = {
 
 const EditExpense: React.FC = () => {
   const { t } = useTranslation();
-  const { user, userId } = useUser(); 
+  const { user, userId } = useUser();   
   const { currency, allSelectedCurrencies } = useCurrency(); 
   const { convertCurrency, getExchangeRate } = useExchangeRates();
   const { updateExpenseWithRecurrence } = useRecurringExpense();
@@ -139,6 +139,7 @@ const EditExpense: React.FC = () => {
   const { expenseId } = useParams<{ expenseId: string }>(); // passed expense id to fill the form, always a string
   const expense = useLiveQuery(() => db.expenses.get(expenseId), [expenseId]); // get it from Dexie 
   const [passedExpenseId, setPassedExpenseId] = useState<string>(expenseId);
+  const [isOwner, setIsOwner] = useState<boolean>(true);
 
   const accounts: Account[] | undefined = useLiveQuery(
     () => db.accounts.orderBy('sortOrder').toArray()
@@ -222,6 +223,7 @@ const EditExpense: React.FC = () => {
     if (!expense) return;
   
     async function initializeExpenseFields(definedExpense: Expense) {
+      setIsOwner(definedExpense.owner === user.owner ? true : false);
       setDueDate(definedExpense.dueDate ? new Date(definedExpense.dueDate) : undefined);
       const expenseDate = new Date(definedExpense.expenseDate);
       setPassedExpenseId(definedExpense.expenseId);
@@ -874,7 +876,7 @@ const EditExpense: React.FC = () => {
           </IonButtons> 
 
           {/* Secondary menu for this expense, show trash can only for active expenses */}
-          {expense?.isActive ? (
+          {expense?.isActive  ? (
             <IonButtons slot="end">
               <IonIcon 
                 className='medium-icon-btn mr-15 danger'  

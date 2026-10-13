@@ -83,6 +83,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const isInitializingRef = useRef(false);
 
   const currentUserId = db.cloud.currentUser.value?.userId;
+  
   const [isExpelledModalOpen, setIsExpelledModalOpen] = React.useState(false);
 
   const isDexieCloudAuthenticated =
@@ -103,7 +104,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     []
   );
 
-  console.log("👥 Users: ", users);
 
 
   const user = useLiveQuery(
@@ -236,7 +236,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const initializeGuestFromAdmin = async () => {
       try {
-        console.log("😩 guest initialized from admin...");
 
         await db.users.update(user.userId, {
           language: adminUser.language,
@@ -278,7 +277,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     adminUser?.userId, // Use primitive ID, NOT the entire adminUser object
   ]);
 
-
   
   // Create authenticated user record safely
   useEffect(() => {
@@ -304,7 +302,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           .equals(userEmail)
           .toArray();
 
-        console.log("🥳 all matching users: ", allMatchingUsers);
 
         // Fetch member records to check sharing status
         const memberships = await db.members
@@ -321,7 +318,16 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         // ----------------------------------------------------
         if (allMatchingUsers.length > 0) {
           const existingUser = allMatchingUsers[0];
-          console.log("🔄 Reinvite or existing record detected for user:", existingUser.userId);
+
+          // 1. Clear all local tables (removes old admin expenses, accounts, categories)
+          await clearUserData();
+
+          // 2. Force Dexie Cloud to sync latest realm states and records from server
+          try {
+            await db.cloud.sync();
+          } catch (error) {
+            console.warn("⚠️ Sync failed or offline, proceeding with local update:", error);
+          }
           
           await db.users.update(existingUser.userId, {
             owner: currentUserId,
@@ -342,7 +348,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         // ----------------------------------------------------
         // CASE B: FIRST-TIME INVITE / BRAND NEW USER
         // ----------------------------------------------------
-        console.log("✨ Brand new user record being created...");
 
         let countryToSave: CountryData = defaultCountryData;
 
@@ -461,7 +466,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }
 
   return (
-    <UserContext.Provider
+    <UserContext.Provider 
       value={{
         user,
         userId: user.userId,

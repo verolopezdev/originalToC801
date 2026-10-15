@@ -1,14 +1,9 @@
-import React, { createContext, useContext, ReactNode, useEffect, useRef, useState } from "react";
+import React, { createContext, useContext, ReactNode, useEffect, useCallback, useMemo } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db, User, dbReady, CurrencyType, SubscriptionPlan, seedInitialData } from "../db";
+import { db, User, dbReady, CurrencyType, SubscriptionPlan } from "../db";
 import { useTranslation } from "react-i18next";
-import { Preferences } from "@capacitor/preferences";
+
 import { loadCountries, getCountryWithSeparators, detectDeviceCountry } from "../utils/countryUtils";
-import { CountryData } from "../utils/countryUtils";
-
-import { clearUserData } from "../services/DbService";
-
-import Modal from "../components/Modal";
 
 interface UserContextType {
   user: User;
@@ -28,17 +23,8 @@ const usd: CurrencyType = {
   decimalSeparator: ".",
 };
 
-const defaultCountryData: CountryData = {
-  name: "US Dollar",
-  code: "USD",
-  symbol: "$",
-  locale: "en-US",
-  country: "US",
-  thousandSeparator: ",",
-  decimalSeparator: ".",
-};
-
 const UserContext = createContext<UserContextType | undefined>(undefined);
+
 
 const defaultUser: Omit<User, "userId"> = {
   // Identity
@@ -75,19 +61,14 @@ const defaultUser: Omit<User, "userId"> = {
   isTravelMode: false,
 };
 
+
+
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { i18n } = useTranslation();
-  const { t } = useTranslation();
-  const [databaseReady, setDatabaseReady] = useState(false);
-  const isCreatingRef = useRef(false);
-  const isInitializingRef = useRef(false);
+  const [databaseReady, setDatabaseReady] = React.useState(false);
 
   const currentUserId = db.cloud.currentUser.value?.userId;
-  
-  const [isExpelledModalOpen, setIsExpelledModalOpen] = React.useState(false);
-
-  const isDexieCloudAuthenticated =
-    !!currentUserId && currentUserId !== "unauthorized";
+  const isDexieCloudAuthenticated = !!currentUserId && currentUserId !== "unauthorized";
 
   React.useEffect(() => {
     dbReady()
@@ -95,367 +76,162 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       .catch(console.error);
   }, []);
 
-
-  const users = useLiveQuery(
-    async () => {
-      return db.users
-        .toArray();
-    },
-    []
-  );
-
-
-
   const user = useLiveQuery(
     async () => {
       if (!databaseReady) return undefined;
-  
       if (isDexieCloudAuthenticated) {
-        // 1. First search by owner matching current auth user
-        const usersByOwner = await db.users
-          .where("owner")
-          .equals(currentUserId!)
-          .toArray();
-  
-        if (usersByOwner.length > 0) {
-          // Deduplicate: Prioritize local main user (e.g. non-guest or active sharingStatus)
-          const primary = usersByOwner.find((u) => u.sharingStatus === 'active') || usersByOwner[0];
-          return primary;
-        }
-  
-        // 2. Fallback search by current authenticated email
-        const userEmail = db.cloud.currentUser.value?.email;
-        if (userEmail) {
-          const userByEmail = await db.users
-            .where("email")
-            .equals(userEmail)
-            .first();
-          if (userByEmail) return userByEmail;
-        }
+        return db.users.where("owner").equals(currentUserId!).first();
       }
-  
       return db.users.toCollection().first();
     },
-    [databaseReady, currentUserId, isDexieCloudAuthenticated]
+    [databaseReady, currentUserId]
   );
 
+  // Dev logging only on user mutation
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development' && user) {
+      console.log("🙃 LOGGED USER UPDATED: ", user);
+    }
+  }, [user]);
 
   const adminUser = useLiveQuery(
     async () => {
-      if (!databaseReady) return undefined;
-      if (!user?.sharedRealmId) return undefined;
-      if (user.sharingRole !== "guest") return undefined;
-
-      const sharedUsers = await db.users
-        .where("realmId")
-        .equals(user.sharedRealmId)
-        .toArray();
-
-      const admin = sharedUsers.find(
-        (sharedUser) => sharedUser.sharingRole === "admin"
-      );
-
-      return admin;
+      if (!databaseReady || !user?.sharedRealmId || user.sharingRole !== "guest") return undefined;
+      const sharedUsers = await db.users.where("realmId").equals(user.sharedRealmId).toArray();
+      return sharedUsers.find(sharedUser => sharedUser.sharingRole === "admin");
     },
     [databaseReady, user?.sharedRealmId, user?.sharingRole]
   );
 
-
-  // Check if guest was removed
+  // Guest initialization effect
   useEffect(() => {
-    if (!databaseReady || !isDexieCloudAuthenticated || !currentUserId || !user) {
-      return;
-    }
-  
-    const checkIfGuestWasRemoved = async () => {
-      // 1. Check native preference
-      const { value: wasGuest } = await Preferences.get({ key: "wasGuest" });
-      if (wasGuest !== "true") return;
-  
-      let isStillMember = false;
-  
-      try {
-        // Fetch all member records cleanly without relying on single-record live queries
-        const memberships = await db.members
-          .where("userId")
-          .equals(currentUserId)
-          .toArray();
-  
-        // Check if they are still listed in a realm owned by someone else
-        isStillMember = memberships.some((m) => m.owner !== currentUserId);
-        console.warn("😳 User still a member? ", isStillMember);
-      } catch (error) {
-        // PermissionError / AccessDenied from Dexie Cloud means realm access was revoked!
-        console.warn("Realm access revoked or permission denied:", error);
-        isStillMember = false;
-      }
-  
-      // 2. If no longer a guest in any shared realm -> handle expulsion!
-      if (!isStillMember) {
-        console.warn("Guest was removed from the shared realm. Clearing local synced data...");
-
-        // Clean up native preference so this fires ONLY ONCE
-        await Preferences.remove({ key: "wasGuest" });
-
-        // 1. Save user email / identity parameters before clearing
-        const currentCurrency = user.defaultCurrency;
-
-        // 2. Clear all local tables (removes old admin expenses, accounts, categories)
-        await clearUserData();
-
-        // 3. Re-seed default categories & cash account for the standalone user
-        await seedInitialData(currentCurrency);
-
-        // 4. Open expulsion modal
-        setIsExpelledModalOpen(true);
-      }
-    };
-  
-    checkIfGuestWasRemoved().catch(console.error);
-  }, [
-    databaseReady,
-    isDexieCloudAuthenticated,
-    currentUserId,
-    user?.userId,
-    user?.sharedRealmId, // Triggers immediately when shared realm sync state changes
-  ]);
-
-
-
-  // Initialize guest settings from admin
-  useEffect(() => {
-    if (!user) return;
-    if (user.sharingRole !== "guest") return;
-    if (user.guestInitializedFromAdmin) return;
-    if (!adminUser) return;
+    if (!user || user.sharingRole !== "guest" || user.guestInitializedFromAdmin || !adminUser) return;
     if (adminUser.userId === user.userId) return;
 
-    // 🔒 Lock immediately to block duplicate sync events
-    if (isInitializingRef.current) return;
-    isInitializingRef.current = true;
-
     const initializeGuestFromAdmin = async () => {
-      try {
+      console.log("😎 Initializing guest from admin...");
 
-        await db.users.update(user.userId, {
-          language: adminUser.language,
-          selectedCountry: adminUser.selectedCountry,
-
-          defaultCurrency: adminUser.defaultCurrency,
-          actualCurrency: adminUser.actualCurrency,
-          travelCurrency: adminUser.travelCurrency,
-
-          isPremium: adminUser.isPremium,
-          subscriptionPlan: adminUser.subscriptionPlan,
-          subscriptionExpirationDate: adminUser.subscriptionExpirationDate,
-
-          interval: adminUser.interval,
-          localInterval: adminUser.localInterval,
-
-          showDisabledAccounts: adminUser.showDisabledAccounts,
-          showDisabledCategories: adminUser.showDisabledCategories,
-
-          weekStartDay: adminUser.weekStartDay,
-
-          theme: adminUser.theme,
-          mode: adminUser.mode,
-
-          guestInitializedFromAdmin: true,
-        });
-      } catch (error) {
-        console.error("Failed to initialize guest from admin:", error);
-        // Unlock only on error so it can retry if the network/DB write fails
-        isInitializingRef.current = false; 
-      }
+      await db.users.update(user.userId, {
+        language: adminUser.language,
+        selectedCountry: adminUser.selectedCountry,
+        defaultCurrency: adminUser.defaultCurrency,
+        actualCurrency: adminUser.actualCurrency,
+        travelCurrency: adminUser.travelCurrency,
+        isPremium: adminUser.isPremium,
+        subscriptionPlan: adminUser.subscriptionPlan,
+        subscriptionExpirationDate: adminUser.subscriptionExpirationDate,
+        interval: adminUser.interval,
+        localInterval: adminUser.localInterval,
+        showDisabledAccounts: adminUser.showDisabledAccounts,
+        showDisabledCategories: adminUser.showDisabledCategories,
+        weekStartDay: adminUser.weekStartDay,
+        theme: adminUser.theme,
+        mode: adminUser.mode,
+        guestInitializedFromAdmin: true,
+      });
     };
 
-    initializeGuestFromAdmin();
+    initializeGuestFromAdmin().catch(console.error);
   }, [
     user?.userId,
     user?.sharingRole,
     user?.guestInitializedFromAdmin,
-    adminUser?.userId, // Use primitive ID, NOT the entire adminUser object
+    adminUser,
   ]);
 
-  
-  // Create authenticated user record safely
+  // Authenticated user creation effect
   useEffect(() => {
-    if (!databaseReady || !isDexieCloudAuthenticated || !currentUserId || user !== undefined) {
-      return;
-    }
-
-    if (isCreatingRef.current) return;
+    if (!databaseReady || !isDexieCloudAuthenticated || !currentUserId || user !== undefined) return;
 
     const createAuthenticatedUser = async () => {
-      isCreatingRef.current = true;
+      
 
-      try {
-        const userEmail = db.cloud.currentUser.value?.email ?? currentUserId;
+      const existingUser = await db.users.where("owner").equals(currentUserId).first();
+      if (existingUser) return;
 
-        // ----------------------------------------------------
-        // STRICT GUARD: Search for ANY existing user by owner OR email
-        // ----------------------------------------------------
-        const allMatchingUsers = await db.users
-          .where("owner")
-          .equals(currentUserId)
-          .or("email")
-          .equals(userEmail)
-          .toArray();
+      const member = await db.members.where("userId").equals(currentUserId).first();
+      const sharedRealmId = member?.realmId;
+      const countries = await loadCountries();
+      const country = await detectDeviceCountry(countries);
 
+      if (!country) throw new Error("Could not determine user's country.");
 
-        // Fetch member records to check sharing status
-        const memberships = await db.members
-          .where("userId")
-          .equals(currentUserId)
-          .toArray();
+      const countryToSave = getCountryWithSeparators(country);
 
-        const guestMembership = memberships.find((m) => m.owner !== currentUserId);
-        const isGuest = !!guestMembership;
-        const sharedRealmId = guestMembership?.realmId ?? memberships[0]?.realmId;
+      console.log("😎 Creating authenticated user...");
+      
+      const newUser: User = {
+        userId: crypto.randomUUID(),
+        name: "",
+        lastName: "",
+        email: db.cloud.currentUser.value?.email ?? currentUserId,
+        avatar: "",
+        language: countryToSave.locale.split("-")[0],
+        selectedCountry: countryToSave.country,
+        defaultCurrency: countryToSave,
+        actualCurrency: countryToSave,
+        travelCurrency: null,
+        isPremium: false,
+        subscriptionPlan: "free",
+        subscriptionExpirationDate: null,
+        interval: "monthly",
+        localInterval: "monthly",
+        showDisabledAccounts: true,
+        showDisabledCategories: true,
+        favourites: 0,
+        weekStartDay: "sunday",
+        theme: "theme-cyan",
+        mode: "system",
+        isTravelMode: false,
+        owner: currentUserId,
+        realmId: sharedRealmId,
+        sharedRealmId,
+        sharingStatus: 'active',
+        sharingRole: member ? "guest" : undefined,
+        guestInitializedFromAdmin: member ? false : undefined,
+      };
 
-        // ----------------------------------------------------
-        // CASE A: EXISTING USER FOUND (Reinvite or Existing Account)
-        // ----------------------------------------------------
-        if (allMatchingUsers.length > 0) {
-          const existingUser = allMatchingUsers[0];
-
-          // 1. Clear all local tables (removes old admin expenses, accounts, categories)
-          await clearUserData();
-
-          // 2. Force Dexie Cloud to sync latest realm states and records from server
-          try {
-            await db.cloud.sync();
-          } catch (error) {
-            console.warn("⚠️ Sync failed or offline, proceeding with local update:", error);
-          }
-          
-          await db.users.update(existingUser.userId, {
-            owner: currentUserId,
-            realmId: sharedRealmId,
-            sharedRealmId,
-            sharingRole: isGuest ? "guest" : existingUser.sharingRole,
-            sharingStatus: "active",
-            guestInitializedFromAdmin: isGuest ? false : existingUser.guestInitializedFromAdmin,
-          });
-          
-
-          if (isGuest) {
-            await Preferences.set({ key: "wasGuest", value: "true" });
-          }
-          return;
-        }
-
-        // ----------------------------------------------------
-        // CASE B: FIRST-TIME INVITE / BRAND NEW USER
-        // ----------------------------------------------------
-
-        let countryToSave: CountryData = defaultCountryData;
-
-        try {
-          const countries = await loadCountries();
-          const country = await detectDeviceCountry(countries);
-          if (country) {
-            countryToSave = getCountryWithSeparators(country);
-          }
-        } catch (error) {
-          console.warn("Could not detect device country, falling back to USD:", error);
-        }
-
-        const newUser: User = {
-          userId: crypto.randomUUID(),
-
-          // Identity
-          name: "",
-          lastName: "",
-          email: userEmail,
-          avatar: "",
-
-          // Language
-          language: countryToSave.locale ? countryToSave.locale.split("-")[0] : "en",
-          selectedCountry: countryToSave.country,
-
-          // Currency
-          defaultCurrency: countryToSave,
-          actualCurrency: countryToSave,
-          travelCurrency: null,
-
-          // Subscription
-          isPremium: false,
-          subscriptionPlan: "free",
-          subscriptionExpirationDate: null,
-
-          // Settings
-          interval: "monthly",
-          localInterval: "monthly",
-          showDisabledAccounts: true,
-          showDisabledCategories: true,
-          favourites: 0,
-          weekStartDay: "sunday",
-          theme: "theme-cyan",
-          mode: "system",
-          isTravelMode: false,
-
-          // Dexie Cloud
-          owner: currentUserId,
-          realmId: sharedRealmId,
-          sharedRealmId,
-          sharingStatus: "active",
-
-          // Sharing
-          sharingRole: isGuest ? "guest" : undefined,
-          guestInitializedFromAdmin: isGuest ? false : undefined,
-        };
-
-        await db.users.add(newUser);
-
-        if (isGuest) {
-          await Preferences.set({ key: "wasGuest", value: "true" });
-        }
-      } finally {
-        isCreatingRef.current = false;
-      }
+      await db.users.add(newUser);
     };
 
     createAuthenticatedUser().catch(console.error);
   }, [databaseReady, isDexieCloudAuthenticated, currentUserId, user]);
 
-  
-  
   const categorylessId = useLiveQuery(
     async () => {
       if (!databaseReady) return undefined;
-
-      const category = await db.categories
-        .where("categoryName")
-        .equals("Categoryless")
-        .first();
-
+      const category = await db.categories.where("categoryName").equals("Categoryless").first();
       return category?.categoryId ?? "";
     },
     [databaseReady]
   );
 
-  
   useEffect(() => {
-    if (!user) return;
-
-    if (user.language && i18n.language !== user.language) {
+    if (user?.language && i18n.language !== user.language) {
       i18n.changeLanguage(user.language);
     }
   }, [user?.language, i18n]);
 
-  const updateUser = async (updates: Partial<User>) => {
-    if (!user) return;
+  const updateUser = useCallback(async (updates: Partial<User>) => {
+    if (!user?.userId) return;
     await db.users.update(user.userId, updates);
-  };
+  }, [user?.userId]);
 
-  const resetUser = async () => {
-    if (!user) return;
+  const resetUser = useCallback(async () => {
+    if (!user?.userId) return;
     await db.users.put({
       userId: user.userId,
       ...defaultUser,
     });
-  };
+  }, [user?.userId]);
+
+  const contextValue = useMemo(() => ({
+    user: user!, // guarantees user is not null
+    userId: user?.userId ?? "",
+    categorylessId: categorylessId ?? "",
+    updateUser,
+    resetUser,
+  }), [user, categorylessId, updateUser, resetUser]);
 
   if (!user || categorylessId === undefined) {
     return (
@@ -466,38 +242,11 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }
 
   return (
-    <UserContext.Provider 
-      value={{
-        user,
-        userId: user.userId,
-        categorylessId,
-        updateUser,
-        resetUser,
-      }}
-    >
+    <UserContext.Provider value={contextValue}>
       {children}
-
-      {/* Access Revoked Modal */}
-      {isExpelledModalOpen && (
-        <Modal
-          isOpen={isExpelledModalOpen}
-          icon="alert" // Options: 'alert' | 'info' | 'success' | 'failure'
-          title={t("modal.access_revoked_title")}
-          content={t("modal.access_revoked_msg")}
-          closeModal={() => setIsExpelledModalOpen(false)}
-          actions={[
-            {
-              label: t("common.ok"),
-              action: () => setIsExpelledModalOpen(false),
-              style: "small-modal-btn", // Optional CSS class for action button styling
-            },
-          ]}
-        />
-      )}
     </UserContext.Provider>
   );
 };
-
 export const useUser = () => {
   const context = useContext(UserContext);
 

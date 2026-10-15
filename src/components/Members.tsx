@@ -154,9 +154,9 @@ const Members: React.FC = () => {
               {!isAdministrator && user.sharingRole === 'admin' && (
                 <IonButtons slot="end">
                   <IonIcon
-                    className="medium-icon-btn danger"
+                    className="medium-icon-btn medium"
                     icon={closeCircleOutline}
-                    onClick={() => handleDeactivateGuest(memberUserId)}
+                    /* onClick={() => handleDeactivateGuest(memberUserId)} */
                   />
                 </IonButtons>
               )}

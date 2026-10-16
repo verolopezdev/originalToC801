@@ -876,7 +876,7 @@ const EditExpense: React.FC = () => {
           </IonButtons> 
 
           {/* Secondary menu for this expense, show trash can only for active expenses */}
-          {expense?.isActive  ? (
+          {expense?.isActive && isOwner  ? (
             <IonButtons slot="end">
               <IonIcon 
                 className='medium-icon-btn mr-15 danger'  
@@ -900,14 +900,17 @@ const EditExpense: React.FC = () => {
             <h2 className='screen-title'>{expense?.isActive ? t('expenses.edit_exp') : t('expenses.log_exp')}</h2>  
           </div>
 
+        <div className={`${!isOwner ? 'disabled' : ''}`}>
           <AccountSlider
-            editAccount={selectedCardId}
-            key={`account-slider-${resetTrigger}`}
-            accounts={sortedAccounts}
-            onAccountSelect={handleAccountSelect} // Pass the callback to SliderComponent
-          />
+              editAccount={selectedCardId}
+              key={`account-slider-${resetTrigger}`}
+              accounts={sortedAccounts}
+              onAccountSelect={handleAccountSelect} // Pass the callback to SliderComponent
+            />
 
-          <div className='amount'>
+        </div>
+
+          <div className={`amount ${!isOwner ? 'disabled' : ''}`}>
             {selectedCurrency && 
               <AmountInput
                 key={`amount-input-${resetTrigger}`}
@@ -933,13 +936,13 @@ const EditExpense: React.FC = () => {
           <div className='additional-config'>
             
             {/* Categories */}
-            <div className='aditional-btn'>
+            <div className={`aditional-btn ${!isOwner ? 'disabled' : ''}`}>
               <div>
                 <IonIcon icon={gridOutline} className='small-icon-btn primary' />
               </div>
               <div 
                 className='selected-info'
-                onClick={() => setIsOpenCategoryModal(true)}
+                onClick={() => isOwner && setIsOpenCategoryModal(true)}
               >
                 {subcategoryId ? (
                   <>
@@ -961,7 +964,7 @@ const EditExpense: React.FC = () => {
             </div>
 
             {/* Date */}
-            <div className='aditional-btn'>
+            <div className={`aditional-btn ${!isOwner ? 'disabled' : ''}`}>
               <div>
                 <IonIcon icon={calendarOutline} className='small-icon-btn primary' />
               </div>
@@ -1074,7 +1077,7 @@ const EditExpense: React.FC = () => {
           </div>
         
           {/* Add note */}
-          <div className="form-item">
+          <div className={`form-item ${!isOwner ? 'disabled' : ''}`}>
             <div className="parent-input">
               <div className="textarea-container">
                 <IonTextarea
@@ -1107,7 +1110,7 @@ const EditExpense: React.FC = () => {
                 updateExpense(passedExpenseId);
               }
             }}
-            disabled={!isFormValid} // Disable the button if the form is invalid
+            disabled={!isFormValid || !isOwner} // Disable the button if the form is invalid
           >
             {expense?.isActive ? t('expenses.update_exp') : t('expenses.log_exp')}
           </IonButton>

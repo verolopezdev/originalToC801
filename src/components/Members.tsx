@@ -13,7 +13,6 @@ import { useLiveQuery } from 'dexie-react-hooks';
 
 import { db } from '../db';
 import { useUser } from '../context/UserContext';
-import { deactivateGuest } from '../services/SharingService';
 
 import { closeCircleOutline, ellipse } from 'ionicons/icons';
 
@@ -61,16 +60,6 @@ const Members: React.FC = () => {
     );
   }
 
-  const handleDeactivateGuest = async (memberUserId: string) => {
-    if (!user?.sharedRealmId) return;
-
-    try {
-      await deactivateGuest(user.sharedRealmId, memberUserId);
-      console.log('🚫 Guest deactivated:', memberUserId);
-    } catch (error) {
-      console.error('❌ Error deactivating guest:', error);
-    }
-  };
 
   return (
     <section>
@@ -156,7 +145,6 @@ const Members: React.FC = () => {
                   <IonIcon
                     className="medium-icon-btn medium"
                     icon={closeCircleOutline}
-                    /* onClick={() => handleDeactivateGuest(memberUserId)} */
                   />
                 </IonButtons>
               )}

@@ -85,7 +85,8 @@ export const moveAllDataToSharedRealm = async (
       db.expenses,
       db.trips,
       db.historicCurrencyList,
-      db.alternativeCurrencies,
+      db.alternativeCurrencies, 
+      db.recurringSeries,
     ],
     async () => {
       await db.users.toCollection().modify({
@@ -119,6 +120,10 @@ export const moveAllDataToSharedRealm = async (
       await db.alternativeCurrencies.toCollection().modify({
         realmId: sharedRealmId,
       });
+
+      await db.recurringSeries.toCollection().modify({
+        realmId: sharedRealmId,
+      });
     }
   );
 
@@ -130,18 +135,6 @@ export const moveAllDataToSharedRealm = async (
 
 /**
  * Invite one guest to the shared Expense Tracker realm.
- *
- * The guest will:
- * - Have access to the shared realm after accepting the invitation.
- * - Be able to add expenses.
- * - Be able to update expenses.
- * - Be able to delete expenses.
- *
- * The guest will NOT have mutation permissions for:
- * - accounts
- * - categories
- * - trips
- * - currencies
  *
  * @param sharedRealmId The shared Expense Tracker realm ID.
  * @param guestEmail Email address of the guest.
@@ -174,7 +167,7 @@ export const inviteGuest = async (
     invite: true,
 
     permissions: {
-      add: ['expenses', 'users'],
+      add: ['expenses', 'users', 'accounts', 'categories', 'trips', 'currencies', 'historicCurrencyList', 'alternativeCurrencies', 'recurringSeries'],
       update: {},
     },
   });

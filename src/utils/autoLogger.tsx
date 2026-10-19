@@ -139,6 +139,8 @@ export const logAutoExpenses = async (): Promise<boolean> => {
             // This is the core change for the expense record:
             autoLogged: shouldLogAutomatically ? true : false,
             isActive: shouldLogAutomatically ? 1 : 0, 
+            owner: series.owner,
+            realmId: series.realmId
           });
           //console.log("installment index: ", nextIndex);
 

@@ -357,6 +357,7 @@ const Reccurrences: React.FC = () => {
                   isActive={rec.isActive}
                   lastLoggedDate={rec.lastLoggedDate} 
                   amountVaries={newIsEstimated}
+                  owner={rec.owner}
                 />
               );
             })}

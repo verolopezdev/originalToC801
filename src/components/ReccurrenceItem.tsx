@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useUser } from '../context/UserContext';
 
 
 // App components
@@ -43,6 +44,7 @@ interface ReccurrenceItemProps {
   isActive: number;
   lastLoggedDate: string;
   amountVaries: boolean;
+  owner?: string;
 }
 
 const ReccurrenceItem: React.FC<ReccurrenceItemProps> = ({
@@ -63,9 +65,16 @@ const ReccurrenceItem: React.FC<ReccurrenceItemProps> = ({
   nextDueDate,
   isActive,
   lastLoggedDate,
-  amountVaries
+  amountVaries,
+  owner
 }) => {  
   const { t } = useTranslation();
+  const { user } = useUser();
+
+  const borderColor =
+    user?.owner === owner
+      ? 'var(--ion-color-primary)'
+      : 'var(--ion-color-medium)';
   
   let color = isActive === 1 ? categoryColor : 'neutral';
   const frequencyMap = {
@@ -94,7 +103,10 @@ const ReccurrenceItem: React.FC<ReccurrenceItemProps> = ({
 
   return (
      <IonRouterLink routerLink={`/app/viewrecurrence/${seriesId}`} routerDirection="forward">
-      <div className='transaction reccurrence'> 
+      <div 
+        className='transaction reccurrence'
+        style={{ '--right-border-color': borderColor } as React.CSSProperties}
+      > 
         <div className='left-col'>
           <CategoryIcon iconName={categoryIcon} categoryColor={color} autoLogged={autoLogged} isTransaction={true} />
         </div>
@@ -113,7 +125,7 @@ const ReccurrenceItem: React.FC<ReccurrenceItemProps> = ({
 
 					<ul className='reccurrence-list-data'>  
 						<li>{categoryName}</li>
-						<li>{accountName === "Cash" ? t('accounts.default_account_name') : accountName}</li>
+						<li>{accountName === "Cash" ? t('accounts.default_account_name') : accountName}</li>  
             <li>
               {t(`date.frequency.${unit}`, { count: interval })}
               {typeof totalInstallments === 'number' && ` x ${totalInstallments}`}

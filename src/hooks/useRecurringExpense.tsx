@@ -84,14 +84,6 @@ export const useRecurringExpense = () => {
       selectedDate: Date,
       recurrence: RecurrenceSettings  
     ) => {
-      const isGuest = user.sharingRole === "guest";
-
-      // Guests can add normal expenses,
-      // but they cannot create recurring expenses.
-      if (isGuest && recurrence.isRecurring) {
-        throw new Error("Guests cannot create recurring expenses.");
-      }
-
       // If the user belongs to a shared realm, explicitly assign
       // new records to that realm.
       //

@@ -68,8 +68,10 @@ const Members: React.FC = () => {
       <div>
         {members.map((member) => {
           const memberUser = users.find(
-            (item) => item.userId === member.userId
+            (item) => item.email === member.email
           );
+
+          console.log("Member user: ", memberUser);
 
           const memberUserId = member.userId || member.email;
           if (!memberUserId) return null;
@@ -88,6 +90,8 @@ const Members: React.FC = () => {
             member.userId ||
             t('common.default_user_name');
 
+
+          console.log("Member email: ", member.email);
           const lastName = memberUser?.lastName || '';
           const email =
             memberUser?.email || member.email || member.userId || '';

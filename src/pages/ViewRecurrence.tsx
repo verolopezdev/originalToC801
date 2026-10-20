@@ -12,6 +12,7 @@ dayjs.extend(isSameOrBefore);
 
 // Custom hooks
 import useScrollToTop from '../hooks/useScrollToTop';
+import { useUser } from '../context/UserContext'; // Import the useUser hook
 import { useExpense } from '../context/ExpenseContext';
 import { useDatePicker } from '../context/DatePickerContext'; 
 import { useRecurringExpense } from '../hooks/useRecurringExpense';
@@ -79,6 +80,7 @@ interface DueInfo {
 
 const ViewRecurrence: React.FC = () => {
   const { t } = useTranslation();
+  const { user } = useUser();   
   
   const contentRef = useScrollToTop(); 
   const router = useIonRouter();
@@ -86,6 +88,7 @@ const ViewRecurrence: React.FC = () => {
   const { logExpenseForSeries, finalizeRemainingInstallments } = useRecurringExpense();
   const { currency } = useCurrency(); 
   const { getExchangeRate } = useExchangeRates();
+  const [isOwner, setIsOwner] = useState<boolean>(false);
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [popoverEvent, setPopoverEvent] = useState<MouseEvent | null>(null);
@@ -153,6 +156,8 @@ const ViewRecurrence: React.FC = () => {
   // Get recurrence data
   useEffect(() => {
     if(series) {
+      setIsOwner(series.owner === user.owner ? true : false);
+
       setNote(series.note);
       
       const newIsEstimated =
@@ -437,89 +442,92 @@ const ViewRecurrence: React.FC = () => {
   };
   
   const showAccountName = getAccountName(accountId);
+
   
   return (
     <IonPage>
       <IonHeader className='page-header ion-no-border'>
         <IonToolbar>
-          <IonButtons slot="start">
+          <IonButtons slot="start"> 
             <IonBackButton />
           </IonButtons>
 
-          <IonButtons slot="end">
-            <IonButton onClick={openPopover}>
-              <IonIcon icon={ellipsisVertical} />
-            </IonButton>
+          {isOwner && (
+            <IonButtons slot="end">
+              <IonButton onClick={openPopover}>
+                <IonIcon icon={ellipsisVertical} />
+              </IonButton>
 
-            <IonPopover 
-              isOpen={isPopoverOpen} 
-              event={popoverEvent} 
-              onDidDismiss={closePopover} 
-              side="bottom" 
-              alignment="end" 
-              className='secondary-menu'  
-            >
-              <IonContent class="ion-no-padding">
-                <ul className='list'>
-                  {recurrence && recurrence.isRecurring === 1 && (
-                    <>
-                      <li 
-                        className="item" 
-                        onClick={() => {
-                          closePopover(); 
-                          router.push(`/app/editrecurrence/${seriesId}`, 'forward');
-                        }}
-                      >
-                        <IonIcon 
-                          icon={createOutline} 
-                          className="icon"
-                          style={{ marginRight: "15px" }} 
-                        />
-                        {t('expenses.edit_recurrence')}
-                      </li>
+              <IonPopover 
+                isOpen={isPopoverOpen} 
+                event={popoverEvent} 
+                onDidDismiss={closePopover} 
+                side="bottom" 
+                alignment="end" 
+                className='secondary-menu'  
+              >
+                <IonContent class="ion-no-padding">
+                  <ul className='list'>
+                    {recurrence && recurrence.isRecurring === 1 && (
+                      <>
+                        <li 
+                          className="item" 
+                          onClick={() => {
+                            closePopover(); 
+                            router.push(`/app/editrecurrence/${seriesId}`, 'forward');
+                          }}
+                        >
+                          <IonIcon 
+                            icon={createOutline} 
+                            className="icon"
+                            style={{ marginRight: "15px" }} 
+                          />
+                          {t('expenses.edit_recurrence')}
+                        </li>
 
-                      <li 
-                        className="item" 
-                        onClick={() => {
-                          closePopover(); 
-                          if(recurrence.totalOccurrences !== null) {
-                            setShowStopInstallmentRecAlert(true);
-                          } else {
-                            setShowStopAlert(true);
-                          }
-                        }}
-                      >
-                        <IonIcon 
-                          icon={stopCircleOutline} 
-                          className="icon"
-                          style={{ marginRight: "15px" }} 
-                        />
-                        {t('expenses.end_recurrence')}
-                      </li>
-                    </>
-                  )}
+                        <li 
+                          className="item" 
+                          onClick={() => {
+                            closePopover(); 
+                            if(recurrence.totalOccurrences !== null) {
+                              setShowStopInstallmentRecAlert(true);
+                            } else {
+                              setShowStopAlert(true);
+                            }
+                          }}
+                        >
+                          <IonIcon 
+                            icon={stopCircleOutline} 
+                            className="icon"
+                            style={{ marginRight: "15px" }} 
+                          />
+                          {t('expenses.end_recurrence')}
+                        </li>
+                      </>
+                    )}
 
-                  <li 
-                    className="item" 
-                    onClick={() => {
-                      closePopover();
-                      setTimeout(() => {
-                        setRecurrenceToDelete(passedRecurrenceId);
-                        setShowDeleteRecurrenceAlert(true);
-                      }, 100);
-                    }}
-                  >
-                    <IonIcon 
-                      icon={trashOutline} 
-                      className="icon"
-                      style={{ marginRight: "15px" }} 
-                    />
-                    {t('expenses.delete_recurrence')}
-                  </li>
-                </ul>
-              </IonContent>
-            </IonPopover>
-          </IonButtons>
+                    <li 
+                      className="item" 
+                      onClick={() => {
+                        closePopover();
+                        setTimeout(() => {
+                          setRecurrenceToDelete(passedRecurrenceId);
+                          setShowDeleteRecurrenceAlert(true);
+                        }, 100);
+                      }}
+                    >
+                      <IonIcon 
+                        icon={trashOutline} 
+                        className="icon"
+                        style={{ marginRight: "15px" }} 
+                      />
+                      {t('expenses.delete_recurrence')}
+                    </li>
+                  </ul>
+                </IonContent>
+              </IonPopover>
+            </IonButtons>
+          )}
         </IonToolbar>
       </IonHeader>
 
@@ -585,6 +593,7 @@ const ViewRecurrence: React.FC = () => {
               <div className='button-container mt-5'>
                 <IonButton 
                   className='medium success'
+                  disabled={!isOwner}
                   onClick={() => {
                     router.push(`/app/logrecurrenceexpense/${seriesId}`, 'forward');
                   }}
@@ -593,6 +602,7 @@ const ViewRecurrence: React.FC = () => {
                 </IonButton>
                 <IonButton 
                   className='medium danger'
+                  disabled={!isOwner}
                   onClick={() => {
                     setShowDeleteExpenseAlert(true);
                   }}
@@ -639,6 +649,7 @@ const ViewRecurrence: React.FC = () => {
                       totalInstallments={exp.totalInstallments}
                       paymentStatus={exp.isActive}
                       seriesId={passedRecurrenceId}
+                      isOwner={isOwner}
                     />
                   );
                 })

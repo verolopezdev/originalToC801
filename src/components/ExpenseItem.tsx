@@ -18,6 +18,7 @@ import { getDueInfo, getOldestOverdueExpenseForSeries, hasRecurrenceEnded } from
 // Ionic components
 import { 
   IonAlert,
+  IonButton,
 	IonIcon,
   IonRouterLink 
 } from '@ionic/react';
@@ -52,6 +53,7 @@ interface TransactionItemProps {
   totalInstallments?: number;
 	paymentStatus: number;
   seriesId: string;
+  isOwner: boolean;
 }
 
 const ExpenseItem: React.FC<TransactionItemProps> = ({
@@ -66,6 +68,7 @@ const ExpenseItem: React.FC<TransactionItemProps> = ({
   totalInstallments,
 	paymentStatus,
   seriesId,
+  isOwner,
 }) => {  
   const { t } = useTranslation();
   const { checkExpense, checkRecurrence } = useExpense();
@@ -74,7 +77,7 @@ const ExpenseItem: React.FC<TransactionItemProps> = ({
   const router = useIonRouter();
   const today = new Date();
   const [showDeleteExpenseAlert, setShowDeleteExpenseAlert] = useState(false);
-  
+
   const dueInfo = getDueInfo(dueDate.toISOString());  
   const getIcon = (status : string) => {
     switch (status) {
@@ -223,10 +226,10 @@ const ExpenseItem: React.FC<TransactionItemProps> = ({
                 )}
               </>
             ) : paymentStatus === 0 ? (
-              <div className='inner-right-col'>
+              <div className={`inner-right-col ${!isOwner ? 'disabled' : ''}`}> 
                 <IonIcon // Log expense icon
                   icon={receiptOutline}
-                  className='icon-btn icon-btn-success mr-5' 
+                  className='icon-btn icon-btn-success mr-5'
                   onClick={() => {
                     router.push(`/app/editexpense/${expenseId}`, 'forward');      
                   }} 

@@ -391,6 +391,8 @@
     "none_to_display": "Aucune dépense à afficher pour cette période",
     "no_recurrences": "C'est un peu vide ici !",
     "no_recurrences_msg": "Appuyez sur le bouton + pour créer votre première dépense récurrente afin de gagner du temps et de garder vos finances organisées.",
+    "only_owner_can_delete": "Seul le propriétaire de cette dépense peut la supprimer.",
+    "only_owner_can_edit": "Seul le propriétaire de cette dépense peut apporter des modifications.",
     "only_this_exp": "Seulement cette dépense",
     "pay_all_stop": "Tout payer et arrêter",
     "payments_count_one": " × {{count}} paiement",

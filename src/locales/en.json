@@ -392,6 +392,8 @@
     "none_to_display": "No expenses to display for this period",
     "no_recurrences": "Looks a little empty here!",
     "no_recurrences_msg": "Tap the + button to create your first recurring expense to save time and keep your finances organized.",
+    "only_owner_can_delete": "Only the owner of this expense can delete it.",
+    "only_owner_can_edit": "Only the owner of this expense can make changes.",
     "only_this_exp": "Only this expense",
     "pay_all_stop": "Pay All & Stop",
     "payments_count_one": " × {{count}} payment",

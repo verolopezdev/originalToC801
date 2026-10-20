@@ -523,6 +523,12 @@ const EditExpense: React.FC = () => {
 
   // Call this when user wants to delete a recurring expense
   async function handleDeleteClick(passedExpenseId: string) {
+    // Check if the user is the owner
+    if (!isOwner) {
+      openFailureModal(t('expenses.only_owner_can_delete')); 
+      return;
+    }
+    
     if (expense && !expense.seriesId) {
       // Not a recurring expense - just delete directly
       deleteExpense(passedExpenseId);
@@ -693,6 +699,12 @@ const EditExpense: React.FC = () => {
 
   // Update expense record in database
   async function updateExpense(expenseId: string) {
+    // Check if the user is the owner
+    if (!isOwner) {
+      openFailureModal(t('expenses.only_owner_can_edit')); 
+      return;
+    }
+
     // Check if expense exists
     const existingExpense = await db.expenses.get(expenseId);
     if (!existingExpense) {
@@ -838,6 +850,12 @@ const EditExpense: React.FC = () => {
 
   // Delete regular expense
   async function deleteExpense(expenseId: string) {
+    // Check if the user is the owner
+    if (!isOwner) {
+      openFailureModal(t('expenses.only_owner_can_delete')); 
+      return;
+    }
+    
     try {
       // Check if expense exists
       const existingExpense = await db.expenses.get(expenseId);
@@ -968,7 +986,7 @@ const EditExpense: React.FC = () => {
               <div>
                 <IonIcon icon={calendarOutline} className='small-icon-btn primary' />
               </div>
-              <div className='selected-info' onClick={() => handleDateChange()}>
+              <div className='selected-info' onClick={() => isOwner && handleDateChange()}>
                 <span className="title">{t('expenses.config_date')}</span>
                 <span className='data'><FormattedDate date={selectedDate} format="short" /></span> 
               </div>

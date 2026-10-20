@@ -391,6 +391,8 @@
     "none_to_display": "No hay gastos para mostrar en este periodo",
     "no_recurrences": "¡Esto parece un poco vacío!",
     "no_recurrences_msg": "Toca el botón + para crear tu primer gasto recurrente, ahorrar tiempo y mantener tus finanzas organizadas.",
+    "only_owner_can_delete": "Solo el propietario de este gasto puede eliminarlo.",
+    "only_owner_can_edit": "Solo el propietario de este gasto puede realizar cambios.",
     "only_this_exp": "Solo este gasto",
     "pay_all_stop": "Pagar todo y detener",
     "payments_count_one": " × {{count}} pago",

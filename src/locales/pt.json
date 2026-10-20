@@ -391,6 +391,8 @@
     "none_to_display": "Sem despesas para mostrar neste período",
     "no_recurrences": "Parece um pouco vazio por aqui!",
     "no_recurrences_msg": "Toque no botão + para criar a sua primeira despesa recorrente para poupar tempo e manter as suas finanças organizadas.",
+    "only_owner_can_delete": "Apenas o proprietário desta despesa pode excluí-la.",
+    "only_owner_can_edit": "Apenas o proprietário desta despesa pode fazer alterações.",
     "only_this_exp": "Apenas esta despesa",
     "pay_all_stop": "Pagar tudo e parar",
     "payments_count_one": " × {{count}} pagamento",

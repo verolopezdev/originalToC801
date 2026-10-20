@@ -112,9 +112,11 @@ const EditRecurrence: React.FC = () => {
   const { openDatePicker } = useDatePicker(); // 👈 access the date picker
   
   const contentRef = useScrollToTop(); // use the custom hook 
-  const { userId } = useUser(); 
+  const { user, userId } = useUser(); 
 	const { currency, allSelectedCurrencies } = useCurrency(); 
   const [exchangeRate, setExchangeRate] = useState<number>(1);
+  
+  const [isOwner, setIsOwner] = useState<boolean>(true);
   
   const { seriesId } = useParams<{ seriesId: string }>(); // passed series id to fill the form, always a string
 	const [passedRecurrenceId, setPassedRecurrenceId] = useState<string>(seriesId);
@@ -173,6 +175,7 @@ const EditRecurrence: React.FC = () => {
 		async function initializeRecurrenceFields(seriesId: string) {
 			const series = await getRecurringSeriesById(seriesId);
 			if(!series) return;
+      setIsOwner(series.owner === user.owner ? true : false);
 			setPassedRecurrenceId(series.seriesId);
 			const recurrenceStartDate = new Date(series.startDate);
       setStartDate(recurrenceStartDate);
@@ -406,6 +409,12 @@ const EditRecurrence: React.FC = () => {
 
 
   async function handleUpdate() {
+    // Check if the user is the owner
+    if (!isOwner) {
+      openFailureModal(t('expenses.only_owner_can_edit')); 
+      return;
+    }
+
     const isExpired =
         recurrence.endDate &&
         dayjs(recurrence.endDate).isBefore(dayjs(), "day");
@@ -427,7 +436,7 @@ const EditRecurrence: React.FC = () => {
       openFailureModal(t('expenses.recurrence_not_found')); 
       return;
     }
-    
+  
     try {
       await db.transaction(
         'rw', 
@@ -537,14 +546,18 @@ const EditRecurrence: React.FC = () => {
             <h2 className='screen-title'>{t('expenses.edit_recurrence')}</h2>
           </div>
 
-          <AccountSlider
-            editAccount={accountId}
-            key={`account-slider-${resetTrigger}`}
-            accounts={sortedAccounts}
-            onAccountSelect={handleAccountSelect} // Pass the callback to SliderComponent
-          />
+          {/* Account selector */}
+          <div className={`${!isOwner ? 'disabled' : ''}`}>
+            <AccountSlider
+              editAccount={accountId}
+              key={`account-slider-${resetTrigger}`}
+              accounts={sortedAccounts}
+              onAccountSelect={handleAccountSelect} // Pass the callback to SliderComponent
+            />
+          </div>
 
-          <div className='amount'>
+          {/* Series amount */}
+          <div className={`amount ${!isOwner ? 'disabled' : ''}`}>
             {selectedCurrency && 
               <AmountInput
                 key={`amount-input-${resetTrigger}`}
@@ -570,13 +583,13 @@ const EditRecurrence: React.FC = () => {
           <div className='additional-config'>
             
             {/* Categories */}
-            <div className='aditional-btn'>
+            <div className={`aditional-btn ${!isOwner ? 'disabled' : ''}`}>
               <div>
                 <IonIcon icon={gridOutline} className='small-icon-btn primary' />
               </div>
               <div 
                 className='selected-info' 
-                onClick={() => setIsOpenCategoryModal(true)}
+                onClick={() => isOwner && setIsOpenCategoryModal(true)}
               >
                 {subcategoryId ? (
                   <>
@@ -595,7 +608,7 @@ const EditRecurrence: React.FC = () => {
             {/* Date */}
             <div 
               className='aditional-btn'
-              onClick={() => handleDateChange()}
+              onClick={() => isOwner && handleDateChange()}
             >
               <div>
                 <IonIcon icon={calendarOutline} className='small-icon-btn primary' />
@@ -608,7 +621,6 @@ const EditRecurrence: React.FC = () => {
 
             {/* Frecuency */}
             <div
-              /* className={`aditional-btn ${recurrence.totalOccurrences !== null && 'disabled'}`} */
               className='aditional-btn disabled'
               onClick={recurrence.totalOccurrences === null ? () => setShowFrequencyModal(true) : undefined}
             >
@@ -636,7 +648,7 @@ const EditRecurrence: React.FC = () => {
 
             {/* Currency */}
             <div 
-              className={`aditional-btn ${recurrence.isRecurring && 'disabled'}`}
+              className={`aditional-btn ${recurrence.isRecurring && isOwner && 'disabled'}`}
               onClick={recurrence.isRecurring ? undefined : () => setIsAlternativeModalOpen(true)}          
             >
               <IonAvatar className="country-avatar country-avatar-small disabled">
@@ -654,7 +666,7 @@ const EditRecurrence: React.FC = () => {
             </div>
 
             {/* Add notification if recurrence */}
-            {recurrence.isRecurring === 1 && (
+            {recurrence.isRecurring === 1 && isOwner && (
               <>
                 {/* Notify */}
                 <div 
@@ -702,19 +714,19 @@ const EditRecurrence: React.FC = () => {
           </div>
 
           {/* Add note */}
-          <div className="form-item"> 
+          <div className={`form-item ${!isOwner ? 'disabled' : ''}`}> 
             <div className="parent-input">  
               <div className="textarea-container">
-            <IonTextarea
-              value={note}
-              maxlength={120}
-              placeholder={t("expenses.config_note")}
-              onIonInput={(e) => handleNoteChange(e.detail.value ?? "")}
-              autoGrow={true}
-              counter={true}
-            />
-            {error && <p className="textarea-error-text">{error}</p>}
-            </div>
+                <IonTextarea
+                  value={note}
+                  maxlength={120}
+                  placeholder={t("expenses.config_note")}
+                  onIonInput={(e) => handleNoteChange(e.detail.value ?? "")}
+                  autoGrow={true}
+                  counter={true}
+                />
+                {error && <p className="textarea-error-text">{error}</p>}
+              </div>
             </div>
           </div>
 
@@ -726,7 +738,7 @@ const EditRecurrence: React.FC = () => {
                 handleUpdate();
               }
             }}
-            disabled={!isFormValid} // Disable the button if the form is invalid
+            disabled={!isFormValid || !isOwner} // Disable the button if the form is invalid
           >
             {t('expenses.update_recurrence')}
           </IonButton>

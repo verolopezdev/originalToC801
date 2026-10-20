@@ -77,6 +77,15 @@ export const useRecurringExpense = () => {
   const { user } = useUser();
   
   const { checkExpense, checkRecurrence } = useExpense(); 
+
+  // If the user belongs to a shared realm, explicitly assign
+  // new records to that realm.
+  //
+  // For standalone users, realmId is omitted so Dexie Cloud
+  // continues to use the user's private realm automatically.
+  const realmData = user.sharedRealmId
+    ? { realmId: user.sharedRealmId }
+    : {};
   
   const addExpenseWithRecurrence = useCallback(
     async (
@@ -84,14 +93,6 @@ export const useRecurringExpense = () => {
       selectedDate: Date,
       recurrence: RecurrenceSettings  
     ) => {
-      // If the user belongs to a shared realm, explicitly assign
-      // new records to that realm.
-      //
-      // For standalone users, realmId is omitted so Dexie Cloud
-      // continues to use the user's private realm automatically.
-      const realmData = user.sharedRealmId
-        ? { realmId: user.sharedRealmId }
-        : {};
 
       // Wrap the entire operation in a transaction that includes all touched tables 🚨
       return await db.transaction('rw', db.expenses, db.recurringSeries, async (tx) => {
@@ -339,6 +340,7 @@ export const useRecurringExpense = () => {
           isActive: markDeleted ? 2 : 1,
           ...(markDeleted ? { deletionDate: new Date().toISOString() } : {}),
           ...(baseOverride ?? {}), // 👈 merge overrides here
+          ...realmData,
         });
 
         // Calculate new nextDueDate
@@ -462,6 +464,7 @@ export const useRecurringExpense = () => {
             autoLogged: false,
             isActive: 1,
             ...(options.baseOverride ?? {}),
+            ...realmData,
           });
         }
 
@@ -498,6 +501,7 @@ export const useRecurringExpense = () => {
             autoLogged: false,
             isActive: 3,
             deletionDate: today.toISOString(),
+            ...realmData,
           });
         }
     

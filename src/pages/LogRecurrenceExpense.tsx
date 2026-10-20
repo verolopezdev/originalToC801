@@ -385,7 +385,7 @@ const LogRecurrenceExpense: React.FC = () => {
     }
     
     try {
-      let assignAmountAlt = 0;
+      let assignAmountAlt = 0;  
       let assignAmountDef = 0;
 
       if (selectedCurrency.code !== currency.defaultCurrency.code) { // Case 2: regular expense in alternative currency

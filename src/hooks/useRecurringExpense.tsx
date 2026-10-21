@@ -85,7 +85,7 @@ export const useRecurringExpense = () => {
   // continues to use the user's private realm automatically.
   const realmData = user.sharedRealmId
     ? { realmId: user.sharedRealmId }
-    : {};
+    : {}; 
   
   const addExpenseWithRecurrence = useCallback(
     async (

@@ -167,8 +167,21 @@ export const inviteGuest = async (
     invite: true,
 
     permissions: {
-      add: ['expenses', 'users', 'accounts', 'categories', 'trips', 'currencies', 'historicCurrencyList', 'alternativeCurrencies', 'recurringSeries'],
-      update: {},
+      add: [
+        'expenses',
+        'users',
+        'accounts',
+        'categories',
+        'trips',
+        'currencies',
+        'historicCurrencyList',
+        'alternativeCurrencies',
+        'recurringSeries',
+      ],
+      update: {
+        categories: '*', // Grants full update access for categories
+      },
+      manage: ['categories'], // 👈 Required in Dexie Cloud to delete categories owned by other users
     },
   });
 };

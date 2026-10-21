@@ -193,13 +193,13 @@ const NewCategory: React.FC = () => {
 
   
   // Create new account record in database
-  async function addNewCategory() {
+  async function addNewCategory() { 
     try {
       // 🚨 CRITICAL FIX: Wrap the operation in an explicit transaction 🚨
       // We list both 'categories' and 'changes' tables.
       await db.transaction('rw', db.categories, async (tx) => {
 
-        const categoryId = await tx.categories.add({
+        await tx.categories.add({
           categoryId: crypto.randomUUID(),
           categoryName,
           categoryColor,
@@ -207,7 +207,8 @@ const NewCategory: React.FC = () => {
           activeCategory,
           favouriteCategory,
           systemCategory,
-          subcategories
+          subcategories,
+          realmId: user.sharedRealmId
         });
       });
       

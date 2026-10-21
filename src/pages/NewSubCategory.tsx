@@ -3,6 +3,7 @@ import { db } from '../db';
 import { useParams } from 'react-router-dom';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import { useUser } from '../context/UserContext'; // Import the useUser hook
 
 
 // Custom hooks
@@ -54,6 +55,8 @@ import '../Main.css';
 const NewSubCategory: React.FC = () => {
   const contentRef = useScrollToTop(); // use the custom hook 
   const { t } = useTranslation();
+  const { user } = useUser(); // Access user context
+  
   const { themeColor } = useTheme();
   const color = themeColor.split("-")[1]; // Extracts color name to initialize selectedColor
   const { categoryId } = useParams<{ categoryId: string }>(); // category id to fill the form
@@ -214,7 +217,8 @@ const NewSubCategory: React.FC = () => {
             subcategoryIcon,
             activeSubcategory,
             parentCategoryId,
-            favouriteSubcategory
+            favouriteSubcategory,
+            realmId: user.sharedRealmId
           });
 
           await tx.categories.update(parentCategoryId, {

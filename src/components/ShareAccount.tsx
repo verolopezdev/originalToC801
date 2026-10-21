@@ -45,7 +45,7 @@ const ShareAccount: React.FC = () => {
     }
   
     try {
-      await shareAccountWithGuest(user, email);
+      await shareAccountWithGuest(user, email); 
   
       setGuestEmail('');
       setError(null);

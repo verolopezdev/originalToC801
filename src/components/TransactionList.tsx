@@ -1,22 +1,15 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, ParsedExpense } from '../db';
 import { Dayjs } from 'dayjs';
 
-
 // App components
 import TransactionItem from './TransactionItem';
-
-// Custom hooks
-import { useExpense } from '../context/ExpenseContext';
-
 
 // Styles
 import '../Main.css';
 import './TransactionItem.css';
-
 
 interface Props {
   selectedInterval: "weekly" | "monthly" | "yearly";
@@ -26,7 +19,6 @@ interface Props {
   accountId?: string;
   fixedLimit?: number; // Optional: if set, loads only this many records (e.g., 10 for Dashboard)
 }
-
 
 const TransactionList: React.FC<Props> = ({
   selectedInterval,
@@ -38,58 +30,12 @@ const TransactionList: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation();
   
-  const { checkExpense } = useExpense();
   // Use the fixedLimit value, or null if loading all transactions
   const limit = fixedLimit || null;
 
-  const [expenses, setExpenses] = useState<ParsedExpense[]>([]); // list of currently loaded expenses
-  const [hasLoaded, setHasLoaded] = useState(false);
-
-  const isFetchingRef = useRef(false);
-
-  const categories = useLiveQuery(() => db.categories.toArray());
-  const subcategories = useLiveQuery(() => db.subcategories.toArray());
-  const accounts = useLiveQuery(() => db.accounts.toArray());
-  const getCategory = (categoryId: string) => categories?.find(c => c.categoryId === categoryId);
-  const getSubcategory = (subcategoryId: string) => subcategories?.find(sc => sc.subcategoryId === subcategoryId);
-  const getAccountName = (accountId : string) => accounts?.find(ac => ac.accountId === accountId);
-
-  // Effect to load all transactions when dependencies change
-  useEffect(() => {
-    // Reset state and trigger load when dependencies change
-    isFetchingRef.current = false;
-    setExpenses([]);
-    loadTransactions();
-    // The dependency array is correct: it reloads when the view (interval/date) changes or when a new expense is added/modified
-  }, [selectedInterval, start, end, accountId, checkExpense]);  
-
-
-  
-  // Unified function to load transactions (limited or all)
-  const loadTransactions = async () => {
-    if (isFetchingRef.current) return;
-    isFetchingRef.current = true; // Start fetching
-    
-    setHasLoaded(false); // <--- Add this! Hide content while fetching
-
-    try {
-      const result = await fetchExpenses(limit, reverse);
-      setExpenses(result);
-    } catch (error) {
-      console.error("Failed to load transactions:", error);
-      setExpenses([]);
-    } finally {
-      setHasLoaded(true);
-      isFetchingRef.current = false;
-    }
-  };
-
-  
-  // Updated fetchExpenses function to handle the limit
-  const fetchExpenses = async (
-    limit: number | null,
-    reverse: boolean = false
-  ): Promise<ParsedExpense[]> => {
+  // 1. Fetch expenses reactively using useLiveQuery.
+  // It automatically re-runs when db.expenses changes (including after a Dexie Cloud sync).
+  const expenses = useLiveQuery(async () => {
     const allResults = await db.expenses
       .where("expenseDate")
       .between(start.toISOString(), end.toISOString(), true, false) 
@@ -106,14 +52,23 @@ const TransactionList: React.FC<Props> = ({
       ? ordered.slice(0, limit) 
       : ordered;
 
-    // 5. Final results and mapping.
     return limitedResults.map(exp => ({
       ...exp,
       expenseDate: new Date(exp.expenseDate), 
     }));
-  };
+  }, [start, end, accountId, reverse, limit]); // Re-query when these dependencies change
 
+  // Lookups (already using useLiveQuery)
+  const categories = useLiveQuery(() => db.categories.toArray());
+  const subcategories = useLiveQuery(() => db.subcategories.toArray());
+  const accounts = useLiveQuery(() => db.accounts.toArray());
 
+  const getCategory = (categoryId: string) => categories?.find(c => c.categoryId === categoryId);
+  const getSubcategory = (subcategoryId: string) => subcategories?.find(sc => sc.subcategoryId === subcategoryId);
+  const getAccountName = (accountId: string) => accounts?.find(ac => ac.accountId === accountId);
+
+  // useLiveQuery returns `undefined` initially while loading data
+  const hasLoaded = expenses !== undefined;
 
   return (
     <div>

@@ -80,6 +80,7 @@ export const moveAllDataToSharedRealm = async (
     [
       db.users,
       db.accounts,
+      db.accountPreferences,
       db.categories,
       db.subcategories,
       db.expenses,
@@ -94,6 +95,10 @@ export const moveAllDataToSharedRealm = async (
       });
 
       await db.accounts.toCollection().modify({
+        realmId: sharedRealmId,
+      });
+
+      await db.accountPreferences.toCollection().modify({
         realmId: sharedRealmId,
       });
 
@@ -171,6 +176,7 @@ export const inviteGuest = async (
         'expenses',
         'users',
         'accounts',
+        'accountPreferences',
         'categories',
         'trips',
         'currencies',

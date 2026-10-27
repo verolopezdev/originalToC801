@@ -17,7 +17,22 @@
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
   color: white;
+  position: relative;
+  overflow: hidden;
 }
+
+/* Semi-transparent light gray overlay */
+.default-card.is-disabled .disabled-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(74, 73, 73, 0.7); /* Increased opacity and darker gray wash */
+  z-index: 3; /* Set higher than card-bgk (z-index: 2) so it covers the entire card */
+  pointer-events: none;
+}
+
 
 .default-card.primary-card {
   border: 2px solid transparent; /* Optional: Inner border */
@@ -80,6 +95,8 @@
 }
 
 .default-card .top-bar .card-title {
+  display: flex;
+  align-items: center;
   font-size: 1.3em;
   font-weight: 500;
   text-transform: uppercase;
@@ -87,6 +104,10 @@
   word-wrap: break-word; /* Allow wrapping of long words */
   overflow-wrap: break-word; /* Support for older browsers */
   white-space: normal; /* Allow text to wrap to the next line */
+}
+
+.default-card .top-bar .card-title ion-icon {
+  font-size: 1.2em;
 }
 
 .default-card .top-bar .card-placeholder {

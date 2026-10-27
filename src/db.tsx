@@ -115,9 +115,21 @@ interface Account {
   accountLogo: string;
   activeAccount: boolean;
   userId: string;
-  sortOrder: number;
+  //sortOrder: number; // DELETE THIS WHEN SHARING ACCOUNT IS FINNISHED
+  sharedAccount: boolean;
 
   // Dexie Cloud
+  realmId?: string;
+  owner?: string;
+}
+
+export interface AccountPreference {
+  id?: string; // Primary key (can be compound like [userId + accountId])
+  userId: string;
+  accountId: string;
+  sortOrder: number;
+
+  // Dexie Cloud fields if synced per user
   realmId?: string;
   owner?: string;
 }
@@ -268,6 +280,7 @@ const db = new Dexie('DB', { addons: [dexieCloud] }) as Dexie & {
   appmetadata: EntityTable<AppMetadata, 'id'>;
   users: EntityTable<User, 'userId'>;
   accounts: EntityTable<Account, 'accountId'>;
+  accountPreferences: EntityTable<AccountPreference, 'id'>;
   categories: EntityTable<Category, 'categoryId'>;
   subcategories: EntityTable<Subcategory, 'subcategoryId'>;
   expenses: EntityTable<Expense, 'expenseId'>;
@@ -300,7 +313,8 @@ export async function initializeDatabase() {
 db.version(1).stores({
   appmetadata: 'id, key',
   users: 'userId, email, realmId, sharedRealmId, owner',
-  accounts: 'accountId, userId, sortOrder',
+  accounts: 'accountId, userId, sortOrder, sharedAccount',
+  accountPreferences: 'id, userId, sortOrder',
   categories: 'categoryId, categoryName',
   subcategories: 'subcategoryId, subcategoryName, parentCategoryId',
   expenses: 'expenseId, isActive, userId, expenseDate, accountId, categoryId, subcategoryId, expenseCurrencyCode, tripId, seriesId, [seriesId+expenseDate], [seriesId+installmentIndex], [seriesId+isActive+dueDate], [seriesId+dueDate]',
@@ -380,12 +394,14 @@ export const seedInitialData = async (
   try {
     const installationId = crypto.randomUUID(); 
     const userId = crypto.randomUUID();
+    const accountId = crypto.randomUUID();
 
     await db.transaction(
       "rw",
       db.appmetadata,
       db.users,
       db.accounts,
+      db.accountPreferences,
       db.categories,
       async () => {
 
@@ -433,7 +449,7 @@ export const seedInitialData = async (
         } as User);
 
         await db.accounts.add({
-          accountId:crypto.randomUUID(),
+          accountId: accountId,
           userId: userId,
           accountName: "Cash",
           accountIdentifier: "",
@@ -441,7 +457,15 @@ export const seedInitialData = async (
           accountLogo: "fa-money-bill-1-wave",
           activeAccount: true,
           sortOrder: 0,
+          sharedAccount: false,
         } as Account);
+
+        await db.accountPreferences.add({
+          id: `${userId}_${crypto.randomUUID()}`, // Primary key (can be compound like [userId + accountId])
+          userId: userId,
+          accountId: accountId,
+          sortOrder: 0,
+        })
 
         const defaultCategories = [
           { name: "Categoryless", color: "categoryless", icon: "fa-bolt-lightning" },

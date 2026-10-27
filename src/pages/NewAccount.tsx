@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import useScrollToTop from '../hooks/useScrollToTop';
 import { useUser } from '../context/UserContext'; // Import the useUser hook
 import { useKeyboardAutoClose } from '../hooks/useKeyboardAutoClose';
+import { useHasGuest } from '../services/SharingService';
 
 
 // App components
@@ -24,6 +25,7 @@ import {
   IonContent, 
   IonHeader, 
   IonPage,
+  IonToggle,
   IonToolbar,
 } from '@ionic/react';
 
@@ -35,10 +37,11 @@ import '../Main.css';
 
 const NewAccount: React.FC = () => {
   const contentRef = useScrollToTop(); // use the custom hook 
-  const { userId } = useUser(); // Access user context
+  const { user, userId } = useUser(); // Access user context
   const { t } = useTranslation();
   const { themeColor } = useTheme();
   const color = themeColor.split("-")[1]; // Extracts color name to initialize selectedColor
+  const hasActiveGuest = useHasGuest(user.sharedRealmId);
 
   const [errors, setErrors] = useState<{ [key: string]: string | null }>({
     cardName: null,
@@ -59,6 +62,7 @@ const NewAccount: React.FC = () => {
   const [accountIdentifier, setAccountIdentifier] = useState<string>('');
   const [accountLogo, setAccountLogo] = useState<string>("fa-globe");
   const [accountColor, setAccountColor] = useState<string>(color);
+  const [sharedAccount, setSharedAccount] = useState<boolean>(false);
 
   useKeyboardAutoClose(); 
   
@@ -95,7 +99,7 @@ const NewAccount: React.FC = () => {
   async function getNextSortOrder(): Promise<number> {
     // 1. Get the last account ordered by sortOrder
     // .last() will return the account with the highest sortOrder.
-    const lastAccount = await db.accounts
+    const lastAccount = await db.accountPreferences
       .orderBy('sortOrder')
       .last();
   
@@ -170,18 +174,29 @@ const NewAccount: React.FC = () => {
       
       // 🚨 CRITICAL FIX: Wrap the operation in an explicit transaction 🚨
       // We list both 'accounts' and 'changes' tables.
-      await db.transaction('rw', db.accounts, async (tx) => {
+      await db.transaction('rw', db.accounts, db.accountPreferences, async (tx) => {
+        const accountId = crypto.randomUUID();
         
-        const accountId = await tx.accounts.add({
-          accountId: crypto.randomUUID(),
+        await tx.accounts.add({
+          accountId: accountId,
           accountName,
           accountIdentifier,
           accountColor,
           accountLogo,
           activeAccount: true,
           userId,
-          sortOrder
+          //sortOrder,
+          sharedAccount,
+          realmId: user.sharedRealmId ? user.sharedRealmId : user.realmId,
         });
+
+        await db.accountPreferences.add({
+          id: `${userId}_${crypto.randomUUID()}`, // Primary key (can be compound like [userId + accountId])
+          userId: userId,
+          accountId: accountId,
+          sortOrder: sortOrder,
+          realmId: user.sharedRealmId ? user.sharedRealmId : user.realmId,
+        })
         
       });
 
@@ -295,6 +310,23 @@ const NewAccount: React.FC = () => {
               defaultView='accounts'
             />
           </section>
+
+          {/* Share account if there's a guest */}
+          {hasActiveGuest && (
+            <section>
+              <div
+                className='toggle-row'
+                onClick={() => {
+                    setSharedAccount(prev => !prev);
+                }}
+              >
+                <IonToggle
+                  checked={sharedAccount}
+                />
+                <span>Shared account</span>
+              </div>
+            </section>
+          )}
 
           {/* Add account button */}
           <IonButton

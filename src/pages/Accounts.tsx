@@ -1,18 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { db, Account } from "../db";
+import { db, Account, AccountPreference } from "../db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useTranslation } from 'react-i18next';
-
 
 // Custom hooks
 import useScrollToTop from '../hooks/useScrollToTop';
 import { useUser } from '../context/UserContext'; // Import the useUser hook
 
-
 // App components
 import DefaultCard from '../components/DefaultCard';
 import Footer from '../components/Footer'
-
 
 // Ionic components
 import { 
@@ -34,7 +31,6 @@ import {
   useIonViewWillLeave
 } from '@ionic/react';
 
-
 // icons
 import { 
   add,
@@ -50,12 +46,10 @@ import {
   swapVerticalOutline, 
 } from 'ionicons/icons';
 
-
 // Styles
 import '../Main.css';
 import './Accounts.css';
 import '../components/DefaultCard.css';
-
 
 // Footer items
 interface AppPage {
@@ -71,9 +65,6 @@ const appPages: AppPage[] = [
   { title: 'activity', url: '/app/activity', icon: cashOutline }
 ];
 
-
-
-
 const Accounts: React.FC = () => {
   const contentRef = useScrollToTop(); // use the custom hook 
   const { t } = useTranslation();
@@ -82,14 +73,83 @@ const Accounts: React.FC = () => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [popoverEvent, setPopoverEvent] = useState<MouseEvent | null>(null);
 
-  // 1. 🔑 Fetch and sort accounts from DB
-  const accounts: Account[] | undefined = useLiveQuery(
-    () => db.accounts.orderBy('sortOrder').toArray()
-  );
+  // 1. 🔑 Rewritten main function: Fetches accounts, filters/categorizes available vs not available, and sorts securely
+  const accountData = useLiveQuery(async () => {
+    const allAccounts = await db.accounts.toArray();
+    console.log("1. Raw allAccounts from DB:", allAccounts);
+
+    // Guard against missing user identifiers
+    if (!user.owner || !user.userId) {
+      return { availableAccounts: allAccounts, notAvailableAccounts: [] };
+    }
+
+    const preferences = await db.accountPreferences
+      .where('userId')
+      .equals(user.userId)
+      .toArray();
+
+    console.log("2. Fetched preferences for user:", preferences);
+
+    // Create a lookup map for fast performance: { accountId: sortOrder }
+    const sortMap = new Map(preferences.map(p => [p.accountId, p.sortOrder]));
+
+    const available: Account[] = [];
+    const notAvailable: Account[] = [];
+
+    // Categorize accounts according to requirements 1, 2, and 4
+    allAccounts.forEach(account => {
+      const isCurrentOwner = account.owner === user.owner;
+      const isSharedByOther = account.owner !== user.owner && Boolean(account.sharedAccount);
+
+      if (isCurrentOwner || isSharedByOther) {
+        // Point 1 & 2: Current user's accounts + accounts shared by the other user
+        available.push(account);
+      } else {
+        // Point 4: Other user's unshared accounts (Not available for reordering)
+        notAvailable.push(account);
+      }
+    });
+
+    // Point 3: Sort available accounts using accountPreferences with stable fallbacks
+    available.sort((a, b) => {
+      const orderA = sortMap.get(a.accountId);
+      const orderB = sortMap.get(b.accountId);
+
+      // If both have explicit user-defined preferences, sort by order
+      if (orderA !== undefined && orderB !== undefined) {
+        if (orderA !== orderB) {
+          return orderA - orderB;
+        }
+      }
+
+      // If only one has a preference, prioritize it
+      if (orderA !== undefined && orderB === undefined) return -1;
+      if (orderA === undefined && orderB !== undefined) return 1;
+
+      // Stable default grouping fallback if no preferences are saved yet
+      const aIsOwner = a.owner === user.owner ? 1 : 2;
+      const bIsOwner = b.owner === user.owner ? 1 : 2;
+      if (aIsOwner !== bIsOwner) {
+        return aIsOwner - bIsOwner;
+      }
+
+      return (a.accountId || '').localeCompare(b.accountId || '');
+    });
+
+    // Sort not available accounts alphabetically
+    notAvailable.sort((a, b) => (a.accountId || '').localeCompare(b.accountId || ''));
+
+    console.log("3. Final sorted availableAccounts:", available.map(a => ({ id: a.accountId, owner: a.owner, shared: a.sharedAccount })));
+
+    return { availableAccounts: available, notAvailableAccounts: notAvailable };
+  }, [user.owner, user.userId]);
+
+ 
   const [showInactiveAccounts, setShowInactiveAccounts] = useState(() => user.showDisabledAccounts);
   
-  // 2. 🎣 State for the list currently being displayed and reordered
-  const [items, setItems] = useState<Account[]>([]);
+  // 2. 🎣 States for filtered lists currently being displayed and reordered
+  const [availableItems, setAvailableItems] = useState<Account[]>([]);
+  const [notAvailableItems, setNotAvailableItems] = useState<Account[]>([]);
 
   // 3. 📝 State for the reorder mode toggle
   const [isReordering, setIsReordering] = useState(false);
@@ -97,157 +157,166 @@ const Accounts: React.FC = () => {
   // 4. 🔑 State to force the visual component reset
   const [resetKey, setResetKey] = useState(0); 
   
-  // Show helpfull tip
+  // Show helpful tip
   const [showInfo, setShowInfo] = useState<boolean>(false);
   
-  // Check if there are any inactive categories
-  const hasInactiveAccounts = accounts?.some(account => account.activeAccount === false);
+  // Check if there are any inactive categories across all accounts
+  const allLoadedAccounts = [...(accountData?.availableAccounts || []), ...(accountData?.notAvailableAccounts || [])];
+  const hasInactiveAccounts = allLoadedAccounts.some(account => account.activeAccount === false);
 
   useIonViewWillLeave(() => {
     setIsReordering(false);
   });
   
-  
-  // 5. 🔄 Initialize/Update 'items' when 'accounts' (Source of Truth) changes
+  // 5. 🔄 Initialize/Update display items when source data or filters change
   useEffect(() => {
-    // Only update if 'accounts' is defined (i.e., the query has returned data)
-    // AND we are NOT currently in reordering mode.
-    if (accounts && !isReordering) {
-      let filteredAccounts: Account[];
+    if (accountData && !isReordering) {
+      let filteredAvailable = accountData.availableAccounts;
+      let filteredNotAvailable = [...accountData.notAvailableAccounts];
 
       if (!showInactiveAccounts) {
-        // If showInactiveAccounts is FALSE, filter to show only active accounts (activeAccount: true)
-        filteredAccounts = accounts.filter(account => account.activeAccount);
+        // Hide inactive accounts entirely
+        filteredAvailable = filteredAvailable.filter(account => account.activeAccount);
+        filteredNotAvailable = filteredNotAvailable.filter(account => account.activeAccount);
       } else {
-        // If showInactiveAccounts is TRUE, show all accounts (active and inactive)
-        filteredAccounts = accounts;
+        // Extract inactive accounts from both lists (or just available/not available depending on your data structure)
+        // and push them into the end of notAvailableItems so they appear last.
+        const inactiveAvailable = filteredAvailable.filter(account => !account.activeAccount);
+        const inactiveNotAvailable = filteredNotAvailable.filter(account => !account.activeAccount);
+
+        // Keep only active ones in their respective primary slots
+        filteredAvailable = filteredAvailable.filter(account => account.activeAccount);
+        filteredNotAvailable = filteredNotAvailable.filter(account => account.activeAccount);
+
+        // Combine inactive accounts at the tail end of notAvailableItems
+        filteredNotAvailable = [...filteredNotAvailable, ...inactiveNotAvailable, ...inactiveAvailable];
       }
       
-      // Use a defensive copy of the filtered data.
-      setItems([...filteredAccounts]);
+      setAvailableItems([...filteredAvailable]);
+      setNotAvailableItems([...filteredNotAvailable]);
     }
-  }, [accounts, isReordering, showInactiveAccounts]); 
+  }, [accountData, isReordering, showInactiveAccounts]);
+
 
   
-  // 6. 🔄 Handler to manage local reordering (remains mostly the same)
+  // 6. 🔄 Handler to manage local reordering for available items only
   const handleReorder = useCallback((event: CustomEvent<ItemReorderEventDetail>) => {
-    const newOrderedItems = event.detail.complete([...items]);
-    setItems(newOrderedItems);
-  }, [items]);
+    const newOrderedItems = event.detail.complete([...availableItems]) as Account[];
+    console.log("4. After drag-and-drop reorder:", newOrderedItems.map((item: Account) => item.accountId));
+    setAvailableItems(newOrderedItems);
+  }, [availableItems]);
 
-
-  // 7. ✅ Handler for the "Done" button (Persistence logic)
+  
+  // 7. ✅ Handler for the "Done" button (Persists exact sort orders sequentially)
   const handleDone = async () => {
-    // 1. Calculate the updates needed before starting the transaction
-    const updates = items.map((item, index) => ({
-      ...item,
-      sortOrder: index,
-    }));
+    const currentUserId = user.userId;
+    const currentOwner = user.owner;
+    
+    if (!currentUserId || !currentOwner) return;
 
     try {
-      // 2. Wrap the DB operations in a transaction
       await db.transaction(
         'rw', 
-        db.accounts,
-        async (tx) => {
-          await tx.accounts.bulkPut(updates);
+        db.accountPreferences,
+        async () => {
+          const updates = await Promise.all(
+            availableItems.map(async (item, index) => {
+              const prefId = `${currentUserId}_${item.accountId}`;
+              const existingPref = await db.accountPreferences.get(prefId);
+
+              return existingPref
+                ? { ...existingPref, sortOrder: index }
+                : {
+                    id: prefId,
+                    userId: currentUserId,
+                    accountId: item.accountId,
+                    sortOrder: index,
+                    owner: currentOwner
+                  };
+            })
+          );
+
+          await db.accountPreferences.bulkPut(updates);
         }
       );
 
-      // 3. Exit reorder mode *only* after the transaction successfully commits
       setIsReordering(false);
     } catch (error) {
-      console.error("Transaction failed during handleDone (Rollback initiated):", error);
+      console.error("Transaction failed during handleDone:", error);
     }
   };
 
   // 8. ❌ Handler for the "Cancel" button
   const handleCancel = () => {
-    // 1. Exit reordering mode (must be first)
     setIsReordering(false);
 
-    // 2. Discard local changes: The `useEffect` will handle resetting `items`
-    //    to the persistent `accounts` data when `isReordering` becomes false.
-
-    // 3. 💥 Force Visual Reset
     setTimeout(() => {
         setResetKey(prevKey => prevKey + 1);
     }, 0);
   };
   
-
   // 9. 🔄 Handler for starting reorder mode
   const startReorder = () => {
     setIsReordering(true);
   };
   
-  
   // Update showDisabledAccounts in user context
   const showDisabledAccounts = (checked: boolean) => {
-    setShowInactiveAccounts(checked); // Update local state
-    updateUser({ showDisabledAccounts: checked }); // Update context
+    setShowInactiveAccounts(checked);
+    updateUser({ showDisabledAccounts: checked });
   };
 
- 
   // Translate footer menu items
   const translatedMenuItems = appPages.map((item) => ({
     ...item,
     title: t(`common.${item.title}`, { defaultValue: item.title }),
   }));
 
-
   // Open secondary menu
   const openPopover = (event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>) => {
-    setPopoverEvent(event.nativeEvent); // Capture the click event
+    setPopoverEvent(event.nativeEvent);
     setIsPopoverOpen(true);
   };
-
 
   // Close secondary menu
   const closePopover = () => {
     setIsPopoverOpen(false);
   };
 
-
-  
   return (
     <IonPage>
       <IonHeader className='page-header ion-no-border'>
         <IonToolbar>
-          {/* Secondary menu */}
-          {(items.length > 1 || hasInactiveAccounts) && (
+          {(availableItems.length > 1 || hasInactiveAccounts) && (
             <IonButtons slot="end">
-              {/* Button to open the popover */}
-              <IonButton  onClick={openPopover}>
+              <IonButton onClick={openPopover}>
                 <IonIcon icon={ellipsisVertical} />
               </IonButton>
 
-              {/* Popover positioned at the button's bottom-right */}
               <IonPopover 
                 isOpen={isPopoverOpen} 
-                event={popoverEvent} // Position it based on the button click
+                event={popoverEvent} 
                 onDidDismiss={closePopover} 
-                side="bottom" // Align popover below the button
-                alignment="end" // Align popover to the right of the button
+                side="bottom" 
+                alignment="end" 
                 className='secondary-menu'
               >
                 <IonContent class="ion-no-padding">
                   <ul className='list'>
-                  {items.length > 1 && (
+                  {availableItems.length > 1 && (
                     <li 
                       className={`item ${isReordering ? 'disabled' : ''}`} 
                       onClick={() => {
-                        // Only execute the logic if isReordering is FALSE
                         if (!isReordering) {
                           closePopover();
-                          startReorder(); // Assuming clicking "Reorder" sets it to true
+                          startReorder();
                         }
                       }}
                     >
                       <IonIcon 
                         icon={swapVerticalOutline} 
                         className={`icon ${isReordering ? 'disabled' : ''}`}
-                        style={{ marginRight: "15px" }} // Optional spacing
+                        style={{ marginRight: "15px" }} 
                       />
                       {t('accounts.reorder')}
                     </li>
@@ -257,21 +326,20 @@ const Accounts: React.FC = () => {
                       className={`item ${isReordering ? 'disabled' : ''}`} 
                       onClick={() => {
                         if(!isReordering) {
-                          closePopover(); // First, close the popover
-                          showDisabledAccounts(!showInactiveAccounts); // Then update state after a brief delay
+                          closePopover(); 
+                          showDisabledAccounts(!showInactiveAccounts); 
                         }
                       }}
                     >
                       <IonIcon 
                         icon={showInactiveAccounts ? eyeOffOutline : eyeOutline} 
                         className="icon"
-                        style={{ marginRight: "15px" }} // Optional spacing
+                        style={{ marginRight: "15px" }} 
                       />
                       {showInactiveAccounts ? t('common.hide_inactive') : t('common.show_inactive')}
                     </li>
                   )}
                 </ul>
-
                 </IonContent>
               </IonPopover>
             </IonButtons>
@@ -281,14 +349,11 @@ const Accounts: React.FC = () => {
 
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
         <div className="page-container">
-          {/* Screen title */}
           <div className="centered-container mb-20">
             <h2 className='screen-title'>{t('accounts.accounts_title')}</h2>
           </div>
 
-          {/* Subtitle, info and Cancel/Done buttons */}
           <div className="section-header">
-            {/* Subtitle and info */}
             <div className="flex-top ml-20">
               <h6 className='section-title'>{t('accounts.manage_accounts')}</h6>   
               <IonIcon 
@@ -298,17 +363,14 @@ const Accounts: React.FC = () => {
               />
             </div>
 
-            {/* Cancel / Done buttons */}
             {isReordering && (
               <div className='icon-menu-bar mr-5'>
-                {/* Cancel button */}
                 <IonIcon 
                   icon={closeOutline} 
                   onClick={handleCancel}
                   className='medium-icon-btn danger'
                 />
 
-                {/* Done button */}
                 <IonIcon 
                   icon={checkmarkOutline}
                   onClick={handleDone} 
@@ -318,24 +380,21 @@ const Accounts: React.FC = () => {
             )}
           </div>
         
-          {/* Accounts list */}
           <div className='centered-container mb-60'>
+            {/* 1. Reorderable Available Accounts */}
             <IonList lines="none" className='account-list' key={resetKey}>
               <IonReorderGroup 
-                disabled={!isReordering} // Only allow reordering when mode is active
+                disabled={!isReordering} 
                 onIonItemReorder={handleReorder}
               >           
-                {items?.map((item) => (
+                {availableItems?.map((item) => (
                   <IonItem 
                     key={item.accountId} 
                     lines="none" 
                     detail={false} 
-                    // Add a class to the IonItem to target the content later
                     className={`reorder-item-wrapper ${isReordering ? 'is-reordering' : ''}`}   
                   >
-                    
-                    {/* This is the new content wrapper for the animation */}
-                    <div className='reorder-item-content'> 
+                    <div className="reorder-item-content"> 
                       <IonRouterLink
                         routerLink={`/app/editaccount/${item.accountId}`} 
                         routerDirection="forward"
@@ -346,13 +405,14 @@ const Accounts: React.FC = () => {
                           color={item.activeAccount ? item.accountColor : "slateGray"}
                           identifier={item.accountIdentifier}
                           logo={item.accountLogo}
-                          amount='' // don't show amount in this screen
+                          amount='' 
                           editMode={false}
+                          isShared={item.sharedAccount}
+                          isActive={item.activeAccount}
                         />
                       </IonRouterLink>
                     </div>
 
-                    {/* Only render IonReorder for this account if reordering is ON and the account is active */}
                     {isReordering && item.activeAccount && (
                       <IonReorder 
                         slot="end" 
@@ -363,11 +423,45 @@ const Accounts: React.FC = () => {
                 ))}
               </IonReorderGroup>     
             </IonList>
+
+            {/* 2. Non-Available Accounts - Displayed at the bottom outside the reorder group */}
+            {notAvailableItems.length > 0 && (
+              <IonList lines="none" className='account-list'>
+                {notAvailableItems.map((item) => {
+                  return (
+                    <IonItem 
+                      key={item.accountId} 
+                      lines="none" 
+                      detail={false} 
+                      className="reorder-item-wrapper"   
+                    >
+                      <div className="reorder-item-content disabled"> 
+                        <IonRouterLink
+                          routerLink={`/app/editaccount/${item.accountId}`} 
+                          routerDirection="forward"
+                          className='default-card-router-link'
+                        >
+                          <DefaultCard  
+                            title={item.accountName}
+                            color={item.activeAccount ? item.accountColor : "slateGray"}
+                            identifier={item.accountIdentifier}
+                            logo={item.accountLogo}
+                            amount='' 
+                            editMode={false}
+                            isShared={item.sharedAccount}
+                            isActive={false}
+                          />
+                        </IonRouterLink>
+                      </div>
+                    </IonItem>
+                  );
+                })}
+              </IonList>
+            )}
           </div>
         </div>
       </IonContent>
 
-      {/* Info alert for this screen */}
       <IonAlert
         isOpen={showInfo}
         className='custom-alert'

@@ -17,7 +17,7 @@ import {
   IonRouterLink 
 } from '@ionic/react';
 
-import { alertCircle, warning, checkmarkCircle, stopCircle } from 'ionicons/icons';
+import { alertCircle, warning, checkmarkCircle, stopCircle, ellipse } from 'ionicons/icons';
 
 
 // Styles

@@ -134,10 +134,13 @@ const Members: React.FC = () => {
                         icon={ellipse}
                         style={{
                           color: dotColor,
+                          fontSize: '11px',
                           marginRight: '5px',
+                          border: '1px solid white',
+                          borderRadius: '50%',
+                          filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35))',
                         }}
                       />
-
                       <IonNote>{role}</IonNote>
                     </div>
                   </div>

@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import useScrollToTop from '../hooks/useScrollToTop';
 import { useUser } from '../context/UserContext'; // Import the useUser hook
 import { useKeyboardAutoClose } from '../hooks/useKeyboardAutoClose';
+import { useHasGuest } from '../services/SharingService';
 
 
 // App components
@@ -45,6 +46,7 @@ const EditAccount: React.FC = () => {
   const contentRef = useScrollToTop(); // use the custom hook 
   const { t } = useTranslation();
   const { user } = useUser();
+  const hasActiveGuest = useHasGuest(user.sharedRealmId);
   
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [popoverEvent, setPopoverEvent] = useState<MouseEvent | null>(null);
@@ -56,7 +58,11 @@ const EditAccount: React.FC = () => {
   const [accountIdentifier, setAccountIdentifier] = useState<string>('');
   const [accountLogo, setAccountLogo] = useState<string>("");
   const [accountColor, setAccountColor] = useState<string>('');
+  const [accountOwner, setAccountOwner] = useState<string>('');
   const [isActiveAccount, setIsActiveAccount] = useState<boolean>(true);
+  const [sharedAccount, setSharedAccount] = useState<boolean>(false);
+  const [isOwner, setIsOwner] = useState<boolean>(false);
+  
   const [hasExpenses, setHasExpenses] = useState<boolean>(false);
 
 
@@ -86,6 +92,10 @@ const EditAccount: React.FC = () => {
       setAccountColor(account.accountColor);
       setAccountLogo(account.accountLogo);
       setIsActiveAccount(account.activeAccount);
+      setSharedAccount(account.sharedAccount);
+      account.owner && setAccountOwner(account.owner);
+
+      if(account.owner === user.owner) setIsOwner(true);
     }
   }, [account]); // Update state when `account` is available
 
@@ -96,6 +106,7 @@ const EditAccount: React.FC = () => {
   
     async function check() {
       const exists = await hasExpensesOrRecurrencesForAccount(passedAccountId);
+      
       if (isMounted) setHasExpenses(exists);
     }
   
@@ -223,6 +234,7 @@ const EditAccount: React.FC = () => {
             accountColor,
             accountLogo,
             userId: user.userId,
+            sharedAccount,
           });
         }
       ); 
@@ -236,66 +248,82 @@ const EditAccount: React.FC = () => {
     }
   }
 
-  // Enable or disable account
+// Enable or disable account
   const changeActiveAccount = async (accountId: string, activeAccount: boolean) => {
-    if (!accountId) return;
-  
+    if (!accountId || !user?.userId) return;
+
     const newActiveState = !activeAccount;
-  
+
     try {
-      await db.transaction('rw', db.accounts, async () => {
-        
-        let updateSortOrder = undefined; // Sort order to apply to the account being changed
-  
-        if (!newActiveState) {
-            // If DISABLING: Find the highest current sortOrder among ALL accounts
-            const maxSortOrderAccount = await db.accounts.orderBy('sortOrder').last();
-            const maxSortOrder = maxSortOrderAccount ? maxSortOrderAccount.sortOrder : -1;
-            
-            // Assign the new sortOrder to be one higher than the current maximum
-            updateSortOrder = maxSortOrder + 1;
-        }
-        // Note: If ENABLING, we don't change its sortOrder yet; it's handled in the re-indexing below.
-        
-        // 2. Update the account's active state and its new (or current) sortOrder
+      await db.transaction('rw', db.accounts, db.accountPreferences, async () => {
+        // 1. Update the account's active state
         await db.accounts.update(accountId, { 
-            activeAccount: newActiveState, 
-            ...(updateSortOrder !== undefined && { sortOrder: updateSortOrder }) // Apply new sortOrder if disabling
+            activeAccount: newActiveState 
         });
-  
-        // 3. Re-index sortOrder for ALL accounts
-        
-        // We must fetch and sort ALL accounts using the new criteria:
-        // Active accounts first, then Disabled accounts.
+
+        // 2. Fetch all accounts and current user's preferences
         const allAccounts = await db.accounts.toArray();
+        const userPreferences = await db.accountPreferences
+          .where('userId')
+          .equals(user.userId)
+          .toArray();
         
-        const newlyOrderedAccounts = allAccounts.sort((a, b) => {
-            // Primary sort: Active status (Active=true before Disabled=false)
+        const prefMap = new Map(userPreferences.map(p => [p.accountId, p.sortOrder]));
+        
+        // 3. Sort accounts: Active accounts first (ordered by preference), then disabled accounts
+        const sortedAccounts = allAccounts.sort((a, b) => {
             if (a.activeAccount !== b.activeAccount) {
                 return Number(b.activeAccount) - Number(a.activeAccount);
             }
-            
-            // Secondary sort: Current sortOrder to maintain relative order within groups
-            return a.sortOrder - b.sortOrder;
+            const orderA = prefMap.get(a.accountId) ?? 9999;
+            const orderB = prefMap.get(b.accountId) ?? 9999;
+            return orderA - orderB;
         });
-  
-        // 4. Re-assign contiguous sortOrder (0, 1, 2...) based on the new stable list
-        for (let i = 0; i < newlyOrderedAccounts.length; i++) {
-          const account = newlyOrderedAccounts[i];
-          const newSortOrder = i;
-  
-          if (account.sortOrder !== newSortOrder) {
-            await db.accounts.update(account.accountId, { sortOrder: newSortOrder });
+
+        // 4. Re-assign contiguous sortOrder (0, 1, 2...) for active accounts in accountPreferences
+        let activeIndex = 0;
+        for (let i = 0; i < sortedAccounts.length; i++) {
+          const acc = sortedAccounts[i];
+          const compoundKey = [user.userId, acc.accountId];
+
+          if (acc.activeAccount) {
+            const newSortOrder = activeIndex++;
+            
+            const existingPref = await db.accountPreferences
+              .where('[userId+accountId]')
+              .equals(compoundKey)
+              .first();
+
+            if (existingPref) {
+              await db.accountPreferences.update(existingPref.id!, { sortOrder: newSortOrder });
+            } else {
+              await db.accountPreferences.add({
+                id: `${user.userId}_${acc.accountId}`,
+                userId: user.userId,
+                accountId: acc.accountId,
+                sortOrder: newSortOrder,
+              });
+            }
+          } else {
+            // If disabled, remove its preference record (or handle as needed)
+            const existingPref = await db.accountPreferences
+              .where('[userId+accountId]')
+              .equals(compoundKey)
+              .first();
+
+            if (existingPref && existingPref.id) {
+              await db.accountPreferences.delete(existingPref.id);
+            }
           }
         }
-        
       });
       
     } catch (error) {
-      console.error(`Failed to change account status or re-index sortOrder:`, error);
-      // Open failure modal
+      console.error(`Failed to change account status or re-index preferences:`, error);
+      openFailureModal(t('accounts.failed_to_update'));
     } 
   };
+
   // Open secondary menu
   const openPopover = (event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>) => {
     setPopoverEvent(event.nativeEvent); // Capture the click event
@@ -310,46 +338,69 @@ const EditAccount: React.FC = () => {
 
   // Delete account
   const handleDeleteAccount = async (accountId: string) => {
+    if (!user?.userId) return;
+
     try {
-      // 🚨 CRITICAL FIX: Define an atomic transaction encompassing all necessary tables 🚨
       await db.transaction(
-        'rw', // Read-write mode
+        'rw', 
         db.accounts, 
-        async (tx) => {           
+        db.accountPreferences,
+        async () => {           
           // 1. Delete the account record
-          // NOTE: Dexie's delete() returns the number of deleted records.
           await db.accounts.where('accountId').equals(accountId).delete();
           
-          // 2. RE-INDEX sortOrder for ALL remaining accounts (READ)
-          // When called inside a transaction, Dexie ensures this read is consistent 
-          // with the delete performed above (it sees only the remaining accounts).
-          const remainingAccounts = await db.accounts.orderBy('sortOrder').toArray();
+          // 2. Delete the associated preference record for this user
+          await db.accountPreferences
+            .where('[userId+accountId]')
+            .equals([user.userId, accountId])
+            .delete();
+          
+          // 3. Re-index remaining active accounts' preferences
+          const remainingAccounts = await db.accounts.where('activeAccount').equals(1).toArray();
+          const userPreferences = await db.accountPreferences
+            .where('userId')
+            .equals(user.userId)
+            .toArray();
+          
+          const prefMap = new Map(userPreferences.map(p => [p.accountId, p.sortOrder]));
 
-          // 3. Update the sortOrder for remaining accounts (WRITE)
+          remainingAccounts.sort((a, b) => (prefMap.get(a.accountId) ?? 9999) - (prefMap.get(b.accountId) ?? 9999));
+
           for (let i = 0; i < remainingAccounts.length; i++) {
-            const account = remainingAccounts[i];
+            const acc = remainingAccounts[i];
+            const compoundKey = [user.userId, acc.accountId];
             const newSortOrder = i;
 
-            if (account.sortOrder !== newSortOrder) {
-              await db.accounts.update(account.accountId, { sortOrder: newSortOrder });
+            const existingPref = await db.accountPreferences
+              .where('[userId+accountId]')
+              .equals(compoundKey)
+              .first();
+
+            if (existingPref) {
+              if (existingPref.sortOrder !== newSortOrder) {
+                await db.accountPreferences.update(existingPref.id!, { sortOrder: newSortOrder });
+              }
+            } else {
+              await db.accountPreferences.add({
+                id: `${user.userId}_${acc.accountId}`,
+                userId: user.userId,
+                accountId: acc.accountId,
+                sortOrder: newSortOrder,
+              });
             }
           }
-          
-          // If the code reaches this point, the transaction commits successfully, 
-          // and ALL changes (1 delete, N updates, and N+1 change logs) are committed.
         }
       ); 
-      // 🚨 Transaction ends here 🚨
 
-      openSuccessModal(t('accounts.account_deleted')); // Success feedback
+      openSuccessModal(t('accounts.account_deleted'));
     } catch (error) {
-      // If the transaction fails at any point, the catch block runs, 
-      // and NO changes are written to the database (full rollback).
       openFailureModal(t('accounts.error_deleting'));
       console.error('Error deleting account:', error);
     }
-};
-   
+  };  
+  
+  
+
 
   return (
     <IonPage>
@@ -359,73 +410,74 @@ const EditAccount: React.FC = () => {
             <IonBackButton />
           </IonButtons>
 
-          {/* Secondary menu for this category */}
-          <IonButtons slot="end">
-            {/* Button to open the popover */}
-            <IonButton  onClick={openPopover}>
-              <IonIcon icon={ellipsisVertical} />
-            </IonButton>
+          {/* Secondary menu for this account */}
+          {isOwner && (
+            <IonButtons slot="end">
+              {/* Button to open the popover */}
+              <IonButton  onClick={openPopover}>
+                <IonIcon icon={ellipsisVertical} />
+              </IonButton>
 
-            {/* Popover positioned at the button's bottom-right */}
-            <IonPopover 
-              isOpen={isPopoverOpen} 
-              event={popoverEvent} // Position it based on the button click
-              onDidDismiss={closePopover} 
-              side="bottom" // Align popover below the button
-              alignment="end" // Align popover to the right of the button
-              className='secondary-menu'
-            >
-              <IonContent class="ion-no-padding">
-                <ul className='list'>
-                  {isActiveAccount ? (
-                    <>
+              {/* Popover positioned at the button's bottom-right */}
+              <IonPopover 
+                isOpen={isPopoverOpen} 
+                event={popoverEvent} // Position it based on the button click
+                onDidDismiss={closePopover} 
+                side="bottom" // Align popover below the button
+                alignment="end" // Align popover to the right of the button
+                className='secondary-menu'
+              >
+                <IonContent class="ion-no-padding">
+                  <ul className='list'>
+                    {isActiveAccount ? (
+                      <>
+                        <li 
+                          className="item" 
+                          onClick={() => {
+                            closePopover(); // First, close the popover
+                            setTimeout(() => changeActiveAccount(passedAccountId, isActiveAccount), 100); // Then update state after a brief delay
+                          }}
+                        >
+                          <IonIcon icon={eyeOffOutline} /> {t('common.disable')}
+                        </li>
+                      </>
+                    ) : (
                       <li 
                         className="item" 
                         onClick={() => {
-                          closePopover(); // First, close the popover
-                          setTimeout(() => changeActiveAccount(passedAccountId, isActiveAccount), 100); // Then update state after a brief delay
+                          closePopover(); // Close the popover first
+                          setTimeout(() => changeActiveAccount(passedAccountId, isActiveAccount), 100); // Delay state change
                         }}
                       >
-                        <IonIcon icon={eyeOffOutline} /> {t('common.disable')}
+                        <IonIcon icon={eyeOutline} /> {t('common.enable')}
                       </li>
-                    </>
-                  ) : (
-                    <li 
-                      className="item" 
-                      onClick={() => {
-                        closePopover(); // Close the popover first
-                        setTimeout(() => changeActiveAccount(passedAccountId, isActiveAccount), 100); // Delay state change
-                      }}
-                    >
-                      <IonIcon icon={eyeOutline} /> {t('common.enable')}
-                    </li>
-                  )}
-                  {!hasExpenses && (
-                    <li 
-                      className="item" 
-                      onClick={() => {
-                        closePopover();
-                        setTimeout(() => {
-                          handleDeleteAccount(passedAccountId);
-                        }, 100);
-                      }}
-                    >
-                      <IonIcon icon={trashOutline} /> 
-                      {t('common.delete')}
-                    </li>
-                  
-                  )}
-                </ul>
-              </IonContent>
-            </IonPopover>
-          </IonButtons>
-          
+                    )}
+                    {!hasExpenses && (
+                      <li 
+                        className="item" 
+                        onClick={() => {
+                          closePopover();
+                          setTimeout(() => {
+                            handleDeleteAccount(passedAccountId);
+                          }, 100);
+                        }}
+                      >
+                        <IonIcon icon={trashOutline} /> 
+                        {t('common.delete')}
+                      </li>
+                    
+                    )}
+                  </ul>
+                </IonContent>
+              </IonPopover>
+            </IonButtons>
+          )}
         </IonToolbar>
       </IonHeader>
     
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
         <div className="page-container">
-          <div>
+          <div className={!isOwner ? 'disabled' : ''}>
             {/* Screen Header */}
             <div className='centered-container mb-20'>
               <h2 className='screen-title'>{t('accounts.edit_account_title')}</h2>
@@ -439,20 +491,22 @@ const EditAccount: React.FC = () => {
                 identifier={accountIdentifier}
                 logo={accountLogo}
                 amount=""
-                editMode={true}
+                editMode={isOwner}
+                showOwner={hasActiveGuest}
+                owner={hasActiveGuest ? accountOwner : ''}
               />
             </section>
 
             {/* Form Section */}
             <section>
               {/* Card name */}
-              <div className={`form-item ${!isActiveAccount ? 'disabled': ''}`}>
+              <div className={`form-item ${!isActiveAccount || !isOwner ? 'disabled': ''}`}>
                 <div className='input-container'>
                   <label>{t('accounts.card_name')}</label>
                   <input
                     type="text"
                     value={accountName}
-                    disabled={!isActiveAccount}
+                    disabled={!isActiveAccount || !isOwner}
                     maxLength={30}
                     onChange={(e) =>
                       handleInputChange(
@@ -471,13 +525,13 @@ const EditAccount: React.FC = () => {
               </div>
 
               {/* Card identifier */}
-              <div className={`form-item ${!isActiveAccount ? 'disabled': ''}`}>
+              <div className={`form-item ${!isActiveAccount || !isOwner ? 'disabled': ''}`}>
                 <div className="input-container">
                   <label>{t('accounts.card_identifier')}</label>
                   <input
                     type="text"
                     value={accountIdentifier}
-                    disabled={!isActiveAccount}
+                    disabled={!isActiveAccount || !isOwner}
                     maxLength={30}
                     onChange={(e) =>
                       handleInputChange(
@@ -504,7 +558,7 @@ const EditAccount: React.FC = () => {
               <ColorPicker 
                 onColorSelect={setAccountColor} 
                 initialColor={accountColor} 
-                isDisabled={!isActiveAccount}
+                isDisabled={!isActiveAccount || !isOwner}
               />
             </section>
 
@@ -515,10 +569,30 @@ const EditAccount: React.FC = () => {
               <IconPicker 
                 selectedIcon={accountLogo}
                 onIconSelect={setAccountLogo}
-                isDisabled={!isActiveAccount}
+                isDisabled={!isActiveAccount || !isOwner}
                 defaultView='accounts'
               />
             </section>
+
+
+            {/* Share account if there's a guest */}
+            {hasActiveGuest && (
+              <section>
+                <div
+                  className='toggle-row'
+                  onClick={() => {
+                      isOwner && setSharedAccount(prev => !prev);
+                  }}
+                >
+                  <IonToggle
+                    checked={sharedAccount}
+                    disabled={!isOwner}
+                  />
+                  <span className={!isOwner ? 'disabled' : ''}>Shared account</span>
+                </div>
+              </section>
+            )}
+            
 
 
             {/* Add account button */}
@@ -529,7 +603,7 @@ const EditAccount: React.FC = () => {
                   updateAccount(passedAccountId);
                 }
               }}
-              disabled={!isFormValid || !isActiveAccount} // Disable the button if the form is invalid
+              disabled={!isFormValid || !isActiveAccount || !isOwner} // Disable the button if the form is invalid
             >
               {t('accounts.update_account')}
             </IonButton>

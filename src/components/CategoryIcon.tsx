@@ -44,7 +44,7 @@ const Category: React.FC<CategoryProps> = ({
         <IonIcon icon={airplane} className="travel-icon" />
       )}
       {typeof autoLogged === 'boolean' && ( // renders the span only if autoLogged is defined (either true or false)
-        <span className={`recursive-mode ${autoLogged ? 'auto' : 'manual'}`}>
+        <span className={`recursive-mode ${autoLogged ? 'auto' : 'manual'}`}> 
           {autoLogged ? 'A' : 'M'}
         </span>
       )}

@@ -1,0 +1,69 @@
+// accountUtils.ts
+import { db } from '../db'; // Import your global db instance
+
+interface User {
+  owner?: string;
+  userId?: string;
+}
+
+export async function fetchAndSortAccounts(user: User) {
+  const allAccounts = await db.accounts.toArray();
+  console.log("1. Raw allAccounts from DB:", allAccounts);
+
+  // Guard against missing user identifiers
+  if (!user.owner || !user.userId) {
+    return { availableAccounts: allAccounts, notAvailableAccounts: [] };
+  }
+
+  const preferences = await db.accountPreferences
+    .where('userId')
+    .equals(user.userId)
+    .toArray();
+
+  console.log("2. Fetched preferences for user:", preferences);
+
+  // Create a lookup map for fast performance: { accountId: sortOrder }
+  const sortMap = new Map(preferences.map(p => [p.accountId, p.sortOrder]));
+
+  const available: any[] = [];
+  const notAvailable: any[] = [];
+
+  // Categorize accounts according to requirements 1, 2, and 4
+  allAccounts.forEach(account => {
+    const isCurrentOwner = account.owner === user.owner;
+    const isSharedByOther = account.owner !== user.owner && Boolean(account.sharedAccount);
+
+    if (isCurrentOwner || isSharedByOther) {
+      available.push(account);
+    } else {
+      notAvailable.push(account);
+    }
+  });
+
+  // Sort available accounts using accountPreferences with stable fallbacks
+  available.sort((a, b) => {
+    const orderA = sortMap.get(a.accountId);
+    const orderB = sortMap.get(b.accountId);
+
+    if (orderA !== undefined && orderB !== undefined) {
+      if (orderA !== orderB) {
+        return orderA - orderB;
+      }
+    }
+
+    if (orderA !== undefined && orderB === undefined) return -1;
+    if (orderA === undefined && orderB !== undefined) return 1;
+
+    const aIsOwner = a.owner === user.owner ? 1 : 2;
+    const bIsOwner = b.owner === user.owner ? 1 : 2;
+    if (aIsOwner !== bIsOwner) {
+      return aIsOwner - bIsOwner;
+    }
+
+    return (a.accountId || '').localeCompare(b.accountId || '');
+  });
+
+  notAvailable.sort((a, b) => (a.accountId || '').localeCompare(b.accountId || ''));
+
+  return { availableAccounts: available, notAvailableAccounts: notAvailable };
+}

@@ -115,7 +115,6 @@ interface Account {
   accountLogo: string;
   activeAccount: boolean;
   userId: string;
-  //sortOrder: number; // DELETE THIS WHEN SHARING ACCOUNT IS FINNISHED
   sharedAccount: boolean;
 
   // Dexie Cloud
@@ -124,7 +123,7 @@ interface Account {
 }
 
 export interface AccountPreference {
-  id?: string; // Primary key (can be compound like [userId + accountId])
+  id?: string; // Primary key is compound [userId + accountId]
   userId: string;
   accountId: string;
   sortOrder: number;

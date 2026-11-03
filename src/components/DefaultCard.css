@@ -41,6 +41,7 @@
 }
 
 .default-card .card-bgk {
+  position: relative; /* Provides positioning context for the pseudo-element */
   background-image: url('/assets/images/bubble.png');
   background-repeat: no-repeat;
   background-position: top right;
@@ -56,6 +57,7 @@
   flex-direction: column;
   justify-content: space-between;
 }
+
 
 .bgk-icon-default-card {
   position: absolute;
@@ -107,7 +109,8 @@
 }
 
 .default-card .top-bar .card-title ion-icon {
-  font-size: 1.2em;
+  font-size: 1.1em;
+  margin-right: 3px;
 }
 
 .default-card .top-bar .card-placeholder {

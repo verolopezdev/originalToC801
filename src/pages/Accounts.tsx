@@ -6,10 +6,14 @@ import { useTranslation } from 'react-i18next';
 // Custom hooks
 import useScrollToTop from '../hooks/useScrollToTop';
 import { useUser } from '../context/UserContext'; // Import the useUser hook
+import { useHasGuest } from '../services/SharingService';
 
 // App components
 import DefaultCard from '../components/DefaultCard';
 import Footer from '../components/Footer'
+
+// App utility functions
+import { fetchAndSortAccounts } from '../utils/accountUtils';
 
 // Ionic components
 import { 
@@ -69,81 +73,17 @@ const Accounts: React.FC = () => {
   const contentRef = useScrollToTop(); // use the custom hook 
   const { t } = useTranslation();
   const { user, updateUser } = useUser(); // Access user context
+  const hasActiveGuest = useHasGuest(user.sharedRealmId);
+  
   // Open and close secondary menu
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [popoverEvent, setPopoverEvent] = useState<MouseEvent | null>(null);
 
   // 1. 🔑 Rewritten main function: Fetches accounts, filters/categorizes available vs not available, and sorts securely
-  const accountData = useLiveQuery(async () => {
-    const allAccounts = await db.accounts.toArray();
-    console.log("1. Raw allAccounts from DB:", allAccounts);
-
-    // Guard against missing user identifiers
-    if (!user.owner || !user.userId) {
-      return { availableAccounts: allAccounts, notAvailableAccounts: [] };
-    }
-
-    const preferences = await db.accountPreferences
-      .where('userId')
-      .equals(user.userId)
-      .toArray();
-
-    console.log("2. Fetched preferences for user:", preferences);
-
-    // Create a lookup map for fast performance: { accountId: sortOrder }
-    const sortMap = new Map(preferences.map(p => [p.accountId, p.sortOrder]));
-
-    const available: Account[] = [];
-    const notAvailable: Account[] = [];
-
-    // Categorize accounts according to requirements 1, 2, and 4
-    allAccounts.forEach(account => {
-      const isCurrentOwner = account.owner === user.owner;
-      const isSharedByOther = account.owner !== user.owner && Boolean(account.sharedAccount);
-
-      if (isCurrentOwner || isSharedByOther) {
-        // Point 1 & 2: Current user's accounts + accounts shared by the other user
-        available.push(account);
-      } else {
-        // Point 4: Other user's unshared accounts (Not available for reordering)
-        notAvailable.push(account);
-      }
-    });
-
-    // Point 3: Sort available accounts using accountPreferences with stable fallbacks
-    available.sort((a, b) => {
-      const orderA = sortMap.get(a.accountId);
-      const orderB = sortMap.get(b.accountId);
-
-      // If both have explicit user-defined preferences, sort by order
-      if (orderA !== undefined && orderB !== undefined) {
-        if (orderA !== orderB) {
-          return orderA - orderB;
-        }
-      }
-
-      // If only one has a preference, prioritize it
-      if (orderA !== undefined && orderB === undefined) return -1;
-      if (orderA === undefined && orderB !== undefined) return 1;
-
-      // Stable default grouping fallback if no preferences are saved yet
-      const aIsOwner = a.owner === user.owner ? 1 : 2;
-      const bIsOwner = b.owner === user.owner ? 1 : 2;
-      if (aIsOwner !== bIsOwner) {
-        return aIsOwner - bIsOwner;
-      }
-
-      return (a.accountId || '').localeCompare(b.accountId || '');
-    });
-
-    // Sort not available accounts alphabetically
-    notAvailable.sort((a, b) => (a.accountId || '').localeCompare(b.accountId || ''));
-
-    console.log("3. Final sorted availableAccounts:", available.map(a => ({ id: a.accountId, owner: a.owner, shared: a.sharedAccount })));
-
-    return { availableAccounts: available, notAvailableAccounts: notAvailable };
-  }, [user.owner, user.userId]);
-
+  const accountData = useLiveQuery(
+    () => fetchAndSortAccounts(user), 
+    [user.owner, user.userId]
+  );
  
   const [showInactiveAccounts, setShowInactiveAccounts] = useState(() => user.showDisabledAccounts);
   
@@ -409,6 +349,8 @@ const Accounts: React.FC = () => {
                           editMode={false}
                           isShared={item.sharedAccount}
                           isActive={item.activeAccount}
+                          showOwner={hasActiveGuest}
+                          owner={item.owner}
                         />
                       </IonRouterLink>
                     </div>
@@ -450,6 +392,8 @@ const Accounts: React.FC = () => {
                             editMode={false}
                             isShared={item.sharedAccount}
                             isActive={false}
+                            showOwner={hasActiveGuest}
+                            owner={item.owner}
                           />
                         </IonRouterLink>
                       </div>

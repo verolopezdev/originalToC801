@@ -84,6 +84,7 @@ const Accounts: React.FC = () => {
     () => fetchAndSortAccounts(user), 
     [user.owner, user.userId]
   );
+
  
   const [showInactiveAccounts, setShowInactiveAccounts] = useState(() => user.showDisabledAccounts);
   
@@ -347,6 +348,7 @@ const Accounts: React.FC = () => {
                           logo={item.accountLogo}
                           amount='' 
                           editMode={false}
+                          isMyAccount={item.owner === user.owner}
                           isShared={item.sharedAccount}
                           isActive={item.activeAccount}
                           showOwner={hasActiveGuest}
@@ -377,7 +379,7 @@ const Accounts: React.FC = () => {
                       detail={false} 
                       className="reorder-item-wrapper"   
                     >
-                      <div className="reorder-item-content disabled"> 
+                      <div className="reorder-item-content"> 
                         <IonRouterLink
                           routerLink={`/app/editaccount/${item.accountId}`} 
                           routerDirection="forward"
@@ -390,8 +392,9 @@ const Accounts: React.FC = () => {
                             logo={item.accountLogo}
                             amount='' 
                             editMode={false}
+                            isMyAccount={item.owner === user.owner}
                             isShared={item.sharedAccount}
-                            isActive={false}
+                            isActive={item.activeAccount}
                             showOwner={hasActiveGuest}
                             owner={item.owner}
                           />

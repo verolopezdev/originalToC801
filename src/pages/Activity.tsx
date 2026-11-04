@@ -4,11 +4,9 @@ import { db } from '../db';
 import { useTranslation } from 'react-i18next';
 import dayjs, { Dayjs } from "dayjs";
 
-
 // Custom hooks
 import useScrollToTop from '../hooks/useScrollToTop';
-import { useUser } from '../context/UserContext'; // Import the useUser hook
-
+import { useUser } from '../context/UserContext';
 
 // App components
 import AccountTotalSlider from '../components/AccountTotalSlider';
@@ -19,8 +17,7 @@ import TransactionListByCategory from '../components/TransactionListByCategory';
 
 // Utility functions
 import { getDateRangeForInterval } from '../utils/getDateRangeForInterval';
-
-
+import { fetchAndSortAccounts } from '../utils/accountUtils';
 
 // Ionic components
 import { 
@@ -30,7 +27,6 @@ import {
   IonPage,
   IonToolbar 
 } from '@ionic/react';
-
 
 // Icons
 import { 
@@ -42,14 +38,11 @@ import {
   cash,
 } from 'ionicons/icons';
 
-
 // Styles
 import '../Main.css';
 
-
 // Define a strict type for interval options
 type IntervalOption = "weekly" | "monthly" | "yearly";
-
 
 // Footer items
 interface AppPage {
@@ -67,31 +60,26 @@ const appPages: AppPage[] = [
 
 
 const Activity: React.FC = () => {
-  const contentRef = useScrollToTop(); // use the custom hook 
+  const contentRef = useScrollToTop();
   const { t, i18n } = useTranslation();
   const { user } = useUser();
 
-  const { interval } = user; // Extract the subscribed property
+  const { interval } = user; 
   const weekStartDay = user.weekStartDay;
 
-  const [selectedInterval, setSelectedInterval] = useState<IntervalOption>(interval); // State managed at the top level
+  const [selectedInterval, setSelectedInterval] = useState<IntervalOption>(interval);
   const [currentDate, setCurrentDate] = useState<Dayjs>(() =>
-      dayjs().locale(i18n.language)
-    ); // Store selected date
-
-  const allAccounts = useLiveQuery(() => db.accounts.toArray());
+    dayjs().locale(i18n.language)
+  );
   const [selectedCardId, setSelectedCardId] = useState<string>('');
   const [viewMode, setViewMode] = useState<"date" | "category">("date");
-
 
   useEffect(() => {
     setCurrentDate(prev => prev.locale(i18n.language));
   }, [i18n.language]);
 
-
   // Calculate start and end date for the current period
   const { start, end } = useMemo(() => {
-    // 1. Call the utility, which returns standard JavaScript Date objects
     const { start: dateStart, end: dateEnd } =
       getDateRangeForInterval(
         selectedInterval,
@@ -100,13 +88,17 @@ const Activity: React.FC = () => {
         weekStartDay
       );
     
-    // 2. Convert the standard Date objects into Dayjs objects
     return {
-      // Use dayjs() constructor to convert the Date object
       start: dayjs(dateStart) as Dayjs, 
       end: dayjs(dateEnd) as Dayjs,
     };
   }, [selectedInterval, currentDate, weekStartDay]);
+
+  // Fetch sorted available/unavailable accounts using useLiveQuery
+  const sortedAccountsData = useLiveQuery(async () => {
+    if (!user) return { availableAccounts: [], notAvailableAccounts: [] };
+    return await fetchAndSortAccounts(user);
+  }, [user]);
 
 
   // --- NEW: Query for ALL unique account IDs used in expenses for this period ---
@@ -117,50 +109,50 @@ const Activity: React.FC = () => {
       .and(exp => exp.isActive === 1) // Only count active expenses
       .toArray();
 
-    // Use a Set to collect unique account IDs efficiently
     const accountIds = new Set<string>();
     expensesInPeriod.forEach(exp => {
-      accountIds.add(exp.accountId);
+      if (exp.accountId) {
+        accountIds.add(exp.accountId);
+      }
     });
 
     return Array.from(accountIds);
   }, [start.valueOf(), end.valueOf()]); // Re-run when the date range changes
 
 
-  // --- UPDATED: Combine allAccounts with usedAccountIdsInPeriod ---
+  // --- UPDATED: Filter accounts to show inactive ones ONLY if used in the period ---
   const accountsToShow = useMemo(() => {
-    if (!allAccounts) return [];
+    if (!sortedAccountsData) return [];
 
-    // Filter the full list of accounts to include:
-    // 1. All Active accounts
-    // 2. Any Disabled account that has an expense in the current period (i.e., its ID is in usedAccountIdsInPeriod)
-    const activeAndUsedAccounts = allAccounts.filter(account => {
-      const isUsed = usedAccountIdsInPeriod?.includes(account.accountId!);
-      // Include if: (Active) OR (Disabled AND used in this period)
-      return account.activeAccount || isUsed;
-    });
-    
-    // Now apply the sorting logic on this filtered list
-    return activeAndUsedAccounts.sort((a, b) => {
-      // Your existing sorting logic (Active > Default > sortOrder) is correct here
-      // ... (existing sorting logic goes here)
-      // --- 1. Primary Sort: Active Status ---
-      if (a.activeAccount && !b.activeAccount) return -1;
-      if (!a.activeAccount && b.activeAccount) return 1;
-  
-      // --- At this point, both are ACTIVE OR both are DISABLED (but used in period) ---
+    // Helper function to check if an account should be kept:
+    // Keep it if it's active OR (it's inactive but has expenses in this period)
+    const isValidAccount = (account: any) => {
+      const isActive = account.activeAccount ?? true; // fallback if property is named differently
+      if (isActive) return true;
       
-      // If both are DISABLED, sort by sortOrder (or just by accountId as a fallback)
-      if (!a.activeAccount && !b.activeAccount) {
-        return a.sortOrder - b.sortOrder;
-      }
-  
-  
-      // 3. Tertiary Sort: sortOrder
-      return a.sortOrder - b.sortOrder;
-    });
-  }, [allAccounts, usedAccountIdsInPeriod, t]);
+      const accountId = account.accountId;
+      return usedAccountIdsInPeriod?.includes(accountId);
+    };
 
+    let filteredAvailable = sortedAccountsData.availableAccounts.filter(isValidAccount);
+    let filteredNotAvailable = sortedAccountsData.notAvailableAccounts.filter(isValidAccount);
+
+    // Extract inactive accounts to push them to the very end
+    const inactiveAvailable = filteredAvailable.filter(account => !account.activeAccount);
+    const inactiveNotAvailable = filteredNotAvailable.filter(account => !account.activeAccount);
+
+    // Keep only active ones in their primary slots
+    filteredAvailable = filteredAvailable.filter(account => account.activeAccount);
+    filteredNotAvailable = filteredNotAvailable.filter(account => account.activeAccount);
+
+    // Combine inactive accounts at the tail end
+    filteredNotAvailable = [...filteredNotAvailable, ...inactiveNotAvailable, ...inactiveAvailable];
+    
+    return [
+      ...filteredAvailable,
+      ...filteredNotAvailable
+    ];
+  }, [sortedAccountsData, usedAccountIdsInPeriod]);
 
 
   // Load general interval state (weekly, monthly, yearly)
@@ -169,30 +161,23 @@ const Activity: React.FC = () => {
       setSelectedInterval(interval);  
     }
   }, [interval]);
-  
-
 
   // Handle selected card id change from SliderComponent
   const handleAccountSelect = (accountId: string) => {
-    setSelectedCardId(accountId); // Update the state with the selected account id
+    setSelectedCardId(accountId);
   };
 
-
-  // Translate titles
-    // Translate footer menu item titles
-    const translatedMenuItems = appPages.map((item) => ({
-      ...item,
-      title: t(`common.${item.title}`, { defaultValue: item.title }),
-    }));
-  
-
+  // Translate footer menu item titles
+  const translatedMenuItems = appPages.map((item) => ({
+    ...item,
+    title: t(`common.${item.title}`, { defaultValue: item.title }),
+  }));
 
   // Show expenses by date or category
   const toggleViewMode = () => {
     setViewMode((prev) => (prev === 'date' ? 'category' : 'date'));
   };
 
-  
   return (
     <IonPage>
       <IonHeader className='page-header ion-no-border'>
@@ -200,9 +185,7 @@ const Activity: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-
       <IonContent className="ion-padding-horizontal" ref={contentRef}>
-          {/* Screen Header */}
           <div className='centered-container mb-20'>
             <h2 className='screen-title'>{t('common.activity')}</h2>
           </div>
@@ -212,7 +195,7 @@ const Activity: React.FC = () => {
               {/* Card slider */}
               <AccountTotalSlider        
                 accounts={accountsToShow} 
-                onAccountSelect={handleAccountSelect} // Pass the callback to SliderComponent
+                onAccountSelect={handleAccountSelect}
                 currentDate={currentDate} 
                 selectedInterval={selectedInterval} 
                 setSelectedInterval={setSelectedInterval} 
@@ -224,19 +207,17 @@ const Activity: React.FC = () => {
               <IntervalToolbar    
                 selectedInterval={selectedInterval}
                 currentDate={currentDate}
-                setCurrentDate={setCurrentDate} // Update date from IntervalToolbar 
+                setCurrentDate={setCurrentDate} 
                 weekStartDay={weekStartDay} 
               />
 
               {/* View mode */}
               <div className='section-header mt-10'>
                 <div className='flex-space'>
-                  {/* Title */}
                   <h6 className="section-title">
                     {viewMode === "date" ? t('activity.by_date') : t('activity.by_category')}
                   </h6>
 
-                  {/* View mode icons */}
                   <div className='icon-menu-bar mr-5'>
                     <IonIcon
                       icon={viewMode === 'category' ? listOutline : gridOutline}

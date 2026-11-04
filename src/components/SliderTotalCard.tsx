@@ -16,10 +16,19 @@ import FormatAmount from './FormatAmount';
 // Utility functions
 import { getTotalExpensesForPeriod } from '../utils/getTotalExpensesByInterval';
 
+// Ionic components
+import { 
+  IonIcon
+} from '@ionic/react';
+
+
+import { closeCircle, closeCircleOutline, closeOutline, lockClosed, lockClosedOutline } from 'ionicons/icons';
+
+
 // Styles
 import './SliderCard.css';
 
-interface SliderTotalCardProps {
+interface SliderTotalCardProps {  
   color: string;
   title: string;
   identifier: string;
@@ -29,7 +38,12 @@ interface SliderTotalCardProps {
   currentDate: Dayjs;
   accountId?: string;
   start: Dayjs; 
-  end: Dayjs;   
+  end: Dayjs;  
+  isMyAccount?:boolean;
+  isShared?: boolean;
+  showOwner?: boolean;
+  isActive?: boolean; // New optional prop
+  owner?: string; 
 }
 
 
@@ -43,7 +57,12 @@ const SliderTotalCard: React.FC<SliderTotalCardProps> = ({
   currentDate,
   accountId,
   start,
-  end  
+  end,
+  isMyAccount,
+  isShared = false,
+  showOwner = false,
+  isActive = true,
+  owner
 }) => {
   const { currency } = useCurrency();
   const { t } = useTranslation();
@@ -83,12 +102,20 @@ const SliderTotalCard: React.FC<SliderTotalCardProps> = ({
 
           {/* Top bar */}
           <div className='top-bar'>
-            <div className='card-data'> 
+            <div  className={`card-data ${!isActive ? 'disabled' : ''}`}> 
               {/* Account name */}
               <div className="card-title">
-                {(title === "Cash" ? t('accounts.default_account_name') : title) || t('accounts.card_name')}
+                {accountId && accountId !== '0' ? (
+                  !isMyAccount && isActive && !isShared ? (
+                    <IonIcon icon={lockClosed}></IonIcon>
+                  ) : !isActive ? (
+                    <IonIcon icon={closeCircle}></IonIcon>
+                  ) : null
+                ) : null}
+                <span className="card-title-text">
+                  {(title === "Cash" ? t('accounts.default_account_name') : title) || t('accounts.card_name')}
+                </span>
               </div>
-
               {/* Account identifier */}
               <div className="card-identifier">
                 {identifier}

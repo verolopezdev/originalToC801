@@ -1,3 +1,10 @@
+.default-card,
+.default-card .card-bgk,
+.default-card .top-bar,
+.default-card .top-bar .card-title {
+  box-sizing: border-box;
+}
+
 .default-card-router-link {
   display: block; 
   width: 100%;
@@ -5,6 +12,7 @@
 
 .card-container {
   width: 100% !important;
+  max-width: 400px;
   display: flex;
   justify-content: center;
   padding: 0;
@@ -13,6 +21,7 @@
 .default-card {
   border-radius: 15px;
   width: 100%;
+  min-width: 0;
   height: 150px;
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
@@ -50,12 +59,14 @@
   z-index: 2; /* Ensure content is above bubbles */
   text-align: end;
   width: 100%;
+  min-width: 0;
   height: 100%;
   padding: 20px;
   border-radius: 15px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  box-sizing: border-box;
 }
 
 
@@ -93,22 +104,36 @@
   display: flex;
   flex-direction: column;
   align-items: start;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.9));
+  width: 100%;
+  min-width: 0;
 }
 
 .default-card .top-bar .card-title {
   display: flex;
   align-items: center;
+  width: 100%;
+  min-width: 0;
   font-size: 1.3em;
   font-weight: 500;
   text-transform: uppercase;
-  text-align: left; /* Ensure consistent left alignment */
-  word-wrap: break-word; /* Allow wrapping of long words */
-  overflow-wrap: break-word; /* Support for older browsers */
-  white-space: normal; /* Allow text to wrap to the next line */
+  text-align: left;
+  max-width: 100%;
+  overflow: hidden;
 }
 
+.default-card .top-bar .card-title .truncate-text {
+  flex: 1 1 0%;
+  width: 0;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+
 .default-card .top-bar .card-title ion-icon {
+  flex: 0 0 auto;
   font-size: 1.1em;
   margin-right: 3px;
 }

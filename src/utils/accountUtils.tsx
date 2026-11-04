@@ -8,7 +8,6 @@ interface User {
 
 export async function fetchAndSortAccounts(user: User) {
   const allAccounts = await db.accounts.toArray();
-  console.log("1. Raw allAccounts from DB:", allAccounts);
 
   // Guard against missing user identifiers
   if (!user.owner || !user.userId) {
@@ -20,7 +19,6 @@ export async function fetchAndSortAccounts(user: User) {
     .equals(user.userId)
     .toArray();
 
-  console.log("2. Fetched preferences for user:", preferences);
 
   // Create a lookup map for fast performance: { accountId: sortOrder }
   const sortMap = new Map(preferences.map(p => [p.accountId, p.sortOrder]));

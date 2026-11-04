@@ -109,7 +109,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (adminUser.userId === user.userId) return;
 
     const initializeGuestFromAdmin = async () => {
-      console.log("😎 Initializing guest from admin...");
 
       await db.users.update(user.userId, {
         language: adminUser.language,
@@ -158,7 +157,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       const countryToSave = getCountryWithSeparators(country);
 
-      console.log("😎 Creating authenticated user...");
       
       const newUser: User = {
         userId: crypto.randomUUID(),

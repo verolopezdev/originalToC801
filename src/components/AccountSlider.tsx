@@ -23,7 +23,7 @@ const AccountSlider: React.FC<AccountSliderProps> = ({ editAccount, accounts, on
 
   // Find the index of the editAccount in the accounts list
   const initialIndex = useMemo(() => {
-    const index = accounts.findIndex(account => account.accountId === editAccount);
+    const index = accounts.findIndex(account => account.accountId === editAccount); 
     return index !== -1 ? index : 0; // Ensure we don't return -1
   }, [accounts, editAccount]);
 

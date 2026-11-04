@@ -313,7 +313,7 @@ db.version(1).stores({
   appmetadata: 'id, key',
   users: 'userId, email, realmId, sharedRealmId, owner',
   accounts: 'accountId, userId, sortOrder, sharedAccount',
-  accountPreferences: 'id, userId, sortOrder',
+  accountPreferences: 'id, userId, [userId+accountId], sortOrder',
   categories: 'categoryId, categoryName',
   subcategories: 'subcategoryId, subcategoryName, parentCategoryId',
   expenses: 'expenseId, isActive, userId, expenseDate, accountId, categoryId, subcategoryId, expenseCurrencyCode, tripId, seriesId, [seriesId+expenseDate], [seriesId+installmentIndex], [seriesId+isActive+dueDate], [seriesId+dueDate]',

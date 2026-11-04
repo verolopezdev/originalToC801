@@ -181,7 +181,7 @@ const NewExpense: React.FC = () => {
   useKeyboardAutoClose();
 
   // Get all active accounts
-  const sortedAccounts = useMemo(() => {
+  const sortedAccounts = useMemo(() => {  
     if (!accounts) return [];
 
     // Filter out inactive accounts

@@ -399,7 +399,6 @@ const EditAccount: React.FC = () => {
     }
   };  
   
-  
 
 
   return (
@@ -487,7 +486,7 @@ const EditAccount: React.FC = () => {
             <section className="centered-container">
               <DefaultCard
                 title={accountName}
-                color= {isActiveAccount ? accountColor : "neutral"}
+                color= {isActiveAccount ? accountColor : "slateGray"}
                 identifier={accountIdentifier}
                 logo={accountLogo}
                 amount=""
@@ -586,9 +585,9 @@ const EditAccount: React.FC = () => {
                 >
                   <IonToggle
                     checked={sharedAccount}
-                    disabled={!isOwner}
+                    disabled={!isOwner || !isActiveAccount}
                   />
-                  <span className={!isOwner ? 'disabled' : ''}>Shared account</span>
+                  <span className={!isOwner || !isActiveAccount ? 'disabled' : ''}>Shared account</span>
                 </div>
               </section>
             )}

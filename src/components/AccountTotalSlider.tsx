@@ -9,6 +9,8 @@ import SliderTotalCard from './SliderTotalCard';
 import { useTheme } from '../theme/ThemeContext';
 import dayjs, { Dayjs } from "dayjs";
 
+import { useUser } from '../context/UserContext'; // Import the useUser hook
+import { useHasGuest } from '../services/SharingService';
 
 
 // Styles
@@ -37,6 +39,8 @@ const AccountTotalSlider: React.FC<AccountTotalSliderProps> = ({
   const { t } = useTranslation();
   const swiperRef = useRef<any>(null);
   const { themeColor } = useTheme(); // theme-yellow
+  const { user } = useUser(); // Access user context
+  const hasActiveGuest = useHasGuest(user.sharedRealmId);
   
 
   // Prepend new account Total Expenses to account array
@@ -65,7 +69,7 @@ const AccountTotalSlider: React.FC<AccountTotalSliderProps> = ({
     onAccountSelect(selectedCard);
   };
 
-  
+
   
   return (
     <div className="expense-slider">
@@ -83,7 +87,7 @@ const AccountTotalSlider: React.FC<AccountTotalSliderProps> = ({
           <SwiperSlide key={account.accountId}>
             <SliderTotalCard          
               title={account.accountName}
-              color={account.activeAccount ? account.accountColor : "neutral"}
+              color={account.activeAccount ? account.accountColor : "slateGray"}
               identifier={account.accountIdentifier}
               logo={account.accountLogo}
               selectedInterval={selectedInterval} 
@@ -92,6 +96,11 @@ const AccountTotalSlider: React.FC<AccountTotalSliderProps> = ({
               accountId={account.accountId}
               start={start}
               end={end}
+              isMyAccount={account.owner === user.owner}
+              isShared={account.sharedAccount}
+              isActive={account.activeAccount}
+              showOwner={hasActiveGuest}
+              owner={account.owner}
             />
           </SwiperSlide>
         ))}

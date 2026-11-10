@@ -143,7 +143,7 @@ const Accounts: React.FC = () => {
   // 6. 🔄 Handler to manage local reordering for available items only
   const handleReorder = useCallback((event: CustomEvent<ItemReorderEventDetail>) => {
     const newOrderedItems = event.detail.complete([...availableItems]) as Account[];
-    console.log("4. After drag-and-drop reorder:", newOrderedItems.map((item: Account) => item.accountId));
+    //console.log("4. After drag-and-drop reorder:", newOrderedItems.map((item: Account) => item.accountId));
     setAvailableItems(newOrderedItems);
   }, [availableItems]);
 
@@ -224,6 +224,8 @@ const Accounts: React.FC = () => {
     setIsPopoverOpen(false);
   };
 
+
+  
   return (
     <IonPage>
       <IonHeader className='page-header ion-no-border'>

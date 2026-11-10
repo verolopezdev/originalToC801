@@ -44,7 +44,7 @@ const DefaultCard: React.FC<DefaultCardProps> = ({
     <div className="card-container">  
       <div className={`default-card ${color}`}>
         {/* Light gray overlay for disabled state */}
-        {!isActive && <div className="disabled-overlay" />}
+        {!isActive && <div className="disabled-overlay" />} 
 
         <div className="card-bgk">
           {/* Account icon */}

@@ -83,7 +83,7 @@ const AccountSlider: React.FC<AccountSliderProps> = ({ editAccount, accounts, on
       >
         {accounts?.map((account) => (
           <SwiperSlide key={account.accountId}>
-            <SliderCard     
+            <SliderCard       
               title={account.accountName}
               color={account.activeAccount ? account.accountColor : "neutral"}  
               identifier={account.accountIdentifier}

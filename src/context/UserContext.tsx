@@ -88,12 +88,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   );
 
   // Dev logging only on user mutation
+  /*
   useEffect(() => {
     if (process.env.NODE_ENV === 'development' && user) {
       console.log("🙃 LOGGED USER UPDATED: ", user);
     }
   }, [user]);
-
+  */
+ 
   const adminUser = useLiveQuery(
     async () => {
       if (!databaseReady || !user?.sharedRealmId || user.sharingRole !== "guest") return undefined;

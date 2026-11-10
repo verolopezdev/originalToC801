@@ -20,6 +20,7 @@ import { useDatePicker } from '../context/DatePickerContext';
 import { validateName } from '../utils/validateName';
 import { logAutoExpenses } from '../utils/autoLogger';
 import { getFlagImage } from '../utils/getExchangeRates';
+import { fetchAvailableAccounts } from '../utils/accountUtils';
 
 
 // App components
@@ -180,7 +181,9 @@ const NewExpense: React.FC = () => {
   // Keyboard close on tap or scroll
   useKeyboardAutoClose();
 
+
   // Get all active accounts
+  /*
   const sortedAccounts = useMemo(() => {  
     if (!accounts) return [];
 
@@ -189,8 +192,19 @@ const NewExpense: React.FC = () => {
     // 2. Sort the active accounts
     return activeAccounts;
   }, [accounts]);
+*/
+
+  const newSortedAccounts = useLiveQuery(async () => {
+    if (!user) return [];
+    return await fetchAvailableAccounts(user);  
+  }, [user]);
   
   
+
+
+  console.log("New sorted accounts: ", newSortedAccounts);
+  
+  /*
   // New code block to find the ID of the first sorted account
   const firstSortedAccountId = useMemo(() => {
 
@@ -206,6 +220,7 @@ const NewExpense: React.FC = () => {
       setSelectedAccountId(firstSortedAccountId);
     }
   }, [firstSortedAccountId, passedAccountId]);
+*/
 
   useEffect(() => {
     setSelectedCurrency(currency.actualCurrency);
@@ -280,6 +295,7 @@ const NewExpense: React.FC = () => {
 
     initDefaultCategory();
 
+    /*
     // Priority 1: Account passed via route parameter (for editing/pre-selection)
     if (passedAccountId && passedAccountId !== '0' && passedAccountId !== '') {
       setSelectedAccountId(passedAccountId);
@@ -292,6 +308,7 @@ const NewExpense: React.FC = () => {
     else {
       setSelectedAccountId('');
     }
+      */
 
     setSubcategoryId('');
     setAmountInCents(0);
@@ -543,7 +560,7 @@ const NewExpense: React.FC = () => {
 
           <AccountSlider  
             key={`account-slider-${resetTrigger}`}
-            accounts={sortedAccounts}
+            accounts={newSortedAccounts ?? []} // Falls back to an empty array if undefined
             editAccount={selectedAccountId}
             onAccountSelect={handleAccountSelect} // Pass the callback to SliderComponent
           />  

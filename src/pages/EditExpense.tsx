@@ -20,6 +20,7 @@ import { useDatePicker } from '../context/DatePickerContext';
 // Utils
 import { validateName } from '../utils/validateName';
 import { getFlagImage } from '../utils/getExchangeRates';
+import { fetchAvailableAccounts } from '../utils/accountUtils';
 
 
 // App components
@@ -388,7 +389,7 @@ const EditExpense: React.FC = () => {
 
 
   // Get all active accounts AND the currently selected inactive account (if applicable)
-  const sortedAccounts = useMemo(() => {
+  const sortedAccounts = useMemo(() => {  
     if (!accounts) return [];
 
     // 🏆 CHANGE: Use the stable initial ID, NOT the one that changes on swipe
@@ -410,6 +411,12 @@ const EditExpense: React.FC = () => {
 
     return filteredAccounts;
   }, [accounts, initialExpenseAccountId]);
+
+
+  const newSortedAccounts = useLiveQuery(async () => {
+      if (!user) return [];
+      return await fetchAvailableAccounts(user);  
+    }, [user]);
 
 
 
@@ -884,7 +891,7 @@ const EditExpense: React.FC = () => {
     }
   }
 
-  
+
   return (
     <IonPage>
       <IonHeader className='page-header ion-no-border'>
@@ -919,10 +926,10 @@ const EditExpense: React.FC = () => {
           </div>
 
         <div className={`${!isOwner ? 'disabled' : ''}`}>
-          <AccountSlider
+          <AccountSlider  
               editAccount={selectedCardId}
               key={`account-slider-${resetTrigger}`}
-              accounts={sortedAccounts}
+              accounts={newSortedAccounts ?? []} // Falls back to an empty array if undefined
               onAccountSelect={handleAccountSelect} // Pass the callback to SliderComponent
             />
 

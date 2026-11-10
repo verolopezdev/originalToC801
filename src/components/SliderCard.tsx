@@ -25,10 +25,12 @@ const SliderCard: React.FC<SliderCardProps> = ({ color, title, identifier, logo 
           </div>
 
           <div className='top-bar'> 
-            <div className='card-data'> 
+            <div className='card-data'>   
               {/* Account name */}
               <div className="card-title">
-                {(title === "Cash" ? t('accounts.default_account_name') : title) || t('accounts.card_name')}
+                <span className="card-title-text">
+                  {(title === "Cash" ? t('accounts.default_account_name') : title) || t('accounts.card_name')}
+                </span>
               </div>
 
               {/* Account identifier */}

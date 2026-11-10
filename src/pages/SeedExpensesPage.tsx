@@ -65,10 +65,11 @@ type Translations = Record<Language, Translation>;
 interface SeedContext {
   accountId: any;
   findCatId: (name: string) => any;
+  users: any[];
 }
 
 // ----------------------------------------------------------------------
-// Async Helper: Resolves prerequisite data (Account ID & Categories)
+// Async Helper: Resolves prerequisite data (Account ID, Categories, and Users)
 // ----------------------------------------------------------------------
 const getSeedContext = async (): Promise<SeedContext | null> => {
   // 1. Fetch default account
@@ -86,9 +87,13 @@ const getSeedContext = async (): Promise<SeedContext | null> => {
     return null;
   }
 
-  console.log("Categories: ", categories);
+  // 3. Fetch users for owner alternating
+  const users = await db.users.toArray();
 
-  // 3. Category ID mapping helper
+  console.log("Categories: ", categories);
+  console.log("Users found for seeding: ", users);
+
+  // 4. Category ID mapping helper
   const findCatId = (name: string): string => {
     const found = categories.find(
       (c) => c.categoryName?.toLowerCase() === name.toLowerCase()
@@ -101,17 +106,22 @@ const getSeedContext = async (): Promise<SeedContext | null> => {
     return found.categoryId;
   };
 
-  return { accountId, findCatId };
+  return { accountId, findCatId, users };
 };
 
 // ----------------------------------------------------------------------
 // Main Component
 // ----------------------------------------------------------------------
 const SeedExpensesPage: React.FC = () => {
+  const { user } = useUser();
   const { currency } = useCurrency();
   const { t } = useTranslation();
   const [years, setYears] = React.useState<number>(1);
   const [showToast, setShowToast] = React.useState(false);
+
+  const realmData = user.sharedRealmId
+    ? { realmId: user.sharedRealmId }
+    : {}; 
 
   const translatedMenuItems = appPages.map((item) => ({
     ...item,
@@ -126,7 +136,7 @@ const SeedExpensesPage: React.FC = () => {
       const context = await getSeedContext();
       if (!context) return;
 
-      const { accountId, findCatId } = context;
+      const { accountId, findCatId, users } = context;
 
       await db.transaction('rw', [db.expenses, db.recurringSeries], async () => {
         await db.expenses.clear();
@@ -274,7 +284,16 @@ const SeedExpensesPage: React.FC = () => {
             : merchants[Math.floor(Math.random() * merchants.length)];
         };
 
+        let userIndex = 0;
         const addExpense = (date: Date, categoryId: any, amount: number, note: string) => {
+          // Determine owner: alternate if more than 1 user exists
+          let ownerValue = null;
+          if (users.length > 0) {
+            const currentUserObj = users[userIndex % users.length];
+            ownerValue = currentUserObj.owner !== undefined ? currentUserObj.owner : currentUserObj.userId || null;
+            userIndex++;
+          }
+
           expenses.push({
             expenseId: crypto.randomUUID(),
             accountId, // Dynamically set from DB
@@ -288,7 +307,9 @@ const SeedExpensesPage: React.FC = () => {
             expenseLocale: locale,
             tripId: null,
             expenseDate: date.toISOString(),
-            isActive: 1,
+            isActive: 1,  
+            owner: ownerValue, // Added owner field
+            ...realmData,
           });
         };
 

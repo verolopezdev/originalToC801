@@ -155,6 +155,7 @@ const Activity: React.FC = () => {
   }, [sortedAccountsData, usedAccountIdsInPeriod]);
 
 
+
   // Load general interval state (weekly, monthly, yearly)
   useEffect(() => {
     if (interval) {

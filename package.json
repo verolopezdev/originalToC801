@@ -14,15 +14,16 @@
     "sync-version": "node scripts/sync-version.cjs"
   },
   "dependencies": {
-    "@capacitor/android": "^8.0.0",
+    "@capacitor-community/admob": "^8.4.0",
+    "@capacitor/android": "^8.6.2",
     "@capacitor/app": "^8.0.0",
     "@capacitor/camera": "^8.0.0",
-    "@capacitor/core": "^8.0.0",
+    "@capacitor/core": "^8.6.2",
     "@capacitor/device": "^8.0.0",
     "@capacitor/filesystem": "^8.0.0",
     "@capacitor/geolocation": "^8.0.0",
     "@capacitor/haptics": "^8.0.0",
-    "@capacitor/ios": "^8.0.0",
+    "@capacitor/ios": "^8.6.2",
     "@capacitor/keyboard": "^8.0.0",
     "@capacitor/preferences": "^8.0.0",
     "@capacitor/screen-orientation": "^8.0.0",
@@ -52,7 +53,7 @@
     "i18next": "^24.1.0",
     "i18next-browser-languagedetector": "^8.0.2",
     "ionicons": "^7.0.0",
-    "jspdf": "^3.0.3",
+    "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.2",
     "maskito": "^0.0.2",
     "react": "^18.2.0",
@@ -62,11 +63,11 @@
     "react-router": "^5.3.4",
     "react-router-dom": "^5.3.4",
     "recharts": "^3.2.1",
-    "swiper": "^11.2.4"
+    "swiper": "^12.1.2"
   },
   "devDependencies": {
-    "@capacitor/assets": "^3.0.5",
-    "@capacitor/cli": "^8.0.0",
+    "@capacitor/assets": "^4.0.0",
+    "@capacitor/cli": "^8.6.2",
     "@testing-library/dom": ">=7.21.4",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",

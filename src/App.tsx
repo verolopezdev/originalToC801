@@ -43,7 +43,7 @@ setupIonicReact();
 const App: React.FC = () => {
   
   return (
-    <IonApp>
+    <IonApp>  
       <ThemeProvider>
         <CurrencyProvider>
         

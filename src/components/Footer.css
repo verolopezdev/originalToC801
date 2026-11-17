@@ -1,14 +1,16 @@
 .footer {
-  position: static;
+  position: static; 
   bottom: 0;
   width: 100%;
-  height: 70px; /* Adjust footer height for ios */
+  /*height: 90px; /* Adjust footer height for ios */
+  height: auto;
   color: var(--ion-text-color);
   -webkit-text-size-adjust: none; /* Prevents font size adjustments in WebKit browsers */
   text-size-adjust: none;        /* Standard property for other browsers */
   display: flex;
   align-items: center; /* align items top for ios */
   background: var(--ion-item-background);
+  background-color: purple;
 }
 
 .footer ion-toolbar {

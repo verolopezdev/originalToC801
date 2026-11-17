@@ -24,6 +24,7 @@ import DashboardMainCard from '../components/DashboardMainCard';
 import DashboardMainTrip from '../components/DashboardMainTrip';
 import TransactionList from '../components/TransactionList';
 import Footer from '../components/Footer';
+import MediumNativeAd from '../components/MediumNativeAd';
 
 
 // Ionic components
@@ -291,6 +292,8 @@ const Dashboard: React.FC = () => {
               totalSpent={tripTotal ?? 0} // if tripTotal is null or undefined, use 0 instead to avoid flicker (shows icon for a split second)
             />
           )}
+
+          <MediumNativeAd />
         
           <section>
             <div className='mb-20'>

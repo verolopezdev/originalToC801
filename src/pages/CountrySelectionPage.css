@@ -51,13 +51,7 @@ h4.app-type {
   bottom: 0;
   left: 0;
   right: 0;
-  /* Top is 0% opacity (transparent), bottom is 100% solid ion background */
-  background: linear-gradient(
-    180deg, 
-    color-mix(in srgb, var(--ion-background-color, #ffffff) 0%, transparent) 0%, 
-    var(--ion-background-color, #ffffff) 40%
-  );
-  padding: 16px 20px 24px 20px;
+  padding: 16px 20px 40px 20px;
   z-index: 10;
 }
 

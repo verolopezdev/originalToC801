@@ -1,6 +1,7 @@
 import { useLocation } from 'react-router-dom';
 import { useUser } from '../context/UserContext'; // Import the useUser hook
 import { useTranslation } from 'react-i18next';
+import { useNativeAds } from '../context/NativeAdProvider';
 
 // Ionic components
 import {
@@ -59,6 +60,16 @@ const Menu: React.FC = () => {
   const location = useLocation();
   const router = useIonRouter();
 
+  const { pauseAll, resumeAll } = useNativeAds();
+
+  const handleMenuWillOpen = async () => {
+    await pauseAll();
+  };
+
+  const handleMenuDidClose = () => {
+    resumeAll();
+  };
+
   const subscriptionMenuLabel =
   user.subscriptionPlan !== "free" && user.isPremium === false
     ? t("plans.renew_premium")
@@ -78,7 +89,15 @@ const Menu: React.FC = () => {
   };
 
   return (
-    <IonMenu contentId="main" menuId="appMenu" type="overlay" side="end" swipeGesture={false}>
+    <IonMenu 
+      contentId="main" 
+      menuId="appMenu" 
+      type="overlay" 
+      side="end" 
+      swipeGesture={false}
+      onIonWillOpen={handleMenuWillOpen}
+      onIonDidClose={handleMenuDidClose}
+    >
       <IonContent>
         <IonGrid style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
           {/* Avatar Profile */}

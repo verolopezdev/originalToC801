@@ -6,6 +6,7 @@ import { Dayjs } from 'dayjs';
 
 // App components
 import TransactionItem from './TransactionItem';
+import SmallNativeAd from '../components/SmallNativeAd';
 
 // Styles
 import '../Main.css';
@@ -75,7 +76,7 @@ const TransactionList: React.FC<Props> = ({
       {/* Conditionally show loading indicator or transactions */}
       {hasLoaded && (
         expenses.length > 0 ? (
-          expenses.map((exp) => {
+          expenses.map((exp, id) => {
             const category = getCategory(exp.categoryId);
             const subcategory = getSubcategory(exp.subcategoryId);
             const accountName = getAccountName(exp.accountId)?.accountName || '';
@@ -92,24 +93,33 @@ const TransactionList: React.FC<Props> = ({
               : "";
 
             return (
-              <TransactionItem
-                key={exp.expenseId}
-                isActive={exp.isActive}
-                categoryIcon={subcategory?.subcategoryIcon || category?.categoryIcon || ""}
-                categoryColor={subcategory?.subcategoryColor || category?.categoryColor || ""}
-                categoryName={subcategory?.subcategoryName || categoryDisplayName || "Unknown"}
-                accountName={accountName}
-                expenseNote={exp.expenseNote}
-                expenseId={exp.expenseId}
-                expenseAmount={amount}
-                expenseDate={exp.expenseDate}
-                expenseCurrencyCode={exp.expenseCurrencyCode}
-                tripId={exp.tripId}
-                installmentIndex={exp.installmentIndex}
-                totalInstallments={exp.totalInstallments}
-                owner={exp.owner}
-                {...(exp.seriesId ? { autoLogged: exp.autoLogged } : {})}
-              />
+              <>
+                <TransactionItem
+                  key={exp.expenseId}
+                  isActive={exp.isActive}
+                  categoryIcon={subcategory?.subcategoryIcon || category?.categoryIcon || ""}
+                  categoryColor={subcategory?.subcategoryColor || category?.categoryColor || ""}
+                  categoryName={subcategory?.subcategoryName || categoryDisplayName || "Unknown"}
+                  accountName={accountName}
+                  expenseNote={exp.expenseNote}
+                  expenseId={exp.expenseId}
+                  expenseAmount={amount}
+                  expenseDate={exp.expenseDate}
+                  expenseCurrencyCode={exp.expenseCurrencyCode}
+                  tripId={exp.tripId}
+                  installmentIndex={exp.installmentIndex}
+                  totalInstallments={exp.totalInstallments}
+                  owner={exp.owner}
+                  {...(exp.seriesId ? { autoLogged: exp.autoLogged } : {})}
+                />
+
+                {(id + 1) % 8 === 0 && (
+                  <SmallNativeAd
+                    key={`ad-${exp.expenseId}`}
+                    slotKey={`transaction-after-${exp.expenseId}`}
+                  />
+                )}
+              </>
             );
           })
         ) : (

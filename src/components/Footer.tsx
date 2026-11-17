@@ -28,7 +28,7 @@ const Footer: React.FC<FooterProps> = ({ appPages }) => {
   const { t } = useTranslation();
   
   return (
-    <IonFooter className="footer">
+    <IonFooter className="footer">  
       <IonToolbar>
         <div className="grid-container">  
           {/* <div className="grid-item">Item 1</div> */}

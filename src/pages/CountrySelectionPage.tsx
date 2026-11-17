@@ -258,7 +258,7 @@ const CountrySelectionPage: React.FC = () => {
           expand="block"
           onClick={handleContinue}
           disabled={!selectedCountry}
-          className="continue-btn"
+          className="continue-btn"  
         >
           {t('common.continue')}
         </IonButton>

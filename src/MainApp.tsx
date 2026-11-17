@@ -8,6 +8,7 @@ import { NumericKeypadProvider } from "./context/NumericKeypadContext";
 import { ExpenseProvider } from "./context/ExpenseContext";
 import { IntervalProvider } from "./context/IntervalContext";
 import { TripProvider } from "./context/TripContext";
+import { NativeAdProvider } from "./context/NativeAdProvider";
 
 import Menu from "./components/Menu";
 
@@ -86,6 +87,7 @@ const MainApp: React.FC = () => {
 
   return (
       <UserProvider>
+        <NativeAdProvider>
           <ExchangeRateProvider>
             <DatePickerProvider>
               <NumericKeypadProvider>
@@ -156,6 +158,7 @@ const MainApp: React.FC = () => {
               </NumericKeypadProvider>
             </DatePickerProvider>
           </ExchangeRateProvider>
+        </NativeAdProvider>
       </UserProvider>
   );
 };

@@ -1,0 +1,70 @@
+
+/* Shared native ad container */
+
+.native-ad-wrapper {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  margin: 12px 0;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+/* Sponsored label */
+
+.native-ad-label {
+  display: block;
+  padding: 6px 12px 2px;
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 500;
+  color: #888888;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+/* Medium ad */
+
+.native-ad-medium {
+  width: 100%;
+  min-width: 300px;
+  min-height: 320px;
+  box-sizing: border-box;
+}
+
+.native-ad-medium capacitor-admob-native {
+  display: block;
+  width: 100%;
+  height: 300px;
+}
+
+/* Small ad */
+
+.native-ad-small {
+  width: 100%;
+  min-width: 120px;
+  height: auto;
+  min-height: 0;
+}
+
+.native-ad-small capacitor-admob-native {
+  display: block;
+  width: 100%;
+  height: 120px;
+  min-height: 120px;
+  box-sizing: border-box;
+}
+
+/* Dark theme */
+
+body.dark .native-ad-wrapper,
+body.ion-palette-dark .native-ad-wrapper {
+  background: #1e1e1e;
+}
+
+body.dark .native-ad-label,
+body.ion-palette-dark .native-ad-label {
+  color: #aaaaaa;
+}

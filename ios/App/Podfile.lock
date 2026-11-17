@@ -1,12 +1,17 @@
 PODS:
-  - Capacitor (8.4.1):
+  - Capacitor (8.6.2):
     - CapacitorCordova
   - CapacitorApp (8.1.0):
     - Capacitor
   - CapacitorCamera (8.2.0):
     - Capacitor
     - IONCameraLib (~> 1.0.4)
-  - CapacitorCordova (8.4.1)
+  - CapacitorCommunityAdmob (8.4.0):
+    - Capacitor
+    - Google-Mobile-Ads-SDK (= 13.11.0)
+    - GoogleUserMessagingPlatform (~> 3.1)
+    - WebViewNativeUIEngine (< 2.0, >= 1.0.10)
+  - CapacitorCordova (8.6.2)
   - CapacitorDevice (8.0.2):
     - Capacitor
   - CapacitorFilesystem (8.1.2):
@@ -27,14 +32,19 @@ PODS:
     - Capacitor
   - CapacitorStatusBar (8.0.2):
     - Capacitor
+  - Google-Mobile-Ads-SDK (13.11.0):
+    - GoogleUserMessagingPlatform (>= 1.1)
+  - GoogleUserMessagingPlatform (3.1.0)
   - IONCameraLib (1.0.4)
   - IONFilesystemLib (1.1.2)
   - IONGeolocationLib (2.1.0)
+  - WebViewNativeUIEngine (1.0.10)
 
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
   - "CapacitorApp (from `../../node_modules/@capacitor/app`)"
   - "CapacitorCamera (from `../../node_modules/@capacitor/camera`)"
+  - "CapacitorCommunityAdmob (from `../../node_modules/@capacitor-community/admob`)"
   - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
   - "CapacitorDevice (from `../../node_modules/@capacitor/device`)"
   - "CapacitorFilesystem (from `../../node_modules/@capacitor/filesystem`)"
@@ -45,9 +55,12 @@ DEPENDENCIES:
   - "CapacitorScreenOrientation (from `../../node_modules/@capacitor/screen-orientation`)"
   - "CapacitorShare (from `../../node_modules/@capacitor/share`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
+  - "WebViewNativeUIEngine (from `../../node_modules/@webview-native-ui/engine`)"
 
 SPEC REPOS:
   trunk:
+    - Google-Mobile-Ads-SDK
+    - GoogleUserMessagingPlatform
     - IONCameraLib
     - IONFilesystemLib
     - IONGeolocationLib
@@ -59,6 +72,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/app"
   CapacitorCamera:
     :path: "../../node_modules/@capacitor/camera"
+  CapacitorCommunityAdmob:
+    :path: "../../node_modules/@capacitor-community/admob"
   CapacitorCordova:
     :path: "../../node_modules/@capacitor/ios"
   CapacitorDevice:
@@ -79,12 +94,15 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/share"
   CapacitorStatusBar:
     :path: "../../node_modules/@capacitor/status-bar"
+  WebViewNativeUIEngine:
+    :path: "../../node_modules/@webview-native-ui/engine"
 
 SPEC CHECKSUMS:
-  Capacitor: 35242afe195b1e53c58ca1b827d1b444c5e6602b
+  Capacitor: 0a406b8a50b1ddcfe49fbc5795515918d5294708
   CapacitorApp: 449ffe26375e96f8aaaee625ac6e01e5c57c8650
   CapacitorCamera: 8f6acf83664118321111e76acef86390211ccb08
-  CapacitorCordova: eebe6bcf807b1b06f3f48237650f96bbcd0eef09
+  CapacitorCommunityAdmob: 3dab150291c3e46e85dd0265aa3d0d192661ab8d
+  CapacitorCordova: 8e68a712e47128cf5b97e88b9c2b406b9b956b22
   CapacitorDevice: 14cba6f88d1c3074cbf825fea977c8c526453ff8
   CapacitorFilesystem: 2db285a1ac6e475cc27cae2e1bea999000f9e2be
   CapacitorGeolocation: b36f6287bfc9f2eefa04dc900496f2c8ae666136
@@ -94,10 +112,13 @@ SPEC CHECKSUMS:
   CapacitorScreenOrientation: 6c3c84223ea1dd44aaa7184e2b416dd1192270d0
   CapacitorShare: 0c58305114538568059bfc07111f22dcb9cb2a82
   CapacitorStatusBar: 01d5763b4ed720de5ce2edbc938de6a98f4c8f32
+  Google-Mobile-Ads-SDK: 09d0868abe43b9f851b7b340a245679f0eafc96c
+  GoogleUserMessagingPlatform: befe603da6501006420c206222acd449bba45a9c
   IONCameraLib: f2349804460bd9e3f892e42109b8d996ab3fa19d
   IONFilesystemLib: 21a63377696b2d8fab5632ecfb7d2ac67bddb68a
   IONGeolocationLib: 6a7b6f76063fb1b01cfb14fae7d0f526e3c9b271
+  WebViewNativeUIEngine: 86d71c4633b0eb26c915b2c01f7c1755e8826173
 
-PODFILE CHECKSUM: 92e2558dce8fe6de7fad5cb54789c41d9ab82647
+PODFILE CHECKSUM: 056d8bdf33aaea3984d46f620e085a6a21b957be
 
 COCOAPODS: 1.16.2

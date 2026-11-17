@@ -405,7 +405,6 @@
 
 /* -- General Elements -- */
 
-
 * {
   box-sizing: border-box;
 }
@@ -1255,6 +1254,7 @@ section {
 .custom-alert {
   --background: var(--ion-background-color);
 }
+
 
 ion-button {
   color: white;

@@ -68,7 +68,7 @@ const AccountSlider: React.FC<AccountSliderProps> = ({ editAccount, accounts, on
   return (
     <div 
       className="expense-slider"
-      style={{ marginBottom: accounts.length > 1 ? 40 : 20 }}
+      style={{ marginBottom: accounts.length > 1 ? 40 : 20 }} 
     >  
       <Swiper
         onSwiper={(swiper) => (swiperRef.current = swiper)} // Save swiper instance

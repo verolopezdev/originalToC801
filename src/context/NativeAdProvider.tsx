@@ -213,10 +213,19 @@ export const NativeAdProvider: React.FC<
             style: {
               backgroundColor: '#ffffff',
               cornerRadius: 12,
+            
+              borderColor: '#eeeeee',
+              borderWidth: 0,
+            
               headlineColor: '#202124',
-              bodyColor: '#5f6368',
+              headlineFontSize: 16,
+            
+              bodyColor: '#666666',
+              bodyFontSize: 13,
+            
               callToActionBackgroundColor: '#2563eb',
               callToActionTextColor: '#ffffff',
+              callToActionFontSize: 13,
             },
           });
 

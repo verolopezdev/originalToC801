@@ -1012,6 +1012,15 @@ section {
   margin-bottom: 10px;
 }
 
+.section-header-flex {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+
 .section-title {
   text-transform: uppercase;
   font-weight: 600;
@@ -1022,6 +1031,32 @@ section {
   display: flex;
   align-items: center;   /* ensure text itself is vertically centered if multiline */
 }
+
+.section-title-flex {
+  margin: 0; /* prevent default h6 bottom margin from offsetting vertical alignment */
+  min-width: 0;
+}
+
+.section-link, .section-link ion-icon {
+  display: flex;
+  align-items: flex-start;
+  background: none;
+  border: none;
+  padding: 6px 0; /* keeps touch target comfortable without shifting right alignment */
+  margin: 0;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ion-color-medium, #2b8cff); 
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.section-link:active {
+  opacity: 0.6;
+}
+
 
 .info-icon {
   font-size: 18px;

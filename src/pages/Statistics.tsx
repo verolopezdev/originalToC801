@@ -387,7 +387,7 @@ const statistics: React.FC = () => {
               {/* Period title, info and date range */}
               <div>
                 <div className="flex">
-                  <h6 className='section-title'>{chartTitle}</h6> 
+                  <h6 className='section-title section-title-flex'>{chartTitle}</h6> 
                   <IonIcon 
                     icon={informationCircleOutline} 
                     className="info-icon"

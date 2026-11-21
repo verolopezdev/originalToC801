@@ -7,7 +7,7 @@
   box-sizing: border-box;
   position: relative;
   overflow: hidden;
-  margin: 12px 0;
+  margin: 0 0 20px 0;
   border-radius: 12px;
   background: #ffffff;
 }
@@ -16,14 +16,15 @@
 
 .native-ad-label {
   display: block;
-  padding: 6px 12px 2px;
+  padding: 5px 12px 4px;
   font-size: 10px;
-  line-height: 14px;
+  line-height: 13px;
   font-weight: 500;
   color: #888888;
   text-transform: uppercase;
   letter-spacing: 0.6px;
 }
+
 
 /* Medium ad */
 
@@ -42,11 +43,14 @@
 
 /* Small ad */
 
+/* Small ad */
+
 .native-ad-small {
   width: 100%;
   min-width: 120px;
   height: auto;
   min-height: 0;
+  border-radius: 12px;
 }
 
 .native-ad-small capacitor-admob-native {
@@ -55,16 +59,18 @@
   height: 120px;
   min-height: 120px;
   box-sizing: border-box;
+  border-radius: 12px;
 }
+
 
 /* Dark theme */
 
 body.dark .native-ad-wrapper,
 body.ion-palette-dark .native-ad-wrapper {
-  background: #1e1e1e;
+  background: var(--ion-background-color);
 }
 
 body.dark .native-ad-label,
 body.ion-palette-dark .native-ad-label {
-  color: #aaaaaa;
+  color: var(--ion-color-medium);
 }

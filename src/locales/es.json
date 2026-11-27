@@ -479,7 +479,11 @@
     "choose_plan": "Elige un plan"
   },
   "premium": {
-    "type_email": "Escribe aquí el correo electrónico del invitado"
+    "type_email": "Escribe aquí el correo electrónico del invitado",
+    "premium_feature": "FUNCIÓN PREMIUM",
+    "unlock_premium": "Desbloquear Premium",
+    "travel_mode_description": "Cambia automáticamente de moneda cuando viajas y mantén tus gastos organizados en la moneda de tu destino.",
+    "alternative_currencies_description": "Desbloqueá Premium para agregar monedas alternativas y administrar múltiples monedas en tu registro de gastos."
   },
   "profile": {
     "profile_title": "Perfil",

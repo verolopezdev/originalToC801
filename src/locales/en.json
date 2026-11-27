@@ -483,7 +483,11 @@
     "choose_plan": "Choose a plan"
   },
   "premium": {
-    "type_email": "Type guest email here"
+    "type_email": "Type guest email here",
+    "premium_feature": "PREMIUM FEATURE",
+    "unlock_premium": "Unlock Premium",
+    "travel_mode_description": "Automatically switch currencies when traveling and keep your expenses organized in your destination currency.",
+    "alternative_currencies_description": "Unlock Premium to add alternative currencies and manage multiple currencies in your expense tracker."
   },
   "profile": {
     "profile_title": "Profile",

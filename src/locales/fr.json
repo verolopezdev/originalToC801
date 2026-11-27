@@ -480,7 +480,11 @@
 
   },
   "premium": {
-    "type_email": "Saisissez ici l’adresse e-mail de l’invité"
+    "type_email": "Saisissez ici l’adresse e-mail de l’invité",
+    "premium_feature": "FONCTIONNALITÉ PREMIUM",
+    "unlock_premium": "Débloquer Premium",
+    "travel_mode_description": "Changez automatiquement de devise lorsque vous voyagez et gardez vos dépenses organisées dans la devise de votre destination.",
+    "alternative_currencies_description": "Débloquez Premium pour ajouter des devises alternatives et gérer plusieurs devises dans votre application de suivi des dépenses."
   },
   "profile": {
     "profile_title": "Profil",

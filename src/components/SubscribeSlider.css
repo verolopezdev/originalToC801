@@ -1,0 +1,180 @@
+.subscribe-slider {
+  margin-left: -16px; /* Negative margin cancels out the padding */
+  margin-right: -16px;
+  width: calc(100% + 32px); /* Ensures full width after removing padding */
+}
+
+/* Override Swiper pagination bullet styling for dark theme */
+.subscribe-slider .swiper-pagination {
+  bottom: 0px; 
+}
+
+.subscribe-slider .swiper-pagination-bullet {
+  background-color: #999; /* Default dot color */
+  opacity: 1;
+}
+
+.subscribe-slider .swiper-pagination-bullet-active {
+  background: var(--ion-color-primary);
+  width: 16px;
+  border-radius: 4px;
+  transition: width 0.25s ease;
+
+}
+
+/* Ensure Swiper wrapper gives room for pagination dots */
+.subscribe-slider .swiper {
+  padding-bottom: 0px;
+}
+
+/* Card Container */
+.subscribe-card {
+  /* Mix with opaque white so light and dark modes render identically */
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--card-accent) 100%, #ffffff) 0%,
+    color-mix(in srgb, var(--card-accent) 60%, #ffffff) 100%
+  );
+
+  /* Lock text colors so dark mode doesn't turn text white on a light card */
+  color: #1c1c1e;
+
+  border-radius: 22px;
+  padding: 20px 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.18s ease;
+}
+
+.subscribe-card:active {
+  transform: scale(0.985);
+}
+
+.subscribe-card-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+/* Left Typography Section */
+.subscribe-text-section {
+  flex: 1;
+  min-width: 0; /* Enables proper text truncation inside flex containers */
+}
+
+.subscribe-title {
+  color: #f4f5f8;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin: 0 0 8px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subscribe-desc {
+  color: #f4f5f8;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Right Concentric Glow & Cloud Graphic */
+.subscribe-graphic-section {
+  position: relative;
+  width: 92px;
+  height: 92px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.subscribe-glow-ring {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.ring-outer {
+  width: 92px;
+  height: 92px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.07) 75%,
+    rgba(255, 255, 255, 0.20) 100%
+  );
+}
+
+.ring-inner {
+  width: 68px;
+  height: 68px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.09) 10%,
+    rgba(255, 255, 255, 0.10) 100%
+  );
+}
+
+.subscribe-badge {
+  position: relative;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(180deg, #f3f7fd 0%, #d4e1f5 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.35),
+    inset 0 2px 3px rgba(255, 255, 255, 0.9);
+}
+
+.subscribe-badge-icon {
+  color: var(--card-accent, #3880ff);
+  font-size: 26px;
+  filter: drop-shadow(0 2px 4px rgba(56, 128, 255, 0.35));
+}
+
+.section-header-premium-features {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.section-header .section-title .section-title-premium-features {
+  margin: 0; /* prevent default h6 bottom margin from offsetting vertical alignment */
+  min-width: 0;
+}
+
+.section-link, .section-link ion-icon {
+  display: flex;
+  align-items: flex-start;
+  background: none;
+  border: none;
+  padding: 6px 0; /* keeps touch target comfortable without shifting right alignment */
+  margin: 0;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ion-color-medium, #2b8cff); 
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.section-link:active {
+  opacity: 0.6;
+}

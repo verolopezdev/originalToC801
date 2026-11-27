@@ -24,6 +24,7 @@ import DashboardMainCard from '../components/DashboardMainCard';
 import DashboardMainTrip from '../components/DashboardMainTrip';
 import TransactionList from '../components/TransactionList';
 import Footer from '../components/Footer';
+import { SubscribeSlider } from '../components/SubscribeSlider';
 
 
 // Ionic components
@@ -212,6 +213,10 @@ const Dashboard: React.FC = () => {
     router.push('/app/profile');  
   };
 
+  const handleCardClick = (item: any) => {
+    console.log('Clicked card:', item.title);
+  };
+
   
   return (
     <IonPage>
@@ -291,6 +296,7 @@ const Dashboard: React.FC = () => {
               totalSpent={tripTotal ?? 0} // if tripTotal is null or undefined, use 0 instead to avoid flicker (shows icon for a split second)
             />
           )}
+
         
           <section>
             <div className='mb-20'>
@@ -306,7 +312,13 @@ const Dashboard: React.FC = () => {
               />
             )}
           </section>
+
+          {!user?.isPremium && (
+            <SubscribeSlider />
+          )}
         </div>
+
+        
       </IonContent>
       <Footer appPages={translatedMenuItems} />
     </IonPage>

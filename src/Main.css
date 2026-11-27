@@ -1013,6 +1013,13 @@ section {
   margin-bottom: 10px;
 }
 
+.section-header-flex {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
 .section-title {
   text-transform: uppercase;
   font-weight: 600;

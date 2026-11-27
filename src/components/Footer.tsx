@@ -1,3 +1,4 @@
+
 import { useTranslation } from 'react-i18next';
 
 // Ionic components
@@ -12,7 +13,7 @@ import {
 } from '@ionic/react';
 
 // Styles
-import '../Main.css'; 
+import '../Main.css';
 import './Footer.css';
 
 interface FooterProps {
@@ -21,70 +22,68 @@ interface FooterProps {
     icon: string;
     title: string;
   }>;
+  disableAddButton?: boolean;
 }
 
-
-const Footer: React.FC<FooterProps> = ({ appPages }) => {   
+const Footer: React.FC<FooterProps> = ({
+  appPages,
+  disableAddButton = false
+}) => {
   const { t } = useTranslation();
-  
+
   return (
     <IonFooter className="footer">
       <IonToolbar>
-        <div className="grid-container">  
-          {/* <div className="grid-item">Item 1</div> */}
+        <div className="grid-container">
+
           {appPages.map((appPage, index) => {
-            // Check if the current element is the third one (index 2)
+
+            // Central Add button
             if (index === 2) {
               return (
-                <IonRouterLink 
-                  key={index}
-                  routerLink={appPage.url} 
-                  routerDirection="forward"
-                  style={{ textDecoration: 'none' }} /* Optional: remove underline styling */
-                >
-                  <div 
-                    key={index}
-                  >
-                    <IonFab horizontal="center">
-                      <IonFabButton>
-                        <IonIcon icon={appPage.icon} />
-                      </IonFabButton>
-                    </IonFab>
-                  </div>
-                </IonRouterLink>
+                <div key={appPage.url}>
+                  <IonFab horizontal="center">
+                    <IonFabButton
+                      disabled={disableAddButton}
+                      routerLink={disableAddButton ? undefined : appPage.url}
+                    >
+                      <IonIcon icon={appPage.icon} />
+                    </IonFabButton>
+                  </IonFab>
+                </div>
               );
             }
 
-            // Render a regular IonItem for other elements
+            // Regular navigation buttons
             return (
-              <IonRouterLink 
-                key={index}
-                routerLink={appPage.url} 
+              <IonRouterLink
+                key={appPage.url}
+                routerLink={appPage.url}
                 routerDirection="forward"
-                className={`${location.pathname === appPage.url ? 'selected-item' : ''}`}
-                style={{ textDecoration: 'none' }} /* Optional: remove underline styling */
+                className={
+                  location.pathname === appPage.url
+                    ? 'selected-item'
+                    : ''
+                }
+                style={{ textDecoration: 'none' }}
               >
-                <div 
-                  className="icon-text"
-                  key={index}
-                >
+                <div className="icon-text">
                   <IonIcon aria-hidden="true" icon={appPage.icon} />
                   <span>{appPage.title}</span>
                 </div>
               </IonRouterLink>
             );
           })}
-            
-          <div 
-            className="icon-text"
-            key={5}
-          >
-            <IonMenuButton                     
-              menu="appMenu" // this links to your custom menu
-              autoHide={false} // optional, prevents it from hiding automatically
-            /> 
-            <span className='menu-name'>{t('common.menu')}</span> 
+
+          {/* Menu button */}
+          <div className="icon-text">
+            <IonMenuButton
+              menu="appMenu"
+              autoHide={false}
+            />
+            <span className="menu-name">{t('common.menu')}</span>
           </div>
+
         </div>
       </IonToolbar>
     </IonFooter>

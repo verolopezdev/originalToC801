@@ -253,7 +253,7 @@ const CountrySelectionPage: React.FC = () => {
         </div>
       </IonContent>
 
-      <div className="fixed-footer-button">
+      <div className="fixed-footer-button"> 
         <IonButton
           expand="block"
           onClick={handleContinue}

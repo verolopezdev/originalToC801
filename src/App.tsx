@@ -38,7 +38,9 @@ ScreenOrientation.lock({
   orientation: "portrait",
 });
 
-setupIonicReact();
+setupIonicReact({
+  rippleEffect: false,
+});
 
 const App: React.FC = () => {
   

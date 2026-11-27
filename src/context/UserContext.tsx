@@ -233,14 +233,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     resetUser,
   }), [user, categorylessId, updateUser, resetUser]);
 
-  if (!user || categorylessId === undefined) {
+/*   if (!user || categorylessId === undefined) {
     return (
       <div style={{ padding: 50, color: "white" }}>
         Loading user context...
       </div>
     );
   }
-
+ */
   return (
     <UserContext.Provider value={contextValue}>
       {children}
